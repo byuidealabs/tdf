@@ -1,20 +1,22 @@
 extends auth
 
 block auth
-  form.signin.form-horizontal(action="/users/session", method="post")
+  h2 Sign In
+  form.signin.form-horizontal(action="/users/session", method="post", role="form")
     p.error= message
-    .control-group
-      label.control-label(for='email') Email
-      .controls
-        input#email(type='text', name="email", placeholder='Email')
+    .form-group
+      label.control-label.col-lg-2(for='email') Email
+      .col-lg-3
+        input.form-control#email(type='text', name="email", placeholder='Email')
 
-    .control-group
-      label.control-label(for='password') Password
-      .controls
-        input#password(type='password', name="password", placeholder='Password')
+    .form-group
+      label.control-label.col-lg-2(for='password') Password
+      .col-lg-3
+        input.form-control#password(type='password', name="password", placeholder='Password')
 
-    .form-actions
-      button.btn.btn-primary(type='submit') Sign in
-      &nbsp;
-      | or&nbsp;
-      a.show-signup(href="/signup") Sign up
+    .form-group
+      .col-lg-offset-2.col-lg-3
+        button.btn.btn-primary(type='submit') Sign in
+        &nbsp;
+        | or&nbsp;
+        a.show-signup(href="/signup") Sign up
