@@ -1,0 +1,7 @@
+<section data-ng-controller="UsersController" data-ng-init="find()">
+    <ul class="users">
+        <li data-ng-repeat="user in users">
+            <a href="#!/users/{{user.id}}">{{user.username}}</a>
+        </li>
+    </ul>
+</section>
