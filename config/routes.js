@@ -80,7 +80,7 @@ module.exports = function(app, passport, auth) {
     //  Articles
     //=========================================================================
 
-    //Article Routes
+    // Article Routes
     var articles = require('../app/controllers/articles');
     app.get('/articles', articles.all);
     app.post('/articles', auth.requiresLogin, articles.create);
@@ -90,8 +90,23 @@ module.exports = function(app, passport, auth) {
     app.del('/articles/:articleId', auth.requiresLogin, 
             auth.article.hasAuthorization, articles.destroy);
 
-    //Finish with setting up the articleId param
+    // Finish with setting up the articleId param
     app.param('articleId', articles.article);
+
+    //=========================================================================
+    //  Leagues
+    //=========================================================================
+
+    // League Routes
+    var leagues = require('../app/controllers/leagues');
+    app.get('/leagues', leagues.all);
+    app.post('/leagues', auth.requiresLogin, leagues.create);
+    app.get('/leagues/:leagueId', leagues.show);
+    app.put('/leagues/:leagueId', auth.requiresLogin, leagues.update);
+    app.del('/leagues/:leagueId', auth.requiresLogin, leagues.destroy);
+
+    // Finish with setting up the leagueId param
+    app.param('leagueId', leagues.league);
 
     //=========================================================================
     //  Home
