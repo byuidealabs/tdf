@@ -1,7 +1,12 @@
 var async = require('async');
 
 module.exports = function(app, passport, auth) {
-    //User Routes
+
+    //=========================================================================
+    //  Users
+    //=========================================================================
+
+    // User Routes
     var users = require('../app/controllers/users');
     app.get('/signin', users.signin);
     app.get('/signup', users.signup);
@@ -15,8 +20,17 @@ module.exports = function(app, passport, auth) {
         failureFlash: 'Invalid email or password.'
     }), users.session);
 
+    // Public User Routes
+    app.get('/users', users.all)
     app.get('/users/me', users.me);
+    app.get('/users/profile', users.profile, auth.requiresLogin)
     app.get('/users/:userId', users.show);
+    app.put('/users/:userId', users.update, auth.requiresLogin, 
+            auth.user.hasAuthorization);
+
+    //=========================================================================
+    //  Auth
+    //=========================================================================
 
     //Setting the facebook oauth routes
     app.get('/auth/facebook', passport.authenticate('facebook', {
@@ -62,16 +76,26 @@ module.exports = function(app, passport, auth) {
     //Finish with setting up the userId param
     app.param('userId', users.user);
 
+    //=========================================================================
+    //  Articles
+    //=========================================================================
+
     //Article Routes
     var articles = require('../app/controllers/articles');
     app.get('/articles', articles.all);
     app.post('/articles', auth.requiresLogin, articles.create);
     app.get('/articles/:articleId', articles.show);
-    app.put('/articles/:articleId', auth.requiresLogin, auth.article.hasAuthorization, articles.update);
-    app.del('/articles/:articleId', auth.requiresLogin, auth.article.hasAuthorization, articles.destroy);
+    app.put('/articles/:articleId', auth.requiresLogin, 
+            auth.article.hasAuthorization, articles.update);
+    app.del('/articles/:articleId', auth.requiresLogin, 
+            auth.article.hasAuthorization, articles.destroy);
 
     //Finish with setting up the articleId param
     app.param('articleId', articles.article);
+
+    //=========================================================================
+    //  Home
+    //=========================================================================
 
     //Home route
     var index = require('../app/controllers/index');

@@ -1,7 +1,7 @@
 {
-    "db": "mongodb://localhost/mean-dev",
+    "db": "mongodb://localhost/tdf-dev",
     "app": {
-        "name": "MEAN - A Modern Stack - Development"
+        "name": "TDF - Development"
     },
     "facebook": {
         "clientID": "APP_ID",

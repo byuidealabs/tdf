@@ -2,7 +2,8 @@
  * Module dependencies.
  */
 var mongoose = require('mongoose'),
-    User = mongoose.model('User');
+    User = mongoose.model('User'),
+    _ = require('underscore');
 
 /**
  * Auth callback
@@ -71,12 +72,7 @@ exports.create = function(req, res) {
  *  Show profile
  */
 exports.show = function(req, res) {
-    var user = req.profile;
-
-    res.render('users/show', {
-        title: user.name,
-        user: user
-    });
+    res.jsonp(public_profile(req.user));
 };
 
 /**
@@ -84,6 +80,10 @@ exports.show = function(req, res) {
  */
 exports.me = function(req, res) {
     res.jsonp(req.user || null);
+};
+
+exports.profile = function(req, res) {
+    res.jsonp(req.user);
 };
 
 /**
@@ -101,3 +101,43 @@ exports.user = function(req, res, next, id) {
             next();
         });
 };
+
+/**
+ * List of Users
+ */
+exports.all = function(req, res) {
+    User.find().exec(function(err, users) {
+        if (err) {
+            res.render('error', {
+                status: 500
+            });
+        }
+        else {
+            res.jsonp(public_profiles(users));
+        }
+    });
+};
+
+/**
+ * Updates the user's profile
+ */
+exports.update = function(req, res) {
+    var user = req.user;
+
+    user = _.extend(user, req.body);
+
+    user.save(function(err) {
+        res.jsonp(user);
+    });
+};
+
+function public_profiles(users) {
+    return _.map(users, public_profile);
+}
+
+function public_profile(user) {
+    return {
+        id : user.id,
+        username : user.username
+    };
+}

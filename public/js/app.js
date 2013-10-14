@@ -1,4 +1,7 @@
-window.app = angular.module('mean', ['ngCookies', 'ngResource', 'ui.bootstrap', 'ui.route', 'mean.system', 'mean.articles']);
+window.app = angular.module('tdf', ['ngCookies', 'ngResource', 'ui.bootstrap', 
+                            'ui.route', 'tdf.system', 'tdf.articles',
+                            'tdf.users']);
 
-angular.module('mean.system', []);
-angular.module('mean.articles', []);
+angular.module('tdf.system', []);
+angular.module('tdf.articles', []);
+angular.module('tdf.users', []);
