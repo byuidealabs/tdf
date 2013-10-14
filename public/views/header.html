@@ -1,9 +1,10 @@
 <div class="navbar-inner" data-ng-controller="HeaderController">
     <ul class="nav">
         <li>
-            <a class="brand" href="/">MEAN - A Modern Stack</a>
+            <a class="brand" href="/">Tour de Finance</a>
         </li>
-        <li data-ng-repeat="item in menu" data-ng-show="global.user" ui-route="/{{item.link}}" ng-class="{active: $uiRoute}">
+        <li data-ng-repeat="item in menu" data-ng-show="global.user"
+                ui-route="/{{item.link}}" ng-class="{active: $uiRoute}">
             <a href="#!/{{item.link}}">{{item.title}}</a>
         </li>
     </ul>
@@ -20,8 +21,8 @@
 				{{global.user.name}} <b class="caret"></b>
 			</a>
             <ul class="dropdown-menu">
-                <li><a href="/signout">Signout</a>
-                </li>
+                <li><a href="/signout">Signout</a></li>
+                <li><a href="/#!/users/profile">Edit Profile</a></li>
             </ul>
         </li>
     </ul>
