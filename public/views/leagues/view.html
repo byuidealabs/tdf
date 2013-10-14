@@ -1,0 +1,9 @@
+<section data-ng-controller='LeaguesController' data-ng-init='findOne()'>
+    <span>{{league.created | date:'medium'}}</span>
+    <h2>
+        {{league.name}}
+        <a class='btn' href='/#!/leagues/{{league._id}}/edit'>Edit</a>
+        <a class='btn' ng-click='remove(league)'>Delete</a>
+    </h2>
+    <a class='btn' href='/#!/leagues/'>Back to Leagues List</a>
+</section>

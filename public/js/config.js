@@ -2,6 +2,9 @@
 window.app.config(['$routeProvider',
     function($routeProvider) {
         $routeProvider.
+
+        // Articles
+        
         when('/articles', {
             templateUrl: 'views/articles/list.html'
         }).
@@ -14,6 +17,9 @@ window.app.config(['$routeProvider',
         when('/articles/:articleId', {
             templateUrl: 'views/articles/view.html'
         }).
+
+        // Users
+
         when('/users', {
             templateUrl: 'views/users/list.html'
         }).
@@ -23,6 +29,23 @@ window.app.config(['$routeProvider',
         when('/users/:userId', {
             templateUrl: 'views/users/view.html'
         }).
+
+        // Leagues
+        
+        when('/leagues', {
+            templateUrl: 'views/leagues/list.html'
+        }).
+        when('/leagues/create', {
+            templateUrl: 'views/leagues/create.html'
+        }).
+        when('/leagues/:leagueId/edit', {
+            templateUrl: 'views/leagues/edit.html'
+        }).
+        when('/leagues/:leagueId', {
+            templateUrl: 'views/leagues/view.html'
+        }).
+        
+        // Index & default
 
         when('/', {
             templateUrl: 'views/index.html'

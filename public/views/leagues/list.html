@@ -1,0 +1,14 @@
+<section data-ng-controller="LeaguesController" data-ng-init="find()">
+    <ul class="leagues unstyled">
+        <li data-ng-repeat="league in leagues">
+            <span>{{league.created | date:'medium'}}</span> 
+            <h2><a data-ng-href="#!/leagues/{{league._id}}">{{league.name}}</a></h2>
+        </li>
+    </ul>
+    <h1 data-ng-hide="!leagues || leagues.length">
+        No leagues yet. <br> 
+        <a href="/#!/leagues/create">Create One Now.</a>
+    </h1>
+    <a class='btn' href='/#!/leagues/create' 
+       data-ng-show='!leagues || leagues.length'>Add a New League</a>
+</section>
