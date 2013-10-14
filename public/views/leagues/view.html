@@ -2,8 +2,10 @@
     <span>{{league.created | date:'medium'}}</span>
     <h2>
         {{league.name}}
-        <a class='btn' href='/#!/leagues/{{league._id}}/edit'>Edit</a>
-        <a class='btn' ng-click='remove(league)'>Delete</a>
+        <a class='btn' href='/#!/leagues/{{league._id}}/edit' 
+            data-ng-show='global.user.isAdmin'>Edit</a>
+        <a class='btn' data-ng-click='remove(league)'
+            data-ng-show='global.user.isAdmin'>Delete</a>
     </h2>
     <a class='btn' href='/#!/leagues/'>Back to Leagues List</a>
 </section>

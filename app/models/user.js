@@ -16,6 +16,10 @@ var UserSchema = new Schema({
     email: String,
     username: String,
     provider: String,
+    isAdmin: {
+        type: Boolean,
+        default: false
+    },
     hashed_password: String,
     salt: String,
     facebook: {},

@@ -5,10 +5,13 @@
             <h2><a data-ng-href="#!/leagues/{{league._id}}">{{league.name}}</a></h2>
         </li>
     </ul>
-    <h1 data-ng-hide="!leagues || leagues.length">
+    <h1 data-ng-show="!(!leagues || leagues.length)">
         No leagues yet. <br> 
-        <a href="/#!/leagues/create">Create One Now.</a>
+        <a href="/#!/leagues/create" data-ng-show='global.user.isAdmin'>
+            Create One Now.
+        </a>
     </h1>
     <a class='btn' href='/#!/leagues/create' 
-       data-ng-show='!leagues || leagues.length'>Add a New League</a>
+        data-ng-show='(!leagues || leagues.length) && global.user.isAdmin'>
+        Add a New League</a>
 </section>

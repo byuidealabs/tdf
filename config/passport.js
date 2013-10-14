@@ -5,7 +5,9 @@ var mongoose = require('mongoose'),
     GitHubStrategy = require('passport-github').Strategy,
     GoogleStrategy = require('passport-google-oauth').Strategy,
     User = mongoose.model('User'),
-    config = require('./config');
+    config = require('./config'),
+    _ = require('underscore'),
+    admins = require('./admins.json');
 
 
 module.exports = function(passport) {
@@ -15,11 +17,20 @@ module.exports = function(passport) {
     });
 
     passport.deserializeUser(function(id, done) {
+        //User.findOne({
+        //    _id: id
+        //}, function(err, user) {
+        //    done(err, user);
+        //});
         User.findOne({
             _id: id
-        }, function(err, user) {
-            done(err, user);
-        });
+        }).exec(
+            function(err, user) {
+                if (_.contains(admins, user.username)) {
+                    user.isAdmin = true;
+                }
+                done(err, user);
+            });
     });
 
     //Use local strategy

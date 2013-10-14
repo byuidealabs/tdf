@@ -100,10 +100,13 @@ module.exports = function(app, passport, auth) {
     // League Routes
     var leagues = require('../app/controllers/leagues');
     app.get('/leagues', leagues.all);
-    app.post('/leagues', auth.requiresLogin, leagues.create);
+    app.post('/leagues', auth.requiresLogin, auth.requiresAdmin, 
+             leagues.create);
     app.get('/leagues/:leagueId', leagues.show);
-    app.put('/leagues/:leagueId', auth.requiresLogin, leagues.update);
-    app.del('/leagues/:leagueId', auth.requiresLogin, leagues.destroy);
+    app.put('/leagues/:leagueId', auth.requiresLogin, auth.requiresAdmin,
+            leagues.update);
+    app.del('/leagues/:leagueId', auth.requiresLogin, auth.requiresAdmin,
+            leagues.destroy);
 
     // Finish with setting up the leagueId param
     app.param('leagueId', leagues.league);
