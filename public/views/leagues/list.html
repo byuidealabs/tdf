@@ -10,12 +10,12 @@
                 "league-list-btns": true,
                 "btn-group": global.user.isAdmin}'>
                 <a class='btn btn-primary'
-                    href='/#!/leagues/{{league.id}}'>
+                    href='/#!/leagues/{{league._id}}'>
                     View League
                 </a>
                 <a class='btn btn-default'
                     ng-show='global.user.isAdmin'
-                    href='/#!/users/profile'>
+                    href='/#!/leagues/{{league._id}}/edit'>
                     Edit
                 </a>
             </div>

@@ -1,20 +1,68 @@
-<section data-ng-controller='LeaguesController' data-ng-init='findOne()'>
-    <h2>Edit League</h2>
-    <form class='form-horizontal' data-ng-submit='update()'>
+<section ng-controller='LeaguesController' ng-init='findOne()'>
+    <h1>Edit League</h1>
+    <form class='form-horizontal' ng-submit='update()'>
         <div class='form-group'>
-            <label class='control-label col-lg-2' for='name'>
+            <label class='control-label col-lg-4' for='name'>
                 League Name
             </label>
-            <div class='col-lg-3'>
+            <div class='col-lg-6'>
                 <input type='text' class='form-control'
-                    data-ng-model='league.name' id='name' 
-                    placeholder='Name' required>
+                    ng-model='league.name' id='name' placeholder='Name' 
+                    required>
             </div>
         </div>
+
         <div class='form-group'>
-            <div class='col-lg-offset-2 col-lg-3'>
+            <label class='control-label col-lg-4' for='isOpenLeague'>
+                Security
+            </label>
+            <div class='col-lg-3'>
+                <select class='form-control' id='isOpenLeague'
+                    ng-model='league.isOpenLeague'
+                    ng-options='o.value as o.label 
+                        for o in options.isOpenLeague'>
+                </select>
+            </div>
+        </div>
+
+        <div class='form-group'>
+            <label class='control-label col-lg-4' for='maxAgents'>
+                Maximum Allowed Agents
+            </label>
+            <div class='col-lg-2'>
+                <input type='number' class='form-control'
+                    ng-model='league.maxAgents' id='maxAgents' required>
+            </div>
+        </div>
+
+        <div class='form-group'>
+            <label class='control-label col-lg-4' for='maxrUserAgents'>
+                Maximum Allowed Agents per User
+            </label>
+            <div class='col-lg-2'>
+                <input type='number' class='form-control'
+                    ng-model='league.maxrUserAgents' id='maxrUserAgents'
+                    required>
+            </div>
+        </div>
+
+        <div class='form-group'>
+            <label class='control-label col-lg-4' for='principalAgentRequired'>
+                Eligible Agents
+            </label>
+            <div class='col-lg-4'>
+                <select class='form-control' id='principalAgentRequired'
+                    ng-model='league.principalAgentRequired'
+                    ng-options='o.value as o.label
+                        for o in options.eligibleAgents'>
+                </select>
+            </div>
+        </div>
+
+        <div class='form-group'>
+            <div class='col-lg-offset-4 col-lg-6'>
                 <input type='submit' class='btn btn-primary'>
             </div>
         </div>
-    </form>
+     </form>
 </section>
