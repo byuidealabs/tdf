@@ -19,11 +19,14 @@ angular.module('tdf.leagues').controller('LeaguesController',
             // TODO decide how to handle agents in deleted leagues
             league.$remove();
 
-            /*for (var i in $scope.leagues) {
-                if ($scope.leagues[i] == league) {
-                    $scope.leagues.splice(i, 1);
+            if ($scope.leagues) {
+                // Needed if called from list.html
+                for (var i in $scope.leagues) {
+                    if ($scope.leagues[i] == league) {
+                        $scope.leagues.splice(i, 1);
+                    }
                 }
-            }*/ // Needed if called from list.html
+            }
 
             $location.path('leagues/');
         };
@@ -52,6 +55,8 @@ angular.module('tdf.leagues').controller('LeaguesController',
             },
             function(league) {
                 $scope.league = league;
+                $scope.league.test = [1, 2, 3];
             });
         };
+
     }]);

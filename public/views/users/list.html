@@ -1,8 +1,8 @@
-<section data-ng-controller="UsersController" data-ng-init="find()">
+<section ng-controller="UsersController" ng-init="find()">
 
     <h1>Registered Users</h1>
 
-    <div class='panel panel-default' data-ng-repeat='user in users'>
+    <div class='panel panel-default' ng-repeat='user in users'>
         <div class='panel-body'>
             <h3 class='pull-left user-list-name'>{{user.username}}</h3>
 
@@ -14,7 +14,7 @@
                     View Profile 
                 </a>
                 <a class='btn btn-default' 
-                    data-ng-show='user.id == global.user._id'
+                    ng-show='user.id == global.user._id'
                     href='/#!/users/profile'>
                     Edit
                 </a>

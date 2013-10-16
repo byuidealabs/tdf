@@ -1,17 +1,30 @@
-<section data-ng-controller="LeaguesController" data-ng-init="find()">
-    <ul class="leagues unstyled">
-        <li data-ng-repeat="league in leagues">
-            <span>{{league.created | date:'medium'}}</span> 
-            <h2><a data-ng-href="#!/leagues/{{league._id}}">{{league.name}}</a></h2>
-        </li>
-    </ul>
-    <h1 data-ng-show="!(!leagues || leagues.length)">
-        No leagues yet. <br> 
-        <a href="/#!/leagues/create" data-ng-show='global.user.isAdmin'>
-            Create One Now.
-        </a>
-    </h1>
-    <a class='btn' href='/#!/leagues/create' 
-        data-ng-show='(!leagues || leagues.length) && global.user.isAdmin'>
-        Add a New League</a>
+<section ng-controller="LeaguesController" ng-init="find()">
+
+    <h1>Existing Leagues</h1>
+
+    <div class='panel panel-default' ng-repeat='league in leagues'>
+        <div class='panel-body'>
+            <h3 class='pull-left league-list-name'>{{league.name}}</h3>
+
+            <div ng-class='{"pull-right": true,
+                "league-list-btns": true,
+                "btn-group": global.user.isAdmin}'>
+                <a class='btn btn-primary'
+                    href='/#!/leagues/{{league.id}}'>
+                    View League
+                </a>
+                <a class='btn btn-default'
+                    ng-show='global.user.isAdmin'
+                    href='/#!/users/profile'>
+                    Edit
+                </a>
+            </div>
+        </div> 
+    </div>
+
+
+    <a class='btn btn-primary' href='/#!/leagues/create'
+        data-ng-show='global.user.isAdmin'>
+        Add a New League
+    </a>
 </section>

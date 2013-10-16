@@ -1,15 +1,19 @@
-<section data-ng-controller="LeaguesController">
-    <form class="form-horizontal" data-ng-submit="create()">
-        <div class="control-group">
-            <label class="control-label" for="name">League Name</label>
-            <div class="controls">
-                <input type="text" data-ng-model="name" id="name" 
-                           placeholder="Name" required>
+<section data-ng-controller='LeaguesController'>
+    <h2>Create a League</h2>
+    <form class='form-horizontal' data-ng-submit='create()'>
+        <div class='form-group'>
+            <label class='control-label col-lg-2' for='name'>
+                League Name
+            </label>
+            <div class='col-lg-3'>
+                <input type='text' class='form-control'
+                    data-ng-model='name' id='name' 
+                    placeholder='Name' required>
             </div>
         </div>
-        <div class="control-group">
-            <div class="controls">
-                <input type="submit" class="btn">
+        <div class='form-group'>
+            <div class='col-lg-offset-2 col-lg-3'>
+                <input type='submit' class='btn btn-primary'>
             </div>
         </div>
     </form>
