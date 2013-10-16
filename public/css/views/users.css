@@ -1,0 +1,9 @@
+.user-list-btns {
+    position:relative;
+    top:12px;
+}
+
+.user-list-name {
+    position:relative;
+    top:-4px;    
+}
