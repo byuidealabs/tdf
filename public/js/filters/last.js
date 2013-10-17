@@ -4,5 +4,5 @@ angular.module('tdf').filter('last',
     function(_) {
         return function(input) {
             return _.last(input);
-        }
+        };
     }]);

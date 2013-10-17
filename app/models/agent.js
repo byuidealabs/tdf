@@ -5,47 +5,51 @@ var mongoose = require('mongoose'),
     config = require('../../config/config'),
     Schema = mongoose.Schema;
 
-
 /**
- * Article Schema
+ * Agent Schema
  */
-var ArticleSchema = new Schema({
+var AgentSchema = new Schema({
     created: {
         type: Date,
         default: Date.now
     },
-    title: {
+    name: {
         type: String,
         default: '',
         trim: true
     },
-    content: {
+    description: {
         type: String,
         default: '',
         trim: true
     },
+    // API Key
+    // Historical portfolio compositions
+    // Historical portfolio values
     user: {
         type: Schema.ObjectId,
         ref: 'User'
+    },
+    league: {
+        type: Schema.ObjectId,
+        ref: 'League'
     }
 });
 
 /**
  * Validations
  */
-ArticleSchema.path('title').validate(function(title) {
-    return title.length;
-}, 'Title cannot be blank');
+AgentSchema.path('name').validate(function(name) {
+    return name.length;
+}, 'Name cannot be blank');
 
 /**
  * Statics
  */
-ArticleSchema.statics = {
+AgentSchema.statics = {
     load: function(id, cb) {
         this.findOne({
             _id: id
-        }).populate('user', 'name username').exec(cb);
+        }).populate('user', 'username').populate('name').exec(cb);
     }
 };
-
-mongoose.model('Article', ArticleSchema);

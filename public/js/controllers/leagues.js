@@ -25,7 +25,7 @@ angular.module('tdf.leagues').controller('LeaguesController',
                 maxAgents: 100,
                 maxrUserAgents: 100,
                 principalAgentRequired: false
-            }
+            };
         };
 
         $scope.create = function() {
