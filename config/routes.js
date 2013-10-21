@@ -1,5 +1,3 @@
-var async = require('async');
-
 module.exports = function(app, passport, auth) {
 
     //=========================================================================
@@ -21,11 +19,11 @@ module.exports = function(app, passport, auth) {
     }), users.session);
 
     // Public User Routes
-    app.get('/users', users.all)
+    app.get('/users', users.all);
     app.get('/users/me', users.me);
-    app.get('/users/profile', users.profile, auth.requiresLogin)
+    app.get('/users/profile', users.profile, auth.requiresLogin);
     app.get('/users/:userId', users.show);
-    app.put('/users/:userId', users.update, auth.requiresLogin, 
+    app.put('/users/:userId', users.update, auth.requiresLogin,
             auth.user.hasAuthorization);
 
     //=========================================================================
@@ -85,9 +83,9 @@ module.exports = function(app, passport, auth) {
     app.get('/articles', articles.all);
     app.post('/articles', auth.requiresLogin, articles.create);
     app.get('/articles/:articleId', articles.show);
-    app.put('/articles/:articleId', auth.requiresLogin, 
+    app.put('/articles/:articleId', auth.requiresLogin,
             auth.article.hasAuthorization, articles.update);
-    app.del('/articles/:articleId', auth.requiresLogin, 
+    app.del('/articles/:articleId', auth.requiresLogin,
             auth.article.hasAuthorization, articles.destroy);
 
     // Finish with setting up the articleId param
@@ -100,7 +98,7 @@ module.exports = function(app, passport, auth) {
     // League Routes
     var leagues = require('../app/controllers/leagues');
     app.get('/leagues', leagues.all);
-    app.post('/leagues', auth.requiresLogin, auth.requiresAdmin, 
+    app.post('/leagues', auth.requiresLogin, auth.requiresAdmin,
              leagues.create);
     app.get('/leagues/:leagueId', leagues.show);
     app.put('/leagues/:leagueId', auth.requiresLogin, auth.requiresAdmin,
@@ -110,6 +108,22 @@ module.exports = function(app, passport, auth) {
 
     // Finish with setting up the leagueId param
     app.param('leagueId', leagues.league);
+
+    //=========================================================================
+    //  Agents
+    //=========================================================================
+
+    // Agent Routes
+    var agents = require('../app/controllers/agents');
+    app.get('/agents', agents.all);
+    app.post('/agents', auth.requiresLogin, agents.create);
+    app.get('/agents/:agentId', agents.show);
+    app.put('/agents/:agentId', auth.requiresLogin, agents.update);
+    app.del('/agents/:agentId', auth.requiresLogin, agents.destroy);
+
+    // Finish with setting up the leagueId param
+    app.param('agentId', agents.agent);
+
 
     //=========================================================================
     //  Home

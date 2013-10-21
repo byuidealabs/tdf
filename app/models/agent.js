@@ -2,7 +2,6 @@
  * Module dependencies.
  */
 var mongoose = require('mongoose'),
-    config = require('../../config/config'),
     Schema = mongoose.Schema;
 
 /**
@@ -53,3 +52,5 @@ AgentSchema.statics = {
         }).populate('user', 'username').populate('name').exec(cb);
     }
 };
+
+mongoose.model('Agent', AgentSchema);
