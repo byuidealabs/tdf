@@ -4,7 +4,7 @@ window.app.config(['$routeProvider',
         $routeProvider.
 
         // Articles
-        
+
         when('/articles', {
             templateUrl: 'views/articles/list.html'
         }).
@@ -31,7 +31,7 @@ window.app.config(['$routeProvider',
         }).
 
         // Leagues
-        
+
         when('/leagues', {
             templateUrl: 'views/leagues/list.html'
         }).
@@ -44,7 +44,22 @@ window.app.config(['$routeProvider',
         when('/leagues/:leagueId', {
             templateUrl: 'views/leagues/view.html'
         }).
-        
+
+        // Agents
+
+        when('/agents', {
+            templateUrl: 'views/agents/list.html'
+        }).
+        when('/agents/create', {
+            templateUrl: 'views/agents/create.html'
+        }).
+        when('/agents/:agentId/edit', {
+            templateUrl: 'views/agents/edit.html'
+        }).
+        when('/agents/:agentId', {
+            templateUrl: 'views/agents/view.html'
+        }).
+
         // Index & default
 
         when('/', {
@@ -59,6 +74,6 @@ window.app.config(['$routeProvider',
 //Setting HTML5 Location Mode
 window.app.config(['$locationProvider',
     function($locationProvider) {
-        $locationProvider.hashPrefix("!");
+        $locationProvider.hashPrefix('!');
     }
 ]);
