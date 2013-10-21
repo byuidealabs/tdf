@@ -1,0 +1,13 @@
+<section ng-controller='TestMetricsController'>
+    <h2>Test 1</h2>
+
+    <p>Testing with metric '{{test1.metric}}' and values {{test1.values}}</p>
+    <br />
+    <p>Score = {{testScore(test1.values, test1.metric)}}<p>
+    <p>Expected Score = {{test1.expected_score}}<p>
+    <br />
+    <p>Moving Score = {{testMovingScore(test1.values, test1.metric)}}</p>
+    <p>Expected Moving Score = {{test1.expected_moving}}</p>
+
+
+</section>
