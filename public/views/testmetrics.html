@@ -1,5 +1,19 @@
 <section ng-controller='TestMetricsController'>
-    <h2>Test 1</h2>
+
+    <div ng-repeat='test in tests'>
+        <h2>Test {{$index + 1}}</h2>
+
+        <p>Testing with metric '{{test.metric}}' and values {{test.values}}</p>
+        <br />
+
+        <p>Score = {{testScore(test.values, test.metric)}}</p>
+        <p>Expected Score = {{test.expected_score}}</p>
+        <br />
+
+        <p>Moving Score = {{testMovingScore(test.values, test.metric)}}</p>
+        <p>Expected Moving Score = {{test.expected_moving}}</p>
+    </div>
+    <!--<h2>Test 1</h2>
 
     <p>Testing with metric '{{test1.metric}}' and values {{test1.values}}</p>
     <br />
@@ -7,7 +21,7 @@
     <p>Expected Score = {{test1.expected_score}}<p>
     <br />
     <p>Moving Score = {{testMovingScore(test1.values, test1.metric)}}</p>
-    <p>Expected Moving Score = {{test1.expected_moving}}</p>
+    <p>Expected Moving Score = {{test1.expected_moving}}</p>-->
 
 
 </section>
