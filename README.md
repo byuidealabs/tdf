@@ -48,13 +48,17 @@ Navigate to the tdf directory and execute the following commands:
 	sudo npm install
 	npm install
 	
+If you get a git error 128, you may need to switch the url protocol to https:// (instead of git://). To do this:
+
+	git config --global url."https://".insteadOf git://
+	
 ### Step 5: Run the Grunt Server
 
 In the tdf directory, start the grunt server by:
 
 	grunt
 	
-If everything is installed properly, you will get a message stating that the server is running at localhost:3000. Navigate to [localhost:3000](http://localhost:3000) to access TDF.
+If everything is installed properly, you will get a message stating that the server is running on port 3000. Navigate to [localhost:3000](http://localhost:3000) to access TDF.
 
 # MEAN Stack
 
