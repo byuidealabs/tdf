@@ -1,3 +1,61 @@
+# TDF - Tour de Finance
+
+A paper-trading system for use in studying controls applied to finance.
+
+## Installation
+
+### Step 1: Install node.js
+
+Follow the instructions [here](https://github.com/joyent/node/wiki/Installing-Node.js-via-package-manager). For Ubuntu (recommended):
+
+	sudo apt-get update
+	sudo apt-get install python-software-properties python g++ make
+	sudo add-apt-repository ppa:chris-lea/node.js
+	sudo apt-get update
+	sudo apt-get install nodejs
+	
+### Step 2: Install Grunt and Bower
+
+Install both grunt, the grunt client, and bower globally by:
+
+	sudo npm install -g grunt grunt-cli bower
+
+### Step 3: Install and start MongoDB
+
+Follow the instructions [here](http://docs.mongodb.org/manual/tutorial/install-mongodb-on-ubuntu/). In brief:
+
+	sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 7F0CEB10
+	echo 'deb http://downloads-distro.mongodb.org/repo/ubuntu-upstart dist 10gen' | sudo tee /etc/apt/sources.list.d/mongodb.list
+	sudo apt-get update
+	sudo apt-get install mongodb-10gen
+	
+Once MongoDB is installed, start it by:
+
+	sudo service mongodb start
+	
+You can stop MongoDB by:
+
+	sudo service mongodb stop
+	
+You can also restart MongoDB by:
+
+	sudo service mongodb restart
+	
+### Step 4: Install Project Dependencies
+	
+Navigate to the tdf directory and execute the following commands:
+
+	sudo npm install
+	npm install
+	
+### Step 5: Run the Grunt Server
+
+In the tdf directory, start the grunt server by:
+
+	grunt
+	
+If everything is installed properly, you will get a message stating that the server is running at localhost:3000. Navigate to [localhost:3000](http://localhost:3000) to access TDF.
+
 # MEAN Stack
 
 MEAN is a boilerplate that provides a nice starting point for [MongoDB](http://www.mongodb.org/), [Node.js](http://www.nodejs.org/), [Express](http://expressjs.com/), and [AngularJS](http://angularjs.org/) based applications. It is designed to give you quick and organized way to start developing of MEAN based web apps with useful modules like mongoose and passport pre-bundled and configured. We mainly try to take care of the connection points between existing popular frameworks and solve common integration problems.  
