@@ -7,16 +7,20 @@
             <h3 class='pull-left agent-list-name'>{{agent.name}}</h3>
 
             <div ng-class='{"pull-right": true,
-                "league-list-btns": true,
+                "agent-list-btns": true,
                 "btn-group": true}'>
                 <a class='btn btn-primary'
                     href='/#!/agents/{{agent._id}}'>
-                    View League
+                    View Agent
                 </a>
                 <a class='btn btn-default'
                     ng-show='true'
                     href='/#!/agents/{{agent._id}}/edit'>
                     Edit
+                </a>
+                <a class='btn btn-default'
+                    ng-click='remove(agent)'>
+                    Delete
                 </a>
             </div>
         </div>

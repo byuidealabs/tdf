@@ -29,10 +29,10 @@ var AgentSchema = new Schema({
         type: Schema.ObjectId,
         ref: 'User'
     },
-    league: {
+    /*league: {
         type: Schema.ObjectId,
         ref: 'League'
-    }
+    }*/
 });
 
 /**
@@ -49,7 +49,7 @@ AgentSchema.statics = {
     load: function(id, cb) {
         this.findOne({
             _id: id
-        }).populate('user', 'username').populate('name').exec(cb);
+        }).populate('user', 'username').exec(cb);
     }
 };
 

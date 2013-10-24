@@ -1,5 +1,13 @@
-<section data-ng-controller='AgentsController' data-ng-init='findOne()'>
-    <h1>{{agent.name}}</a>
+<section ng-controller='AgentsController' ng-init='findOne()'>
+    <h1>{{agent.name}}</h1>
 
-    {{agent}}
+    <a class='btn btn-primary' href='/#!/agents/'>Back to Agents List</a>
+    <div class='btn-group'>
+        <a class='btn btn-default' href='/#!/agents/{{agent._id}}/edit'>
+            Edit Agent
+        </a>
+        <a class='btn btn-default' ng-click='remove(agent)'>
+            Delete Agent
+        </a>
+    </div>
 </section>

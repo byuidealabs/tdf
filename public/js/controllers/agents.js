@@ -3,8 +3,14 @@ angular.module('tdf.agents').controller('AgentsController',
     function ($scope, $routeParams, $location, Global, Agents) {
         $scope.global = Global;
 
+        $scope.getDefault = function() {
+            $scope.agent = {
+                name: ''
+            };
+        };
+
         $scope.create = function() {
-            var agent = new Agents();
+            var agent = new Agents($scope.agent);
             agent.$save(function(/*response*/) {
                 $location.path('agents/' + agent._id);
             });
@@ -18,6 +24,8 @@ angular.module('tdf.agents').controller('AgentsController',
                     $scope.agents.splice(i, 1);
                 }
             }
+
+            $location.path('agents/');
         };
 
         $scope.update = function() {

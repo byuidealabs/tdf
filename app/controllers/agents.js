@@ -11,8 +11,12 @@ var mongoose = require('mongoose'),
  */
 exports.agent = function(req, res, next, id) {
     Agent.load(id, function(err, agent) {
-        if (err) return next(err);
-        if (!agent) return next(new Agent('Failed to load agent ' + id));
+        if (err) {
+            return next(err);
+        }
+        if (!agent) {
+            return next(new Agent('Failed to load agent ' + id));
+        }
         req.agent = agent;
         next();
     });
@@ -21,27 +25,29 @@ exports.agent = function(req, res, next, id) {
 /**
  * Create an agent
  */
-exports.create = function(req, res, next) {
+exports.create = function(req, res) {
+    console.log('\n\n' + JSON.stringify(req.body) + '\n\n');
+    console.log(JSON.stringify(req.user));
     var agent = new Agent(req.body);
     agent.user = req.user;
-    League.load(req.body.leagueid, function(err, league) {
+
+    /*League.load(req.body.leagueid, function(err, league) {
         if (err) return next(err);
-        if (!league) return next(new Agent('Failed to load league ' +
+        if (!agent) return next(new Agent('Failed to load league ' +
                                             req.body.leagueid +
                                             ' for new agent.'));
         agent.league = league;
-    });
-    
-    agent.save(function(err){
+    });*/
+
+    agent.save(function(err) {
         if (err) {
             return res.send('users/signup', {
                 errors: err.errors,
                 agent: agent
             });
         }
-        else {
-            res.jsonp(agent);
-        }
+        console.log('\n\n' + JSON.stringify(agent) + '\n\n');
+        res.jsonp(agent);
     });
 };
 
