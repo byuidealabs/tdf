@@ -1,12 +1,16 @@
 angular.module('tdf.agents').controller('AgentsController',
-    ['$scope', '$routeParams', '$location', 'Global', 'Agents',
-    function ($scope, $routeParams, $location, Global, Agents) {
+    ['$scope', '$routeParams', '$location', 'Global', 'Agents', 'Leagues',
+    function ($scope, $routeParams, $location, Global, Agents, Leagues) {
         $scope.global = Global;
 
         $scope.getDefault = function() {
             $scope.agent = {
                 name: ''
             };
+
+            Leagues.query(function(leagues) {
+                $scope.leagues = leagues;
+            });
         };
 
         $scope.create = function() {

@@ -26,8 +26,6 @@ exports.agent = function(req, res, next, id) {
  * Create an agent
  */
 exports.create = function(req, res) {
-    console.log('\n\n' + JSON.stringify(req.body) + '\n\n');
-    console.log(JSON.stringify(req.user));
     var agent = new Agent(req.body);
     agent.user = req.user;
 
