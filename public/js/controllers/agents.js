@@ -99,4 +99,17 @@ angular.module('tdf.agents').controller('AgentsController',
                 }
             });
         };
+
+        $scope.resetTrades = function() {
+            reset = confirm('Are you sure that you want to reset the trades' +
+                            ' on this agent?');
+            if (reset) {
+                Trades.remove({
+                    agentId: $routeParams.agentId
+                }, function(agent) {
+                    $scope.agent = agent;
+                    $scope.message = false;
+                });
+            }
+        };
     }]);

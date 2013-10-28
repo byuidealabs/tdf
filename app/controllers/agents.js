@@ -205,7 +205,7 @@ exports.trade = function(req, res) {
         console.log(agent.cash);
         console.log(agent.portfolio);
 
-        agent.save(function (err) {
+        agent.save(function (/*err*/) {
             res.jsonp(agent);
         });
     }
@@ -219,4 +219,15 @@ exports.trade = function(req, res) {
             error: err
         });
     }
+};
+
+exports.reset = function(req, res) {
+    var agent = req.agent;
+
+    agent.cash = 100000; // TODO grab from league for default starting cash
+    agent.portfolio = [];
+
+    agent.save(function (/*err*/){
+        res.jsonp(agent);
+    });
 };
