@@ -131,7 +131,7 @@ var get_security_price = function(symbol, method) {
 exports.trade = function(req, res) {
     var agent = req.agent;
     var trade = req.body.trade;
-    var last_portfolio = _.last(req.agent);
+    var last_portfolio = _.last(req.agent.portfolio);
     var curr_composition;
 
     if (last_portfolio === undefined) {
@@ -151,7 +151,27 @@ exports.trade = function(req, res) {
         _.each(trade.sell, function(security) {
             var price = get_security_price(security.s, 'sell');
             var profit = price * security.q;
+
+            //agent.cash += profit;
+
+            if (curr_composition[security.s] === undefined) {
+                // TODO remove when short-selling is allowed
+                throw 'Cannot sell a security that you do not own.';
+            }
+
             agent.cash += profit;
+            curr_composition[security.s] -= security.q;
+
+            if (curr_composition[security.s] < 0) {
+                // TODO modify to own negative quantities of security if
+                // short-selling is allowed
+                throw 'Cannot sell more of a security than you currently own.';
+            }
+
+            if (curr_composition[security.s] === 0) {
+                delete curr_composition[security.s];
+            }
+
         });
 
         //---------
@@ -164,12 +184,12 @@ exports.trade = function(req, res) {
             var curr_quantity = curr_composition[security.s] || 0;
 
             agent.cash -= cost;
+            curr_composition[security.s] = curr_quantity + security.q;
 
             if (agent.cash < 0) {
+                // TODO tie into league to allow potential leverage
                 throw 'Not enough cash to purchase desired securities.';
             }
-
-            curr_composition[security.s] = curr_quantity + security.q;
         });
 
         //----------------------
@@ -178,13 +198,16 @@ exports.trade = function(req, res) {
 
         agent.portfolio.push({composition: curr_composition});
 
+        // Uncomment to reset
+        //agent.cash = 100000;
+        //agent.portfolio = [];
+
         console.log(agent.cash);
         console.log(agent.portfolio);
 
-        //-------------------------------------------------
-        // Return current status of agent if all successful
-        //-------------------------------------------------
-        res.jsonp(agent);
+        agent.save(function (err) {
+            res.jsonp(agent);
+        });
     }
     catch (err) {
 

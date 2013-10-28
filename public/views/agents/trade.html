@@ -3,12 +3,12 @@
 
     <h1>Trade</h1>
 
-    <!--<p>{{agent}}</p>
-    <p>{{trade}}</p>-->
+    <!--<p>{{agent}}</p>-->
+    <!--<p>{{trade}}</p>-->
 
     <div class='panel panel-info'>
         <div class='panel-heading'>Current Cash</div>
-        <div class='panel-body'>{{agent.cash | currency}}</div>
+        <div class='panel-body'><h2>{{agent.cash | currency}}</h2></div>
     </div>
     <div class='panel panel-primary'>
         <div class='panel-heading'>Trade</div>
@@ -100,7 +100,7 @@
         <div class='panel-heading'>Historical Portfolio Compositions</div>
         <div class='panel-body'>
             <div class='panel panel-success'
-                ng-repeat='trade in agent.portfolio'>
+                ng-repeat='trade in agent.portfolio | orderBy:"-timestamp"'>
                 <div class='panel-heading'>
                     {{trade.timestamp | date:'medium'}}
                 </div>
