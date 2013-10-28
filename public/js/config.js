@@ -56,6 +56,9 @@ window.app.config(['$routeProvider',
         when('/agents/:agentId/edit', {
             templateUrl: 'views/agents/edit.html'
         }).
+        when('/agents/:agentId/trade', {
+            templateUrl: 'views/agents/trade.html'
+        }).
         when('/agents/:agentId', {
             templateUrl: 'views/agents/view.html'
         }).
