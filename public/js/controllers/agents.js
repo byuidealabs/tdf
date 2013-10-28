@@ -1,8 +1,8 @@
 angular.module('tdf.agents').controller('AgentsController',
     ['$scope', '$routeParams', '$location', 'Global', 'Agents', 'Leagues',
-     'Trades',
+     'Trades', '_',
     function ($scope, $routeParams, $location, Global, Agents, Leagues,
-              Trades) {
+              Trades, _) {
         $scope.global = Global;
 
         $scope.getDefault = function() {
@@ -80,8 +80,23 @@ angular.module('tdf.agents').controller('AgentsController',
             Trades.update({
                 agentId: $routeParams.agentId,
                 trade: $scope.trade
-            }, function(agent) {
-                $scope.agent = agent;
+            }, function(res) {
+                if (_.contains(_.keys(res), 'error')) {
+                    $scope.message = {
+                        type: 'danger',
+                        heading: 'Trade Failed',
+                        body: res.error
+                    };
+                }
+                else {
+                    $scope.agent = res;
+                    $scope.getDefaultTrade();
+                    $scope.message = {
+                        type: 'success',
+                        heading: 'Trade Succeeded',
+                        body: 'All trades were successfully executed.'
+                    };
+                }
             });
         };
     }]);

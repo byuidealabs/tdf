@@ -3,8 +3,9 @@
 
     <h1>Trade</h1>
 
-    <p>{{agent}}</p>
-    <p>{{trade}}</p>
+    <!--<p>{{agent}}</p>
+    <p>{{trade}}</p>-->
+
     <div class='panel panel-info'>
         <div class='panel-heading'>Current Cash</div>
         <div class='panel-body'>{{agent.cash | currency}}</div>
@@ -12,6 +13,12 @@
     <div class='panel panel-primary'>
         <div class='panel-heading'>Trade</div>
         <div class='panel-body'>
+            <div ng-show='message'
+                class='panel panel-{{message.type}}'>
+                <div class='panel-heading'>{{message.heading}}</div>
+                <div class='panel-body'>{{message.body}}</div>
+            </div>
+
             <form class='form-horizontal' ng-submit='executeTrade()'>
                 <div class='form-group'>
                     <h3 class='col-lg-offset-1'>Buy</h3>
