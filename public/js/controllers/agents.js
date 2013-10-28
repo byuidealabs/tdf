@@ -53,4 +53,24 @@ angular.module('tdf.agents').controller('AgentsController',
                 $scope.agent = agent;
             });
         };
+
+        $scope.getDefaultTrade = function() {
+            $scope.trade = {
+                buy: [],
+                sell: []
+            };
+        };
+
+        $scope.addTrade = function(action) {
+            newTrade = {
+                s: '',
+                q: 0
+            };
+            if (action == 'buy') {
+                $scope.trade.buy.push(newTrade);
+            }
+            if (action == 'sell') {
+                $scope.trade.sell.push(newTrade);
+            }
+        };
     }]);
