@@ -1,6 +1,8 @@
 angular.module('tdf.agents').controller('AgentsController',
     ['$scope', '$routeParams', '$location', 'Global', 'Agents', 'Leagues',
-    function ($scope, $routeParams, $location, Global, Agents, Leagues) {
+     'Trades',
+    function ($scope, $routeParams, $location, Global, Agents, Leagues,
+              Trades) {
         $scope.global = Global;
 
         $scope.getDefault = function() {
@@ -72,5 +74,14 @@ angular.module('tdf.agents').controller('AgentsController',
             if (action == 'sell') {
                 $scope.trade.sell.push(newTrade);
             }
+        };
+
+        $scope.executeTrade = function() {
+            Trades.update({
+                agentId: $routeParams.agentId,
+                trade: $scope.trade
+            }, function(agent) {
+                $scope.agent = agent;
+            });
         };
     }]);

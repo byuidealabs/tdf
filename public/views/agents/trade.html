@@ -9,21 +9,10 @@
         <div class='panel-heading'>Current Cash</div>
         <div class='panel-body'>{{agent.cash | currency}}</div>
     </div>
-    <div class='panel panel-info'>
-        <div class='panel-heading'>Current Portfolio</div>
-        <div class='panel-body'>
-            <ul>
-                <li ng-repeat='security in portfolio'>{{security}}</li>
-            </ul>
-            <div ng-show='agent.portfolio.length == 0'>
-                Nothing in Portfolio
-            </div>
-        </div>
-    </div>
     <div class='panel panel-primary'>
         <div class='panel-heading'>Trade</div>
         <div class='panel-body'>
-            <form class='form-horizontal' ng-submit='trade()'>
+            <form class='form-horizontal' ng-submit='executeTrade()'>
                 <div class='form-group'>
                     <h3 class='col-lg-offset-1'>Buy</h3>
                 </div>
@@ -97,6 +86,25 @@
                     </div>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <div class='panel panel-info'>
+        <div class='panel-heading'>Historical Portfolio Compositions</div>
+        <div class='panel-body'>
+            <div class='panel panel-success'
+                ng-repeat='trade in agent.portfolio'>
+                <div class='panel-heading'>
+                    {{trade.timestamp | date:'medium'}}
+                </div>
+                <div class='panel-body'>
+                    <ul>
+                        <li ng-repeat='(symbol, quantity) in trade.composition'>
+                            <b>{{symbol}}:</b> {{quantity}} shares
+                        </li>
+                    </ul>
+                </div>
+            </div>
         </div>
     </div>
 </section>

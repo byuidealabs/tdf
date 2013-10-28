@@ -18,11 +18,8 @@ var AgentSchema = new Schema({
     league: {type: Schema.ObjectId, ref: 'League'},
     cash: {type: Number, default: 100000},
     portfolio: [{
-        time: {type: Date, default: Date.now},
-        securities: [{
-            symbol: String,
-            quantity: Number
-        }]
+        timestamp: {type: Date, default: Date.now},
+        composition: {}
     }]
 });
 

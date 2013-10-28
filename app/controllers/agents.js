@@ -104,3 +104,67 @@ exports.all = function(req, res) {
         }
     });
 };
+
+//=============================================================================
+//  Trading System
+//=============================================================================
+
+// TODO: tie into Yahoo finance and move out of controller
+var get_security_price = function(symbol, method) {
+    if (symbol === 'notasymbol') {
+        // To test non-existent symbols, TODO replace
+        return false;
+    }
+    if (method === 'sell') {
+        return 110;
+    }
+    if (method === 'buy') {
+        return 100;
+    }
+};
+
+/**
+ * Allow a trade to be made
+ */
+exports.trade = function(req, res) {
+    var agent = req.agent;
+    var trade = req.body.trade;
+    var last_portfolio = _.last(req.agent);
+    var curr_composition;
+
+    //console.log('Trade = ' + JSON.stringify(trade));
+
+    if (last_portfolio === undefined) {
+        curr_composition = {};
+    }
+    else {
+        curr_composition = _.clone(last_portfolio.composition);
+    }
+
+    // Sell first...
+    _.each(trade.sell, function(security) {
+        var price = get_security_price(security.s, 'sell');
+        var profit = price * security.q;
+        agent.cash += profit;
+    });
+
+    // Then buy
+    _.each(trade.buy, function(security) {
+        var price = get_security_price(security.s, 'buy');
+        var cost = price * security.q;
+        var curr_quantity = curr_composition[security.s] || 0;
+
+        agent.cash -= cost;
+        curr_composition[security.s] = curr_quantity + security.q;
+    });
+
+    agent.portfolio.push({composition: curr_composition});
+
+    console.log(agent.cash);
+    console.log(agent.portfolio);
+
+    res.jsonp(agent);
+};
+
+
+
