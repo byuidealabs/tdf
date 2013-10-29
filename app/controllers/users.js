@@ -3,6 +3,7 @@
  */
 var mongoose = require('mongoose'),
     User = mongoose.model('User'),
+    Agent = mongoose.model('Agent'),
     _ = require('underscore');
 
 /**
@@ -72,7 +73,14 @@ exports.create = function(req, res) {
  *  Show profile
  */
 exports.show = function(req, res) {
-    res.jsonp(public_profile(req.user));
+    var profile = public_profile(req.profile);
+    Agent.find({user: profile.id}, 'name description league cash')
+         .populate('league', 'name')
+         .exec(function(err, agents) {
+                profile.agents = agents;
+                console.log(JSON.stringify(profile));
+                res.jsonp(profile);
+         });
 };
 
 /**
@@ -136,8 +144,6 @@ function public_profiles(users) {
 }
 
 function public_profile(user) {
-    return {
-        id : user.id,
-        username : user.username
-    };
+    profile = _.pick(user, 'id', 'username');
+    return profile;
 }
