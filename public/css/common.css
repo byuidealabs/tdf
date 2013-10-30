@@ -23,3 +23,11 @@ footer {
 footer p {
     padding:5px 0 12px 10px
 }
+
+.modal {
+    /*To fix display of modals in bootstrap 3*/
+    display: block;
+    width: 40%;
+    overflow: visible;
+    margin: 0 auto;
+}

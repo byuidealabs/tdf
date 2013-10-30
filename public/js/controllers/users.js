@@ -1,8 +1,8 @@
 angular.module('tdf.users').controller('UsersController',
-    ['$scope', '$routeParams', '$location', 'Global', 'Utilities', 'Users',
-     'Agents',
-    function ($scope, $routeParams, $location, Global, Utilities, Users,
-              Agents) {
+    ['$scope', '$routeParams', '$location', '$modal', 'Global', 'Utilities',
+     'Users', 'Agents',
+    function ($scope, $routeParams, $location, $modal, Global, Utilities,
+              Users, Agents) {
         $scope.global = Global;
 
         $scope.find = function(query) {
@@ -34,16 +34,31 @@ angular.module('tdf.users').controller('UsersController',
         };
 
         $scope.removeAgent = function(agent) {
-            var del = confirm('Are you sure you wish to delete this agent ' +
-                              'and all of its data? (this action cannot ' +
-                              'be undone)');
-            if (del) {
+            var modalInstance = $modal.open({
+                templateUrl: 'views/confirmModal.html',
+                controller: function($scope, $modalInstance) {
+                    $scope.heading = 'Confirm Agent Deletion';
+                    $scope.message = 'Are you sure you wish to delete this ' +
+                                     'agent and all of its data? (this ' +
+                                     'action cannot be undone)';
+
+                    $scope.confirm = function() {
+                        $modalInstance.close('confirmed');
+                    };
+
+                    $scope.cancel = function() {
+                        $modalInstance.dismiss('cancel');
+                    };
+                }
+            });
+
+            modalInstance.result.then(function () {
                 Agents.remove({
                     agentId: agent._id
                 }, function() {
                     Utilities.spliceByProperty($scope.user.agents, '_id',
                                                agent._id);
                 });
-            }
+            });
         };
     }]);

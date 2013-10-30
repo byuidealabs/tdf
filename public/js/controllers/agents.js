@@ -1,8 +1,8 @@
 angular.module('tdf.agents').controller('AgentsController',
-    ['$scope', '$routeParams', '$location', 'Global', 'Utilities', 'Agents',
-     'Leagues', 'Trades', '_',
-    function ($scope, $routeParams, $location, Global, Utilities, Agents,
-              Leagues, Trades, _) {
+    ['$scope', '$routeParams', '$location', '$modal', 'Global', 'Utilities',
+     'Agents', 'Leagues', 'Trades', '_',
+    function ($scope, $routeParams, $location, $modal, Global, Utilities,
+              Agents, Leagues, Trades, _) {
         $scope.global = Global;
 
         $scope.getDefault = function() {
@@ -59,14 +59,14 @@ angular.module('tdf.agents').controller('AgentsController',
         };
 
         $scope.addTrade = function(action) {
-            newTrade = {
+            var newTrade = {
                 s: '',
                 q: 0
             };
-            if (action == 'buy') {
+            if (action === 'buy') {
                 $scope.trade.buy.push(newTrade);
             }
-            if (action == 'sell') {
+            if (action === 'sell') {
                 $scope.trade.sell.push(newTrade);
             }
         };
@@ -96,7 +96,7 @@ angular.module('tdf.agents').controller('AgentsController',
         };
 
         $scope.resetTrades = function() {
-            reset = confirm('Are you sure that you want to reset the trades' +
+            /*reset = confirm('Are you sure that you want to reset the trades' +
                             ' on this agent?');
             if (reset) {
                 Trades.remove({
@@ -105,6 +105,32 @@ angular.module('tdf.agents').controller('AgentsController',
                     $scope.agent = agent;
                     $scope.message = false;
                 });
-            }
+            }*/
+            var modalInstance = $modal.open({
+                templateUrl: 'views/confirmModal.html',
+                controller: function($scope, $modalInstance) {
+                    $scope.heading = 'Confirm Trade Reset';
+                    $scope.message = 'Are you sure that you want to reset ' +
+                                     'the trades made by this agent? ' +
+                                     '(this action cannot be undone)';
+
+                    $scope.confirm = function() {
+                        $modalInstance.close('confirmed');
+                    };
+
+                    $scope.cancel = function() {
+                        $modalInstance.dismiss('cancel');
+                    };
+                }
+            });
+
+            modalInstance.result.then(function() {
+                Trades.remove({
+                    agentId: $routeParams.agentId
+                }, function(agent) {
+                    $scope.agent = agent;
+                    $scope.message = false;
+                });
+            });
         };
     }]);

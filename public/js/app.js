@@ -1,5 +1,5 @@
-window.app = angular.module('tdf', ['ngCookies', 'ngResource', 'ui.bootstrap',
-                            'ui.route', 'underscore', 'tdf.utilities',
+window.app = angular.module('tdf', ['ngCookies', 'ngResource', 'ngRoute',
+                            'ui.bootstrap', 'underscore', 'tdf.utilities',
                             'tdf.system', 'tdf.articles', 'tdf.users',
                             'tdf.leagues', 'tdf.agents']);
 
