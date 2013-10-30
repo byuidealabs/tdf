@@ -18,7 +18,8 @@ angular.module('tdf.agents').controller('AgentsController',
         $scope.create = function() {
             var agent = new Agents($scope.agent);
             agent.$save(function(/*response*/) {
-                $location.path('agents/' + agent._id);
+                //$location.path('agents/' + agent._id);
+                $location.path('users/profile');
             });
         };
 

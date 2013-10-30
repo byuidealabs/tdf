@@ -6,21 +6,21 @@
         <div class='panel-body'>
             <h3 class='pull-left user-list-name'>{{user.username}}</h3>
 
-            <div ng-class="{'pull-right': true, 
-                'user-list-btns': true, 
+            <div ng-class="{'pull-right': true,
+                'user-list-btns': true,
                 'btn-group': (user.id == global.user._id)}">
-                <a class='btn btn-primary' 
+                <a class='btn btn-primary'
                     href='/#!/users/{{user.id}}'>
-                    View Profile 
+                    View Profile
                 </a>
-                <a class='btn btn-default' 
+                <a class='btn btn-default'
                     ng-show='user.id == global.user._id'
                     href='/#!/users/profile'>
                     Edit
                 </a>
             </div>
 
-            
+
         </div>
     </div>
 

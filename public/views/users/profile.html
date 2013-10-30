@@ -7,8 +7,8 @@
                 Full Name
             </label>
             <div class='col-lg-3'>
-                <input type='text' class='form-control' 
-                    data-ng-model='user.name' id='name' 
+                <input type='text' class='form-control'
+                    data-ng-model='user.name' id='name'
                     placeholder='Full Name' required>
             </div>
         </div>
@@ -27,7 +27,7 @@
                 Email
             </label>
             <div class='col-lg-3'>
-                <input type='text' class='form-control' 
+                <input type='text' class='form-control'
                     data-ng-model='user.email' id='email'
                     placeholder='email' required>
             </div>
@@ -36,6 +36,54 @@
             <div class='col-lg-offset-2 col-lg-3'>
                 <input type='submit' class='btn btn-primary'>
             </div>
-        <div>
+        </div>
     </form>
+
+    <div class='panel panel-info'>
+        <div class='panel-heading'>
+            Owned Agents
+
+            <a class='btn btn-default pull-right' href='/#!/agents/create'>
+                Create a New Agent
+            </a>
+
+            <div class='clearfix'></div>
+        </div>
+        <div class='panel-body'>
+            <div class='panel panel-primary' ng-repeat='agent in user.agents'>
+                <div class='panel-heading'>
+                    <b>{{agent.name}}</b>
+
+                    <div class='btn-group pull-right'>
+                        <a class='btn btn-default'
+                            href='/#!/agents/{{agent._id}}'>
+                            View
+                        </a>
+                        <a class='btn btn-default'
+                            href='/#!/agents/{{agent._id}}/edit'>
+                            Edit
+                        </a>
+                        <a class='btn btn-danger'
+                            ng-click='removeAgent(agent)'>
+                            Delete
+                        </a>
+                    </div>
+
+                    <a class='btn btn-warning btn-user-agent-trade pull-right'
+                        href='/#!/agents/{{agent._id}}/trade'>
+                        Trade
+                    </a>
+
+                    <div class='clearfix'></div>
+                </div>
+                <div class='panel-body'>
+                    <ul>
+                        <li><b>Description: </b>{{agent.description}}</li>
+                        <li><b>League: </b>{{agent.league.name}}</li>
+                        <li><b>Cash: </b>{{agent.cash | currency}}</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
 </section>

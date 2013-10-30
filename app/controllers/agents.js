@@ -3,7 +3,6 @@
  */
 var mongoose = require('mongoose'),
     Agent = mongoose.model('Agent'),
-    League = mongoose.model('League'),
     _ = require('underscore');
 
 /**
@@ -29,14 +28,6 @@ exports.create = function(req, res) {
     var agent = new Agent(req.body);
     agent.user = req.user;
 
-    /*League.load(req.body.leagueid, function(err, league) {
-        if (err) return next(err);
-        if (!agent) return next(new Agent('Failed to load league ' +
-                                            req.body.leagueid +
-                                            ' for new agent.'));
-        agent.league = league;
-    });*/
-
     agent.save(function(err) {
         if (err) {
             return res.send('users/signup', {
@@ -44,7 +35,6 @@ exports.create = function(req, res) {
                 agent: agent
             });
         }
-        console.log('\n\n' + JSON.stringify(agent) + '\n\n');
         res.jsonp(agent);
     });
 };
@@ -201,9 +191,6 @@ exports.trade = function(req, res) {
         // Uncomment to reset
         //agent.cash = 100000;
         //agent.portfolio = [];
-
-        console.log(agent.cash);
-        console.log(agent.portfolio);
 
         agent.save(function (/*err*/) {
             res.jsonp(agent);

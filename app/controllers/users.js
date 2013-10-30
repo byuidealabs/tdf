@@ -9,7 +9,7 @@ var mongoose = require('mongoose'),
 /**
  * Auth callback
  */
-exports.authCallback = function(req, res, next) {
+exports.authCallback = function(req, res) {
     res.redirect('/');
 };
 
@@ -51,7 +51,7 @@ exports.session = function(req, res) {
 /**
  * Create user
  */
-exports.create = function(req, res) {
+exports.create = function(req, res, next) {
     var user = new User(req.body);
 
     user.provider = 'local';
@@ -63,7 +63,9 @@ exports.create = function(req, res) {
             });
         }
         req.logIn(user, function(err) {
-            if (err) return next(err);
+            if (err) {
+                return next(err);
+            }
             return res.redirect('/');
         });
     });
@@ -73,14 +75,13 @@ exports.create = function(req, res) {
  *  Show profile
  */
 exports.show = function(req, res) {
-    var profile = public_profile(req.profile);
+    var profile = _.pick(req.profile, 'id', 'username');
     Agent.find({user: profile.id}, 'name description league cash')
-         .populate('league', 'name')
-         .exec(function(err, agents) {
-                profile.agents = agents;
-                console.log(JSON.stringify(profile));
-                res.jsonp(profile);
-         });
+        .populate('league', 'name')
+        .exec(function(err, agents) {
+            profile.agents = agents;
+            res.jsonp(profile);
+        });
 };
 
 /**
@@ -91,7 +92,13 @@ exports.me = function(req, res) {
 };
 
 exports.profile = function(req, res) {
-    res.jsonp(req.user);
+    var profile = _.pick(req.user, '_id', 'name', 'username', 'email');
+    Agent.find({user: profile._id}, 'name description league cash')
+        .populate('league', 'name')
+        .exec(function(err, agents) {
+            profile.agents = agents;
+            res.jsonp(profile);
+        });
 };
 
 /**
@@ -114,14 +121,14 @@ exports.user = function(req, res, next, id) {
  * List of Users
  */
 exports.all = function(req, res) {
-    User.find().exec(function(err, users) {
+    User.find({}, 'username').exec(function(err, users) {
         if (err) {
             res.render('error', {
                 status: 500
             });
         }
         else {
-            res.jsonp(public_profiles(users));
+            res.jsonp(users);
         }
     });
 };
@@ -134,16 +141,7 @@ exports.update = function(req, res) {
 
     user = _.extend(user, req.body);
 
-    user.save(function(err) {
+    user.save(function(/*err*/) {
         res.jsonp(user);
     });
 };
-
-function public_profiles(users) {
-    return _.map(users, public_profile);
-}
-
-function public_profile(user) {
-    profile = _.pick(user, 'id', 'username');
-    return profile;
-}
