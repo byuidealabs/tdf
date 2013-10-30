@@ -1,6 +1,6 @@
-angular.module('tdf.articles').controller('ArticlesController', 
-    ['$scope', '$routeParams', '$location', 'Global', 'Articles', 
-    function ($scope, $routeParams, $location, Global, Articles) {
+angular.module('tdf.articles').controller('ArticlesController',
+    ['$scope', '$routeParams', '$location', 'Global', 'Utilities', 'Articles',
+    function ($scope, $routeParams, $location, Global, Utilities, Articles) {
         $scope.global = Global;
 
         $scope.create = function() {
@@ -9,21 +9,16 @@ angular.module('tdf.articles').controller('ArticlesController',
                 content: this.content
             });
             article.$save(function(response) {
-                $location.path("articles/" + response._id);
+                $location.path('articles/' + response._id);
             });
 
-            this.title = "";
-            this.content = "";
+            this.title = '';
+            this.content = '';
         };
 
         $scope.remove = function(article) {
-            article.$remove();  
-
-            for (var i in $scope.articles) {
-                if ($scope.articles[i] == article) {
-                    $scope.articles.splice(i, 1);
-                }
-            }
+            article.$remove();
+            Utilities.spliceByObject($scope.articles, article);
         };
 
         $scope.update = function() {

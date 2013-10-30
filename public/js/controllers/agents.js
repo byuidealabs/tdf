@@ -1,8 +1,8 @@
 angular.module('tdf.agents').controller('AgentsController',
-    ['$scope', '$routeParams', '$location', 'Global', 'Agents', 'Leagues',
-     'Trades', '_',
-    function ($scope, $routeParams, $location, Global, Agents, Leagues,
-              Trades, _) {
+    ['$scope', '$routeParams', '$location', 'Global', 'Utilities', 'Agents',
+     'Leagues', 'Trades', '_',
+    function ($scope, $routeParams, $location, Global, Utilities, Agents,
+              Leagues, Trades, _) {
         $scope.global = Global;
 
         $scope.getDefault = function() {
@@ -25,13 +25,7 @@ angular.module('tdf.agents').controller('AgentsController',
 
         $scope.remove = function(agent) {
             agent.$remove();
-
-            for (var i in $scope.agents) {
-                if ($scope.agents[i] === agent) {
-                    $scope.agents.splice(i, 1);
-                }
-            }
-
+            Utilities.spliceByObject($scope.agents, agent);
             $location.path('agents/');
         };
 

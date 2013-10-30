@@ -1,6 +1,8 @@
 angular.module('tdf.users').controller('UsersController',
-    ['$scope', '$routeParams', '$location', 'Global', 'Users', 'Agents',
-    function ($scope, $routeParams, $location, Global, Users, Agents) {
+    ['$scope', '$routeParams', '$location', 'Global', 'Utilities', 'Users',
+     'Agents',
+    function ($scope, $routeParams, $location, Global, Utilities, Users,
+              Agents) {
         $scope.global = Global;
 
         $scope.find = function(query) {
@@ -39,11 +41,8 @@ angular.module('tdf.users').controller('UsersController',
                 Agents.remove({
                     agentId: agent._id
                 }, function() {
-                    for (var i in $scope.user.agents) {
-                        if ($scope.user.agents[i]._id === agent._id) {
-                            $scope.user.agents.splice(i, 1);
-                        }
-                    }
+                    Utilities.spliceByProperty($scope.user.agents, '_id',
+                                               agent._id);
                 });
             }
         };
