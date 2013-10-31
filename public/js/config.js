@@ -68,6 +68,9 @@ window.app.config(['$routeProvider',
         when('/testmetrics', {
             templateUrl: 'views/testmetrics.html'
         }).
+        when('/testbars', {
+            templateUrl: 'views/testbars.html'
+        }).
 
         // Index & default
 
