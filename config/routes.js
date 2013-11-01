@@ -118,10 +118,16 @@ module.exports = function(app, passport, auth) {
     app.get('/agents', agents.all);
     app.post('/agents', auth.requiresLogin, agents.create);
     app.get('/agents/:agentId', agents.show);
-    app.put('/agents/:agentId', auth.requiresLogin, agents.update);
-    app.del('/agents/:agentId', auth.requiresLogin, agents.destroy);
-    app.put('/agents/trade/:agentId', agents.trade);
-    app.del('/agents/trade/:agentId', agents.reset);
+    app.put('/agents/:agentId', auth.requiresLogin,
+            auth.agent.hasAuthorization, agents.update);
+    app.del('/agents/:agentId', auth.requiresLogin,
+            auth.agent.hasAuthorization, agents.destroy);
+    app.put('/agents/trade/:agentId', auth.agent.hasAuthorization,
+            agents.trade);
+    app.del('/agents/trade/:agentId', auth.agent.hasAuthorization,
+            agents.reset);
+    app.del('/agents/apikey/:agentId', auth.requiresLogin,
+            auth.agent.hasAuthorization, agents.resetapikey);
 
     // Finish with setting up the leagueId param
     app.param('agentId', agents.agent);

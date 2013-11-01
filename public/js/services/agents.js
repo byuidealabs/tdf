@@ -18,8 +18,16 @@ factory('Trades',
                 agentId: '@agentId'
             },
             {
-                update: {
-                    method: 'PUT'
-                }
+                update: {method: 'PUT'}
+            });
+    }]).
+factory('ApiKeys',
+    ['$resource',
+    function($resource) {
+        return $resource('agents/apikey/:agentId',
+            {
+                agentId: '@agentId'
+            }, {
+                update: {method: 'PUT'}
             });
     }]);

@@ -1,8 +1,8 @@
 angular.module('tdf.agents').controller('AgentsController',
     ['$scope', '$routeParams', '$location', '$modal', 'Global', 'Utilities',
-     'Agents', 'Leagues', 'Trades', '_',
+     'Agents', 'Leagues', 'Trades', 'ApiKeys', '_',
     function ($scope, $routeParams, $location, $modal, Global, Utilities,
-              Agents, Leagues, Trades, _) {
+              Agents, Leagues, Trades, ApiKeys, _) {
         $scope.global = Global;
 
         $scope.getDefault = function() {
@@ -68,11 +68,26 @@ angular.module('tdf.agents').controller('AgentsController',
         };
 
         $scope.findOne = function() {
+
+            $scope.apikeytype = 'password';
+            $scope.apikeybtn = 'Show';
+
             Agents.get({
                 agentId: $routeParams.agentId
             }, function(agent) {
                 $scope.agent = agent;
             });
+        };
+
+        $scope.toggleapikey = function() {
+            if ($scope.apikeytype === 'password') {
+                $scope.apikeytype = 'text';
+                $scope.apikeybtn = 'Hide';
+            }
+            else {
+                $scope.apikeytype = 'password';
+                $scope.apikeybtn = 'Show';
+            }
         };
 
         $scope.getDefaultTrade = function() {
@@ -145,6 +160,14 @@ angular.module('tdf.agents').controller('AgentsController',
                     $scope.agent = agent;
                     $scope.message = false;
                 });
+            });
+        };
+
+        $scope.resetapikey = function() {
+            ApiKeys.remove({
+                agentId: $routeParams.agentId
+            }, function(agent) {
+                $scope.agent.apikey = agent.apikey;
             });
         };
     }]);

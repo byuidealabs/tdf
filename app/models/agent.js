@@ -12,7 +12,7 @@ var AgentSchema = new Schema({
     },
     name: {type: String, default: '', trim: true},
     description: {type: String, default: '', trim: true},
-    // API Key
+    apikey: {type: String, default: ''},
     // Historical portfolio values
     user: {type: Schema.ObjectId, ref: 'User'},
     league: {type: Schema.ObjectId, ref: 'League'},

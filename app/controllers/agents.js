@@ -3,7 +3,30 @@
  */
 var mongoose = require('mongoose'),
     Agent = mongoose.model('Agent'),
+    Crypto = require('crypto'),
     _ = require('underscore');
+
+/**
+ * Creates a random ascii key of the specified length
+ */
+var randomAscii = function(len){
+    // Derived from
+    // http://kun.io/blog/42051818404/Node.js:-Creating-a-Random-String
+    var bytes = Crypto.randomBytes(len);
+    var i;
+    var verificationCode = '';
+
+    // loop through each byte
+    for (i=0; i < bytes.length; i++) {
+        var c = bytes[i]; // the character in range 0 to 255
+        var c2 = Math.floor(c / 10.24); // transform to range 0-25 and round down
+        var c3 = c2 + 97; // ASCII a to z is 97 to 122
+        // now convert the transformed character code to its string
+        // value and append to the verification code
+        verificationCode += String.fromCharCode(c3);
+    }
+    return verificationCode;
+};
 
 /**
  * Find agent by id
@@ -26,6 +49,7 @@ exports.agent = function(req, res, next, id) {
  */
 exports.create = function(req, res) {
     var agent = new Agent(req.body);
+    agent.apikey = randomAscii(32);
     agent.user = req.user;
 
     agent.save(function(err) {
@@ -44,8 +68,7 @@ exports.create = function(req, res) {
  */
 exports.update = function(req, res) {
     var agent = req.agent;
-
-    agent = _.extend(agent, req.body);
+    agent = _.extend(agent, _.omit(req.body, 'apikey'));
 
     agent.save(function(/*err*/) {
         res.jsonp(agent);
@@ -77,8 +100,7 @@ exports.show = function(req, res) {
     //TODO add current value and historical values
 
     if (!req.user._id.equals(req.agent.user._id)) {
-        // Hide portfolios as they should not be seen by other users
-        req.agent = _.omit(req.agent.toJSON(), 'portfolio');
+        req.agent = _.omit(req.agent.toJSON(), 'portfolio', 'apikey');
     }
     res.jsonp(req.agent);
 };
@@ -125,8 +147,9 @@ var get_security_price = function(symbol, method) {
  * Otherwise, responds with {error: <message>}
  */
 exports.trade = function(req, res) {
+
     var agent = req.agent;
-    var trade = req.body.trade;
+    var trade = req.body.trade || req.body;  // Depending on source of data
     var last_portfolio = _.last(req.agent.portfolio);
     var curr_composition;
 
@@ -221,6 +244,14 @@ exports.reset = function(req, res) {
     agent.portfolio = [];
 
     agent.save(function (/*err*/){
+        res.jsonp(agent);
+    });
+};
+
+exports.resetapikey = function(req, res) {
+    var agent = req.agent;
+    agent.apikey = randomAscii(32);
+    agent.save(function (/*err*/) {
         res.jsonp(agent);
     });
 };

@@ -44,3 +44,17 @@ exports.article = {
         next();
     }
 };
+
+/**
+ * Agent authorizations routing middleware
+ */
+exports.agent = {
+    hasAuthorization: function(req, res, next) {
+        var userauthorized = (req.agent.user.id === req.user.id);
+        var apikeyauthorized = (req.body.apikey === req.agent.apikey);
+        if (!(userauthorized || apikeyauthorized)) {
+            return res.send(401, 'Not authorized to operate on agent.');
+        }
+        next();
+    }
+};
