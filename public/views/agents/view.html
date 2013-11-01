@@ -1,12 +1,47 @@
 <section ng-controller='AgentsController' ng-init='findOne()'>
     <h1>{{agent.name}}</h1>
 
-    <a class='btn btn-primary' href='/#!/agents/'>Back to Agents List</a>
-    <div class='btn-group'>
+    {{agent}}
+
+    <div class='panel panel-info'>
+        <div class='panel-heading'>Owner</div>
+        <div class='panel-body'>{{agent.user.username}}</div>
+    </div>
+
+    <div class='panel panel-primary'>
+        <div class='panel-heading'>Status</div>
+        <div class='panel-body'>
+            <div class='row'>
+                <div class='col-lg-2'><b>Current Cash</b></div>
+                <div class='col-lg-6'>{{agent.cash | currency}}</div>
+            </div>
+            <div class='row'>
+                <div class='col-lg-2'><b>Current Value</b></div>
+                <div class='col-lg-6'>???</div>
+            </div>
+        </div>
+    </div>
+
+    <div class='panel panel-primary'
+        ng-show='agent.user._id == global.user._id'>
+        <div class='panel-heading'>Historical Composition</div>
+        <div class='panel-body'>
+        </div>
+    </div>
+
+    <div ng-class='{"btn-group": (global.user._id == agent.user._id)}'>
+        <a class='btn btn-primary' href='/#!/profile/'
+            ng-show='global.user._id == agent.user._id'>
+            Profile
+        </a>
+        <div class='btn btn-primary' href='/#!/agents/'>
+            Agent List
+        </div>
+    </div>
+    <div class='btn-group' ng-show='global.user._id == agent.user._id'>
         <a class='btn btn-warning' href='/#!/agents/{{agent._id}}/trade'>
             Trade
         </a>
-
         <a class='btn btn-default' href='/#!/agents/{{agent._id}}/edit'>
             Edit Agent
         </a>
