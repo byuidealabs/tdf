@@ -1,8 +1,6 @@
 <section ng-controller='AgentsController' ng-init='findOne()'>
     <h1>{{agent.name}}</h1>
 
-    {{agent}}
-
     <div class='panel panel-info'>
         <div class='panel-heading'>Owner</div>
         <div class='panel-body'>{{agent.user.username}}</div>
@@ -26,6 +24,19 @@
         ng-show='agent.user._id == global.user._id'>
         <div class='panel-heading'>Historical Composition</div>
         <div class='panel-body'>
+            <div class='panel panel-success'
+                ng-repeat='trade in agent.portfolio | orderBy:"-timestamp"'>
+                <div class='panel-heading'>
+                    {{trade.timestamp | date:'medium'}}
+                </div>
+                <div class='panel-body'>
+                    <ul>
+                        <li ng-repeat='(symbol, quantity) in trade.composition'>
+                            <b>{{symbol}}:</b> {{quantity}} shares
+                        </li>
+                    </ul>
+                </div>
+            </div>
         </div>
     </div>
 

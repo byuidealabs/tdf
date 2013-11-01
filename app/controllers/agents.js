@@ -74,6 +74,12 @@ exports.destroy = function(req, res) {
  * Show an agent
  */
 exports.show = function(req, res) {
+    //TODO add current value and historical values
+
+    if (!req.user._id.equals(req.agent.user._id)) {
+        // Hide portfolios as they should not be seen by other users
+        req.agent = _.omit(req.agent.toJSON(), 'portfolio');
+    }
     res.jsonp(req.agent);
 };
 
