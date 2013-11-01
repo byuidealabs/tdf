@@ -5,5 +5,9 @@
 
 .user-list-name {
     position:relative;
-    top:-4px;    
+    top:-4px;
+}
+
+.btn-user-agent-trade {
+    margin-right:5px;
 }

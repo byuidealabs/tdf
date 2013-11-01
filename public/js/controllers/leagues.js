@@ -1,6 +1,6 @@
 angular.module('tdf.leagues').controller('LeaguesController',
-    ['$scope', '$routeParams', '$location', 'Global', 'Leagues',
-    function($scope, $routeParams, $location, Global, Leagues) {
+    ['$scope', '$routeParams', '$location', 'Global', 'Utilities', 'Leagues',
+    function($scope, $routeParams, $location, Global, Utilities, Leagues) {
         $scope.global = Global;
 
         $scope.options = {
@@ -9,7 +9,7 @@ angular.module('tdf.leagues').controller('LeaguesController',
                 {label: 'Closed (Coming Soon)', value: false}
             ],
             eligibleAgents: [
-                {label: 'All of the user\'s agents are eligible', 
+                {label: 'All of the user\'s agents are eligible',
                     value: false},
                 {label: 'User must select one eligible agent',
                     value: true}
@@ -17,7 +17,7 @@ angular.module('tdf.leagues').controller('LeaguesController',
         };
 
         $scope.getDefault = function() {
-            // TODO: Look to see if it is better to get defaults from 
+            // TODO: Look to see if it is better to get defaults from
             // Schema defaults
             $scope.league = {
                 name: '',
@@ -42,11 +42,7 @@ angular.module('tdf.leagues').controller('LeaguesController',
 
             if ($scope.leagues) {
                 // Needed if called from list.html
-                for (var i in $scope.leagues) {
-                    if ($scope.leagues[i] == league) {
-                        $scope.leagues.splice(i, 1);
-                    }
-                }
+                Utilities.spliceByObject($scope.leagues, league);
             }
 
             $location.path('leagues/');

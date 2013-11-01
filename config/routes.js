@@ -120,10 +120,11 @@ module.exports = function(app, passport, auth) {
     app.get('/agents/:agentId', agents.show);
     app.put('/agents/:agentId', auth.requiresLogin, agents.update);
     app.del('/agents/:agentId', auth.requiresLogin, agents.destroy);
+    app.put('/agents/trade/:agentId', agents.trade);
+    app.del('/agents/trade/:agentId', agents.reset);
 
     // Finish with setting up the leagueId param
     app.param('agentId', agents.agent);
-
 
     //=========================================================================
     //  Home

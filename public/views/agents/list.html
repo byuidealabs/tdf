@@ -1,0 +1,38 @@
+<section ng-controller='AgentsController' ng-init='find()'>
+
+    <h1>Existing Agents</h1>
+
+    <div class='panel panel-default' ng-repeat='agent in agents'>
+        <div class='panel-body'>
+            <h3 class='pull-left agent-list-name'>{{agent.name}}</h3>
+
+            <div ng-class='{"pull-right": true,
+                "agent-list-btns": true,
+                "btn-group": true}'>
+                <a class='btn btn-primary'
+                    href='/#!/agents/{{agent._id}}'>
+                    View Agent
+                </a>
+                <a class='btn btn-default'
+                    ng-show='true'
+                    href='/#!/agents/{{agent._id}}/edit'>
+                    Edit
+                </a>
+                <a class='btn btn-default'
+                    ng-show='true'
+                    href='/#!/agents/{{agent._id}}/trade'>
+                    Trade
+                </a>
+                <a class='btn btn-default'
+                    ng-click='remove(agent)'>
+                    Delete
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <a class='btn btn-primary' href='/#!/agents/create'
+        data-ng-show='true'>
+        Add a New Agent
+    </a>
+</section>

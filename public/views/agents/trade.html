@@ -1,0 +1,119 @@
+<section ng-controller='AgentsController'
+    ng-init='findOne(); getDefaultTrade()'>
+
+    <h1>Trade</h1>
+
+    <!--<p>{{agent}}</p>-->
+    <!--<p>{{trade}}</p>-->
+
+    <div class='panel panel-info'>
+        <div class='panel-heading'>Current Cash</div>
+        <div class='panel-body'><h2>{{agent.cash | currency}}</h2></div>
+    </div>
+    <div class='panel panel-primary'>
+        <div class='panel-heading'>Trade</div>
+        <div class='panel-body'>
+            <div ng-show='message'
+                class='panel panel-{{message.type}}'>
+                <div class='panel-heading'>{{message.heading}}</div>
+                <div class='panel-body'>{{message.body}}</div>
+            </div>
+
+            <form class='form-horizontal' ng-submit='executeTrade()'>
+                <div class='form-group'>
+                    <h3 class='col-lg-offset-1'>Buy</h3>
+                </div>
+
+                <div class='form-group' ng-repeat='security in trade.buy'>
+                    <label class='control-label col-lg-offset-1 col-lg-2'
+                        for='buy-symbol-{{$index}}'>
+                        Ticker Symbol
+                    </label>
+                    <div class='col-lg-2'>
+                        <input class='form-control' type='text'
+                            id='buy-symbol-{{index}}'
+                            ng-model='security.s' />
+                    </div>
+                    <label class='control-label col-lg-2'
+                        for='buy-amt-{{$index}}'>
+                        Amount
+                    </label>
+                    <div class='col-lg-2'>
+                        <input class='form-control' type='number'
+                            id='buy-amt-{{$index}}'
+                            ng-model='security.q' />
+                    </div>
+                </div>
+
+                <div class='form-group'>
+                    <div class='col-lg-offset-1'>
+                        <input type='button' class='btn btn-default'
+                            ng-click='addTrade("buy")'
+                            value='Add a Security' />
+                    </div>
+                </div>
+
+                <div class='form-group'>
+                    <h3 class='col-lg-offset-1'>Sell</h3>
+                </div>
+
+                <div class='form-group' ng-repeat='security in trade.sell'>
+                    <label class='control-label col-lg-offset-1 col-lg-2'
+                        for='buy-symbol-{{$index}}'>
+                        Ticker Symbol
+                    </label>
+                    <div class='col-lg-2'>
+                        <input class='form-control' type='text'
+                            id='buy-symbol-{{index}}'
+                            ng-model='security.s' />
+                    </div>
+                    <label class='control-label col-lg-2'
+                        for='buy-amt-{{$index}}'>
+                        Amount
+                    </label>
+                    <div class='col-lg-2'>
+                        <input class='form-control' type='number'
+                            id='buy-amt-{{$index}}'
+                            ng-model='security.q' />
+                    </div>
+                </div>
+
+                <div class='form-group'>
+                    <div class='col-lg-offset-1'>
+                        <input type='button' class='btn btn-default'
+                            ng-click='addTrade("sell")'
+                            value='Add a Security' />
+                    </div>
+                </div>
+
+                <div class='form-group'>
+                    <div class='col-lg-offset-1 btn-group'>
+                        <input type='submit' class='btn btn-primary'
+                            value='Execute Trade' />
+                        <input type='button' class='btn btn-danger'
+                            value='Reset Trades' ng-click='resetTrades()'>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class='panel panel-info'>
+        <div class='panel-heading'>Historical Portfolio Compositions</div>
+        <div class='panel-body'>
+            <div class='panel panel-success'
+                ng-repeat='trade in agent.portfolio | orderBy:"-timestamp"'>
+                <div class='panel-heading'>
+                    {{trade.timestamp | date:'medium'}}
+                </div>
+                <div class='panel-body'>
+                    <ul>
+                        <li ng-repeat='(symbol, quantity) in trade.composition'>
+                            <b>{{symbol}}:</b> {{quantity}} shares
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

@@ -7,6 +7,19 @@ angular.module('tdf.agents').factory('Agents',
                 agentId: '@_id'
             },
             {
-                update: {method: 'PUT'}
+                update: {method: 'PUT'},
+            });
+    }]).
+factory('Trades',
+    ['$resource',
+    function($resource) {
+        return $resource('agents/trade/:agentId',
+            {
+                agentId: '@agentId'
+            },
+            {
+                update: {
+                    method: 'PUT'
+                }
             });
     }]);

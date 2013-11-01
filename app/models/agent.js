@@ -8,31 +8,19 @@ var mongoose = require('mongoose'),
  * Agent Schema
  */
 var AgentSchema = new Schema({
-    created: {
-        type: Date,
-        default: Date.now
+    created: {type: Date, default: Date.now
     },
-    name: {
-        type: String,
-        default: '',
-        trim: true
-    },
-    description: {
-        type: String,
-        default: '',
-        trim: true
-    },
+    name: {type: String, default: '', trim: true},
+    description: {type: String, default: '', trim: true},
     // API Key
-    // Historical portfolio compositions
     // Historical portfolio values
-    user: {
-        type: Schema.ObjectId,
-        ref: 'User'
-    },
-    league: {
-        type: Schema.ObjectId,
-        ref: 'League'
-    }
+    user: {type: Schema.ObjectId, ref: 'User'},
+    league: {type: Schema.ObjectId, ref: 'League'},
+    cash: {type: Number, default: 100000},
+    portfolio: [{
+        timestamp: {type: Date, default: Date.now},
+        composition: {}
+    }]
 });
 
 /**
@@ -49,7 +37,7 @@ AgentSchema.statics = {
     load: function(id, cb) {
         this.findOne({
             _id: id
-        }).populate('user', 'username').populate('name').exec(cb);
+        }).populate('user', 'username').populate('league', 'name').exec(cb);
     }
 };
 
