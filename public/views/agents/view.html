@@ -3,13 +3,14 @@
 
     <a class='btn btn-primary' href='/#!/agents/'>Back to Agents List</a>
     <div class='btn-group'>
+        <a class='btn btn-warning' href='/#!/agents/{{agent._id}}/trade'>
+            Trade
+        </a>
+
         <a class='btn btn-default' href='/#!/agents/{{agent._id}}/edit'>
             Edit Agent
         </a>
-        <a class='btn btn-default' href='/#!/agents/{{agent._id}}/trade'>
-            Trade
-        </a>
-        <a class='btn btn-default' ng-click='remove(agent)'>
+        <a class='btn btn-danger' ng-click='remove(agent)'>
             Delete Agent
         </a>
     </div>
