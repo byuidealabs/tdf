@@ -24,9 +24,33 @@ angular.module('tdf.agents').controller('AgentsController',
         };
 
         $scope.remove = function(agent) {
-            agent.$remove();
+            /*agent.$remove();
             Utilities.spliceByObject($scope.agents, agent);
-            $location.path('agents/');
+            $location.path('agents/');*/
+            var modalInstance = $modal.open({
+                templateUrl: 'views/confirmModal.html',
+                controller: function($scope, $modalInstance) {
+                    $scope.heading = 'Confirm Agent Deletion';
+                    $scope.message = 'Are you sure that you want to delete ' +
+                                     'this agent? ' +
+                                     '(this action cannot be undone)';
+
+                    $scope.confirm = function() {
+                        $modalInstance.close('confirmed');
+                    };
+
+                    $scope.cancel = function() {
+                        $modalInstance.dismiss('cancel');
+                    };
+                }
+            });
+
+            modalInstance.result.then(function() {
+                agent.$remove();
+                Utilities.spliceByObject($scope.agents, agent);
+                $location.path('users/profile');
+            });
+
         };
 
         $scope.update = function() {
@@ -96,16 +120,6 @@ angular.module('tdf.agents').controller('AgentsController',
         };
 
         $scope.resetTrades = function() {
-            /*reset = confirm('Are you sure that you want to reset the trades' +
-                            ' on this agent?');
-            if (reset) {
-                Trades.remove({
-                    agentId: $routeParams.agentId
-                }, function(agent) {
-                    $scope.agent = agent;
-                    $scope.message = false;
-                });
-            }*/
             var modalInstance = $modal.open({
                 templateUrl: 'views/confirmModal.html',
                 controller: function($scope, $modalInstance) {

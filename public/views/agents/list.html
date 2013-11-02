@@ -8,22 +8,23 @@
 
             <div ng-class='{"pull-right": true,
                 "agent-list-btns": true,
-                "btn-group": true}'>
+                "btn-group": global.user._id == agent.user._id}'>
                 <a class='btn btn-primary'
                     href='/#!/agents/{{agent._id}}'>
                     View Agent
                 </a>
                 <a class='btn btn-default'
-                    ng-show='true'
+                    ng-show='global.user._id == agent.user._id'
                     href='/#!/agents/{{agent._id}}/edit'>
                     Edit
                 </a>
                 <a class='btn btn-default'
-                    ng-show='true'
+                    ng-show='global.user._id == agent.user._id'
                     href='/#!/agents/{{agent._id}}/trade'>
                     Trade
                 </a>
                 <a class='btn btn-default'
+                    ng-show='global.user._id == agent.user._id'
                     ng-click='remove(agent)'>
                     Delete
                 </a>
