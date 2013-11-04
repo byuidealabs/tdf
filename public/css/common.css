@@ -31,3 +31,8 @@ footer p {
     overflow: visible;
     margin: 0 auto;
 }
+
+.container hr {
+    margin: 4px 0;
+    border-color:#333;
+}

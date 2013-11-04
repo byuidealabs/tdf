@@ -70,11 +70,23 @@
         <div class='panel-body'>
             <div class='row'>
                 <div class='col-lg-2'><b>Current Cash</b></div>
-                <div class='col-lg-6'>{{agent.cash | currency}}</div>
+                <div class='col-lg-6'>
+                    {{agent.status.cash | currency}}
+                </div>
             </div>
             <div class='row'>
                 <div class='col-lg-2'><b>Current Value</b></div>
-                <div class='col-lg-6'>???</div>
+                <div class='col-lg-6'>
+                    {{agent.status.portfolio_value | currency}}
+                </div>
+            </div>
+            <hr />
+            <div class='row'>
+                <div class='col-lg-2'><b>Total Value</b></div>
+                <div class='col-lg-6'>
+                    {{agent.status.cash + agent.status.portfolio_value
+                        | currency}}
+                </div>
             </div>
         </div>
     </div>

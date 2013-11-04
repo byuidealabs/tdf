@@ -98,11 +98,42 @@ exports.destroy = function(req, res) {
  */
 exports.show = function(req, res) {
     //TODO add current value and historical values
+    var agent = req.agent.toJSON();
+    var user = req.user;
 
-    if (req.user === undefined || !req.user._id.equals(req.agent.user._id)) {
-        req.agent = _.omit(req.agent.toJSON(), 'portfolio', 'apikey');
+    var current_portfolio = _.last(agent.portfolio);
+
+    var cash = 100000; // TODO tie into league default
+    console.log(JSON.stringify(current_portfolio));
+    if (current_portfolio !== undefined) {
+        cash = current_portfolio.composition.cash;
     }
-    res.jsonp(req.agent);
+
+    var portfolio_value = 0; //TODO
+
+    agent.status = {
+        'current_portfolio': current_portfolio,
+        'portfolio_value': portfolio_value,
+        'cash': cash
+    };
+
+    if (user === undefined || !user._id.equals(agent.user._id)) {
+        agent = _.omit(agent, 'portfolio', 'apikey');
+        agent.status = _.omit(agent.status, 'current_portfolio');
+    }
+    res.jsonp(agent);
+};
+
+/**
+ * Gives the current status (most recent portfolio composition) of the
+ * agent.
+ *
+ * TODO
+ */
+exports.current_status = function(req, res) {
+    var agent = req.agent;
+    var current_portfolio = _.last(agent.portfolio);
+    res.jsonp(current_portfolio);
 };
 
 /**
@@ -261,6 +292,12 @@ exports.trade = function(req, res) {
     }
 };
 
+/**
+ * Resets all trades made by the agent, returning agent.portfolio to its
+ * initial state of [].
+ *
+ * TODO: Check if league is in competition; if so, don't allow reset.
+ */
 exports.reset = function(req, res) {
     var agent = req.agent;
 
@@ -272,6 +309,9 @@ exports.reset = function(req, res) {
     });
 };
 
+/**
+ * Regenerates a new random api key for the user.
+ */
 exports.resetapikey = function(req, res) {
     var agent = req.agent;
     agent.apikey = randomAscii(32);
