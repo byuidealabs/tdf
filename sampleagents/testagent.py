@@ -119,6 +119,19 @@ if __name__ == '__main__':
             r.json()['error']['code'] == 4)
 
     #-------------------------------
+    #   Buy cash
+    #-------------------------------
+
+    buyc = {
+        'buy': [{'s': 'cash', 'q': 100}],
+        'sell': [],
+        'apikey': API_KEY
+    }
+    r = requests.put(SITE + AGENT_ID, data=json.dumps(buyc), headers=HEADERS)
+    assert (r.status_code == 200 and 'error' in r.json() and
+            r.json()['error']['code'] == 5)
+
+    #-------------------------------
     #   Bad API Key
     #-------------------------------
 

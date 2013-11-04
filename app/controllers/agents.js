@@ -135,6 +135,12 @@ var get_security_price = function(symbol, method) {
             'code': 4
         };
     }
+    if (symbol === 'cash') {
+        throw {
+            'msg': 'Cannot trade cash. Please trade securities.',
+            'code': 5
+        };
+    }
     if (method === 'sell') {
         return 110;
     }
@@ -155,6 +161,7 @@ var get_security_price = function(symbol, method) {
  *  3. Attempted to buy more than has cash to purchase
  *  4. Attempted to buy or sell on a nonexistant security (symbol doesn't
  *     match any known security)
+ *  5. Attempted to trade cash
  */
 exports.trade = function(req, res) {
 
