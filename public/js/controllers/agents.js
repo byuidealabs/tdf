@@ -170,4 +170,9 @@ angular.module('tdf.agents').controller('AgentsController',
                 $scope.agent.apikey = agent.apikey;
             });
         };
+
+        $scope.$on('timer-stopped', function() {
+            $scope.findOne();
+            $scope.$broadcast('timer-start');
+        });
     }]);
