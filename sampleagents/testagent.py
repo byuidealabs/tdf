@@ -37,7 +37,7 @@ if __name__ == '__main__':
     }
 
     r = requests.put(SITE + AGENT_ID, data=json.dumps(buy), headers=HEADERS)
-    assert (r.status_code == 200 and 'cash' in r.json())
+    assert (r.status_code == 200 and 'portfolio' in r.json())
 
     #-------------------------------
     #   Working Sell
@@ -50,7 +50,7 @@ if __name__ == '__main__':
     }
 
     r = requests.put(SITE + AGENT_ID, data=json.dumps(sell), headers=HEADERS)
-    assert (r.status_code == 200 and 'cash' in r.json())
+    assert (r.status_code == 200 and 'portfolio' in r.json())
 
     #-------------------------------
     #   Compound Trade
@@ -63,7 +63,7 @@ if __name__ == '__main__':
     }
 
     r = requests.put(SITE + AGENT_ID, data=json.dumps(comp), headers=HEADERS)
-    assert (r.status_code == 200 and 'cash' in r.json())
+    assert (r.status_code == 200 and 'portfolio' in r.json())
 
     #-------------------------------
     #   Oversell a security
@@ -155,4 +155,4 @@ if __name__ == '__main__':
         'apikey': API_KEY
     }
     r = requests.put(SITE + AGENT_ID, data=json.dumps(sall), headers=HEADERS)
-    assert (r.status_code == 200 and 'cash' in r.json())
+    assert (r.status_code == 200 and 'portfolio' in r.json())

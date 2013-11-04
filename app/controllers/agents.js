@@ -162,12 +162,16 @@ exports.trade = function(req, res) {
     var trade = req.body.trade || req.body;  // Depending on source of data
     var last_portfolio = _.last(req.agent.portfolio);
     var curr_composition;
+    var curr_cash;
 
     if (last_portfolio === undefined) {
-        curr_composition = {};
+        curr_composition = {
+            'cash': 100000  //TODO tie into league defaults
+        };
     }
     else {
         curr_composition = _.clone(last_portfolio.composition);
+        curr_cash = curr_composition.cash;
     }
 
     //console.log('Trade = ' + JSON.stringify(trade));
@@ -181,8 +185,6 @@ exports.trade = function(req, res) {
             var price = get_security_price(security.s, 'sell');
             var profit = price * security.q;
 
-            //agent.cash += profit;
-
             if (curr_composition[security.s] === undefined) {
                 // TODO remove when short-selling is allowed
                 throw {
@@ -191,7 +193,7 @@ exports.trade = function(req, res) {
                 };
             }
 
-            agent.cash += profit;
+            curr_composition.cash += profit;
             curr_composition[security.s] -= security.q;
 
             if (curr_composition[security.s] < 0) {
@@ -219,10 +221,10 @@ exports.trade = function(req, res) {
             var cost = price * security.q;
             var curr_quantity = curr_composition[security.s] || 0;
 
-            agent.cash -= cost;
+            curr_composition.cash -= cost;
             curr_composition[security.s] = curr_quantity + security.q;
 
-            if (agent.cash < 0) {
+            if (curr_composition.cash < 0) {
                 // TODO tie into league to allow potential leverage
                 throw {
                     'msg': 'Not enough cash to purchase desired securities.',
@@ -236,11 +238,6 @@ exports.trade = function(req, res) {
         //----------------------
 
         agent.portfolio.push({composition: curr_composition});
-
-        // Uncomment to reset
-        //agent.cash = 100000;
-        //agent.portfolio = [];
-
         agent.save(function (/*err*/) {
             res.jsonp(agent);
         });

@@ -16,7 +16,6 @@ var AgentSchema = new Schema({
     // Historical portfolio values
     user: {type: Schema.ObjectId, ref: 'User'},
     league: {type: Schema.ObjectId, ref: 'League'},
-    cash: {type: Number, default: 100000},
     portfolio: [{
         timestamp: {type: Date, default: Date.now},
         composition: {}
