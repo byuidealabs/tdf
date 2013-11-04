@@ -1,1 +1,26 @@
-<div>Reached</div>
+<div class='panel panel-info' ng-repeat='league in leagues'>
+    <div class='panel-heading'>
+        Agents in League "{{league.name}}"
+    </div>
+    <div class='panel-body'>
+        <div class='panel panel-primary'
+            ng-repeat='agent in agents | filter:{league._id: league._id}'>
+            <div class='panel-heading'>
+                {{agent.name}}
+            </div>
+            <div class='panel-body'>
+                <div class='row'>
+                    <div class='col-lg-2'><b>Owner</b></div>
+                    <div class='col-lg-6'>{{agent.user.username}}</div>
+                </div>
+                <hr />
+                <div class='row'>
+                    <div class='col-lg-2'><b>Current Cash</b></div>
+                    <div class='col-lg-6'>
+                        {{agent.status.cash}}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

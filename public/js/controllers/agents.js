@@ -65,6 +65,10 @@ angular.module('tdf.agents').controller('AgentsController',
             Agents.query(query, function(agents) {
                 $scope.agents = agents;
             });
+
+            Leagues.query(function(leagues) {
+                $scope.leagues = leagues;
+            });
         };
 
         $scope.findOne = function() {
