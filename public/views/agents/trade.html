@@ -1,10 +1,12 @@
 <section ng-controller='AgentsController'
     ng-init='findOne(); getDefaultTrade()'>
 
-    <h1>Trade</h1>
-
-    <!--<p>{{agent}}</p>-->
-    <!--<p>{{trade}}</p>-->
+    <h1>
+        Trade
+        <a class='btn btn-default' href='/#!/agents/{{agent._id}}'>
+            Return to Agent View
+        </a>
+    </h1>
 
     <div class='panel panel-info'>
         <div class='panel-heading'>Current Cash</div>
@@ -99,7 +101,13 @@
     </div>
 
     <div class='panel panel-info'>
-        <div class='panel-heading'>Historical Portfolio Compositions</div>
+        <div class='panel-heading'>
+            Historical Portfolio Compositions
+            <a class='btn btn-success pull-right' ng-click='findOne()'>
+                Refresh
+            </a>
+            <div class='clearfix'></div>
+        </div>
         <div class='panel-body'>
             <div class='panel panel-success'
                 ng-repeat='trade in agent.portfolio | orderBy:"-timestamp"'>
@@ -112,7 +120,14 @@
                             <b>{{symbol}}:</b> {{quantity}} shares
                         </li>
                     </ul>
+                    <div ng-show='!trade.composition ||
+                                  trade.composition.length === 0'>
+                        Portfolio is empty.
+                    </div>
                 </div>
+            </div>
+            <div ng-show='agent.portfolio.length === 0'>
+                    No trades yet.
             </div>
         </div>
     </div>
