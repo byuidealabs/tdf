@@ -50,7 +50,9 @@ exports.article = {
  */
 exports.agent = {
     hasAuthorization: function(req, res, next) {
-        var userauthorized = (req.agent.user.id === req.user.id);
+        var userauthorized = (req.user !== undefined &&
+                              req.agent.user.id === req.user.id &&
+                              !_.contains(req.body, 'apikey'));
         var apikeyauthorized = (req.body.apikey === req.agent.apikey);
         if (!(userauthorized || apikeyauthorized)) {
             return res.send(401, 'Not authorized to operate on agent.');

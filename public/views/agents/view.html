@@ -2,8 +2,60 @@
     <h1>{{agent.name}}</h1>
 
     <div class='panel panel-info'>
-        <div class='panel-heading'>Owner</div>
-        <div class='panel-body'>{{agent.user.username}}</div>
+        <div class='panel-heading'>Details</div>
+        <div class='panel-body'>
+            <form class='form-horizontal'>
+                <div class='form-group'>
+                    <label class='control-label col-lg-1' for='owner'>
+                        Owner
+                    </label>
+                    <div class='col-lg-4'>
+                        <input type='text' class='form-control' id='owner'
+                            ng-model='agent.user.username' disabled>
+                    </div>
+                </div>
+
+                <div class='form-group'>
+                    <label class='control-label col-lg-1' for='league'>
+                        League
+                    </label>
+                    <div class='col-lg-4'>
+                        <input type='text' class='form-control' id='league'
+                            ng-model='agent.league.name' disabled>
+                    </div>
+                </div>
+
+                <div class='form-group'
+                    ng-show='agent.user._id == global.user._id'>
+                    <label class='control-label col-lg-1' for='agentid'>
+                        Public ID
+                    </label>
+                    <div class='col-lg-4'>
+                        <input type='text' class='form-control' id='agentid'
+                            ng-model='agent._id' disabled>
+                    </div>
+                </div>
+
+                <div class='form-group'
+                    ng-show='agent.user._id == global.user._id'>
+                    <label class='control-label col-lg-1' for='apikey'>
+                        API Key
+                    </label>
+                    <div class='input-group col-lg-4'>
+                        <input type='{{apikeytype}}' class='form-control'
+                            ng-model='agent.apikey' disabled>
+                        <div class='input-group-btn'>
+                            <button type='button' class='btn btn-default'
+                                ng-click='toggleapikey()'>
+                                {{apikeybtn}}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+
+            </form>
+        </div>
     </div>
 
     <div class='panel panel-primary'>
@@ -41,13 +93,13 @@
     </div>
 
     <div ng-class='{"btn-group": (global.user._id == agent.user._id)}'>
-        <a class='btn btn-primary' href='/#!/profile/'
+        <a class='btn btn-primary' href='/#!/users/profile/'
             ng-show='global.user._id == agent.user._id'>
             Profile
         </a>
-        <div class='btn btn-primary' href='/#!/agents/'>
+        <a class='btn btn-primary' href='/#!/agents/'>
             Agent List
-        </div>
+        </a>
     </div>
     <div class='btn-group' ng-show='global.user._id == agent.user._id'>
         <a class='btn btn-warning' href='/#!/agents/{{agent._id}}/trade'>

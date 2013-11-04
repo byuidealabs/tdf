@@ -99,7 +99,7 @@ exports.destroy = function(req, res) {
 exports.show = function(req, res) {
     //TODO add current value and historical values
 
-    if (!req.user._id.equals(req.agent.user._id)) {
+    if (req.user === undefined || !req.user._id.equals(req.agent.user._id)) {
         req.agent = _.omit(req.agent.toJSON(), 'portfolio', 'apikey');
     }
     res.jsonp(req.agent);
@@ -130,7 +130,10 @@ exports.all = function(req, res) {
 // TODO: tie into Yahoo finance and move out of controller
 var get_security_price = function(symbol, method) {
     if (symbol === 'notasymbol') {
-        throw 'Unknown security: ' + symbol + '.';
+        throw {
+            'msg': 'Unknown security: ' + symbol + '.',
+            'code': 4
+        };
     }
     if (method === 'sell') {
         return 110;
@@ -144,7 +147,14 @@ var get_security_price = function(symbol, method) {
  * Allow a trade to be made
  *
  * If trade is successful, responds with the new agent
- * Otherwise, responds with {error: <message>}
+ * Otherwise, responds with {error: {'msg': <message>, 'code': <code>}}
+ *
+ * Error codes are as follows:
+ *  1. Attempted to sell a security that does not own
+ *  2. Attempted to sell more of a security than already owns
+ *  3. Attempted to buy more than has cash to purchase
+ *  4. Attempted to buy or sell on a nonexistant security (symbol doesn't
+ *     match any known security)
  */
 exports.trade = function(req, res) {
 
@@ -175,7 +185,10 @@ exports.trade = function(req, res) {
 
             if (curr_composition[security.s] === undefined) {
                 // TODO remove when short-selling is allowed
-                throw 'Cannot sell a security that you do not own.';
+                throw {
+                    'msg': 'Cannot sell a security that you do not own.',
+                    'code': 1
+                };
             }
 
             agent.cash += profit;
@@ -184,7 +197,11 @@ exports.trade = function(req, res) {
             if (curr_composition[security.s] < 0) {
                 // TODO modify to own negative quantities of security if
                 // short-selling is allowed
-                throw 'Cannot sell more of a security than you currently own.';
+                throw {
+                    'msg': 'Cannot sell more of a security than you ' +
+                           'currently own.',
+                    'code': 2
+                };
             }
 
             if (curr_composition[security.s] === 0) {
@@ -207,7 +224,10 @@ exports.trade = function(req, res) {
 
             if (agent.cash < 0) {
                 // TODO tie into league to allow potential leverage
-                throw 'Not enough cash to purchase desired securities.';
+                throw {
+                    'msg': 'Not enough cash to purchase desired securities.',
+                    'code': 3
+                };
             }
         });
 
