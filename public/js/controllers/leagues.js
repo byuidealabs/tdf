@@ -1,6 +1,8 @@
 angular.module('tdf.leagues').controller('LeaguesController',
     ['$scope', '$routeParams', '$location', 'Global', 'Utilities', 'Leagues',
-    function($scope, $routeParams, $location, Global, Utilities, Leagues) {
+    'Agents',
+    function($scope, $routeParams, $location, Global, Utilities, Leagues,
+             Agents) {
         $scope.global = Global;
 
         $scope.options = {
@@ -68,6 +70,10 @@ angular.module('tdf.leagues').controller('LeaguesController',
             },
             function(league) {
                 $scope.league = league;
+                $scope.leagues = [league];
+                Agents.query(function(agents) {
+                    $scope.agents = agents;
+                });
             });
         };
 

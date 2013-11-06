@@ -1,10 +1,11 @@
 <section data-ng-controller='LeaguesController' data-ng-init='findOne()'>
     <h1>{{league.name}}</h1>
-    <p>Created: {{league.created | date:'medium'}}</p>
-    
+
+    <agent-list></agent-list>
+
     <a class='btn btn-primary' href='/#!/leagues/'>Back to Leagues List</a>
     <div class='btn-group'>
-        <a class='btn btn-default' href='/#!/leagues/{{league._id}}/edit' 
+        <a class='btn btn-default' href='/#!/leagues/{{league._id}}/edit'
             data-ng-show='global.user.isAdmin'>Edit League</a>
         <a class='btn btn-default' data-ng-click='remove(league)'
             data-ng-show='global.user.isAdmin'>Delete League</a>
