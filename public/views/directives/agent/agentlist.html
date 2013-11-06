@@ -1,12 +1,56 @@
 <div class='panel panel-info' ng-repeat='league in leagues'>
     <div class='panel-heading'>
         Agents in League "{{league.name}}"
+
+        <div class='pull-right' ng-show='global.user'>
+            <a class='btn btn-success'
+                href='/#!/agents/create'>
+                Create an Agent
+            </a>
+        </div>
+
+        <div class='clearfix'></div>
     </div>
     <div class='panel-body'>
         <div class='panel panel-primary'
             ng-repeat='agent in agents | filter:{league._id: league._id}'>
             <div class='panel-heading'>
                 {{agent.name}}
+
+                <div class='pull-right'
+                    ng-show='global.user._id == agent.user._id'>
+
+                    <a class='btn btn-warning'
+                        href='/#!/agents/{{agent._id}}/trade'>
+                        Make Trade
+                    </a>
+
+                    <div class='btn-group'>
+                        <a class='btn btn-default'
+                            href='/#!/agents/{{agent._id}}'>
+                            View
+                        </a>
+                        <a class='btn btn-default'
+                            href='/#!/agents/{{agent._id}}/edit'>
+                            Edit
+                        </a>
+
+                        <a class='btn btn-danger'
+                            ng-click='remove(agent)'>
+                            Delete
+                        </a>
+                    </div>
+                </div>
+
+                <div class='pull-right'
+                    ng-hide='global.user._id == agent.user._id'>
+                    <a class='btn btn-default' href='/#!/agents/{{agent._id}}'>
+                        View
+                    </a>
+                </div>
+
+                <div class='clearfix'></div>
+
             </div>
             <div class='panel-body'>
                 <div class='row'>

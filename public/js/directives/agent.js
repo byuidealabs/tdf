@@ -3,10 +3,7 @@ angular.module('tdf').directive('agentList',
         return {
             restrict: 'E',
             templateUrl: 'views/directives/agent/agentlist.html',
-            scope: {
-                leagues: '=',
-                agents: '='
-            }
+            scope: false
         };
     }])
 .directive('agentStatus',
