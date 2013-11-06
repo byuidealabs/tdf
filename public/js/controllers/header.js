@@ -5,7 +5,7 @@ angular.module('tdf.system').controller('HeaderController',
 
         $scope.menu = [
             {
-                'title': 'Profile',
+                'title': 'My Profile',
                 'link': 'users/profile'
             },
             {
