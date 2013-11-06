@@ -2,41 +2,5 @@
 
     <h1>Existing Agents</h1>
 
-
     <agent-list global='global' leagues='leagues' agents='agents'></agent-list>
-
-    <div class='panel panel-default' ng-repeat='agent in agents'>
-        <div class='panel-body'>
-            <h3 class='pull-left agent-list-name'>{{agent.name}}</h3>
-
-            <div ng-class='{"pull-right": true,
-                "agent-list-btns": true,
-                "btn-group": global.user._id == agent.user._id}'>
-                <a class='btn btn-primary'
-                    href='/#!/agents/{{agent._id}}'>
-                    View Agent
-                </a>
-                <a class='btn btn-default'
-                    ng-show='global.user._id == agent.user._id'
-                    href='/#!/agents/{{agent._id}}/edit'>
-                    Edit
-                </a>
-                <a class='btn btn-default'
-                    ng-show='global.user._id == agent.user._id'
-                    href='/#!/agents/{{agent._id}}/trade'>
-                    Trade
-                </a>
-                <a class='btn btn-default'
-                    ng-show='global.user._id == agent.user._id'
-                    ng-click='remove(agent)'>
-                    Delete
-                </a>
-            </div>
-        </div>
-    </div>
-
-    <a class='btn btn-primary' href='/#!/agents/create'
-        data-ng-show='true'>
-        Add a New Agent
-    </a>
 </section>

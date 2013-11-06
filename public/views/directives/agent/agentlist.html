@@ -1,10 +1,10 @@
-<div class='panel panel-info' ng-repeat='league in leagues'>
+<div class='panel panel-info' ng-repeat='league in leagues | orderBy:"name"'>
     <div class='panel-heading'>
         Agents in League "{{league.name}}"
 
         <div class='pull-right' ng-show='global.user'>
             <a class='btn btn-success'
-                href='/#!/agents/create'>
+                href='/#!/agents/create/{{league._id}}'>
                 Create an Agent
             </a>
         </div>

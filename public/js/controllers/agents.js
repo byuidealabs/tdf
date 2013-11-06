@@ -6,12 +6,17 @@ angular.module('tdf.agents').controller('AgentsController',
         $scope.global = Global;
 
         $scope.getDefault = function() {
-            $scope.agent = {
-                name: ''
-            };
-
             Leagues.query(function(leagues) {
+                var league = $routeParams.leagueId;
+                if (league === undefined) {
+                    league = _.first(leagues)._id;
+                }
+
                 $scope.leagues = leagues;
+                $scope.agent = {
+                    name: '',
+                    league: league
+                };
             });
         };
 

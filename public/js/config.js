@@ -53,6 +53,9 @@ window.app.config(['$routeProvider',
         when('/agents/create', {
             templateUrl: 'views/agents/create.html'
         }).
+        when('/agents/create/:leagueId', {
+            templateUrl: 'views/agents/create.html'
+        }).
         when('/agents/:agentId/edit', {
             templateUrl: 'views/agents/edit.html'
         }).
