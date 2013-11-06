@@ -2,7 +2,8 @@
  * Module dependencies.
  */
 var mongoose = require('mongoose'),
-    Schema = mongoose.Schema;
+    Schema = mongoose.Schema,
+    _ = require('underscore');
 
 /**
  * Agent Schema
@@ -39,5 +40,29 @@ AgentSchema.statics = {
         }).populate('user', 'username').populate('league', 'name').exec(cb);
     }
 };
+
+/**
+ * Virtuals
+ */
+AgentSchema.set('toJSON', {
+    virtuals: true
+});
+
+AgentSchema.virtual('status').get(function() {
+    var curr_portfolio = _.last(this.portfolio);
+
+    var cash = 100000; // TODO tie into league default
+    if (curr_portfolio !== undefined) {
+        cash = curr_portfolio.composition.cash;
+    }
+
+    var securities_value = 0; //TODO
+    return {
+        'current_composition': curr_portfolio,
+        'securities_value': securities_value,
+        'cash': cash,
+        'total_value': (cash + securities_value)
+    };
+});
 
 mongoose.model('Agent', AgentSchema);

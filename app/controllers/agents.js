@@ -101,22 +101,6 @@ exports.show = function(req, res) {
     var agent = req.agent.toJSON();
     var user = req.user;
 
-    var current_portfolio = _.last(agent.portfolio);
-
-    var cash = 100000; // TODO tie into league default
-    console.log(JSON.stringify(current_portfolio));
-    if (current_portfolio !== undefined) {
-        cash = current_portfolio.composition.cash;
-    }
-
-    var portfolio_value = 0; //TODO
-
-    agent.status = {
-        'current_portfolio': current_portfolio,
-        'portfolio_value': portfolio_value,
-        'cash': cash
-    };
-
     if (user === undefined || !user._id.equals(agent.user._id)) {
         agent = _.omit(agent, 'portfolio', 'apikey');
         agent.status = _.omit(agent.status, 'current_portfolio');
