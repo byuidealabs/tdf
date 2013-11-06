@@ -5,20 +5,16 @@ angular.module('tdf.system').controller('HeaderController',
 
         $scope.menu = [
             {
-                'title': 'My Profile',
-                'link': 'users/profile'
+                'title': 'My Agents',
+                'link': 'users/' + $scope.global.user._id
             },
             {
                 'title': 'Leagues',
                 'link': 'leagues/'
             },
             {
-                'title': 'Users',
+                'title': 'All Users',
                 'link': 'users/'
-            },
-            {
-                'title': 'Agents',
-                'link': 'agents/'
             }
         ];
 

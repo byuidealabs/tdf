@@ -1,10 +1,15 @@
-/**
- * Module dependencies.
- */
+//=============================================================================
+//  Module Dependencies
+//=============================================================================
+
 var mongoose = require('mongoose'),
     Agent = mongoose.model('Agent'),
     Crypto = require('crypto'),
     _ = require('underscore');
+
+//=============================================================================
+//  Helper Functions
+//=============================================================================
 
 /**
  * Creates a random ascii key of the specified length
@@ -19,7 +24,8 @@ var randomAscii = function(len){
     // loop through each byte
     for (i=0; i < bytes.length; i++) {
         var c = bytes[i]; // the character in range 0 to 255
-        var c2 = Math.floor(c / 10.24); // transform to range 0-25 and round down
+        var c2 = Math.floor(c / 10.24); // transform to range 0-25 and round
+                                        // down
         var c3 = c2 + 97; // ASCII a to z is 97 to 122
         // now convert the transformed character code to its string
         // value and append to the verification code
@@ -27,6 +33,31 @@ var randomAscii = function(len){
     }
     return verificationCode;
 };
+
+var get_security_price = function(symbol, method) {
+    if (symbol === 'notasymbol') {
+        throw {
+            'msg': 'Unknown security: ' + symbol + '.',
+            'code': 4
+        };
+    }
+    if (symbol === 'cash') {
+        throw {
+            'msg': 'Cannot trade cash. Please trade securities.',
+            'code': 5
+        };
+    }
+    if (method === 'sell') {
+        return 110;
+    }
+    if (method === 'buy') {
+        return 100;
+    }
+};
+
+//=============================================================================
+//  Exports: CRUD
+//=============================================================================
 
 /**
  * Find agent by id
@@ -138,31 +169,20 @@ exports.all = function(req, res) {
     });
 };
 
-//=============================================================================
-//  Trading System
-//=============================================================================
-
-// TODO: tie into Yahoo finance and move out of controller
-var get_security_price = function(symbol, method) {
-    if (symbol === 'notasymbol') {
-        throw {
-            'msg': 'Unknown security: ' + symbol + '.',
-            'code': 4
-        };
-    }
-    if (symbol === 'cash') {
-        throw {
-            'msg': 'Cannot trade cash. Please trade securities.',
-            'code': 5
-        };
-    }
-    if (method === 'sell') {
-        return 110;
-    }
-    if (method === 'buy') {
-        return 100;
-    }
+/**
+ * Regenerates a new random api key for the user.
+ */
+exports.resetapikey = function(req, res) {
+    var agent = req.agent;
+    agent.apikey = randomAscii(32);
+    agent.save(function (/*err*/) {
+        res.jsonp(agent);
+    });
 };
+
+//=============================================================================
+//  Exports: Trading System
+//=============================================================================
 
 /**
  * Allow a trade to be made
@@ -289,17 +309,6 @@ exports.reset = function(req, res) {
     agent.portfolio = [];
 
     agent.save(function (/*err*/){
-        res.jsonp(agent);
-    });
-};
-
-/**
- * Regenerates a new random api key for the user.
- */
-exports.resetapikey = function(req, res) {
-    var agent = req.agent;
-    agent.apikey = randomAscii(32);
-    agent.save(function (/*err*/) {
         res.jsonp(agent);
     });
 };
