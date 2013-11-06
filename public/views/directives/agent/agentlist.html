@@ -13,7 +13,7 @@
     </div>
     <div class='panel-body'>
         <div class='panel panel-primary'
-            ng-repeat='agent in agents | filter:{league._id: league._id}'>
+            ng-repeat='agent in leagueagents = (agents | filter:{league._id: league._id})'>
             <div class='panel-heading'>
                 {{agent.name}}
 
@@ -60,6 +60,10 @@
                 <br />
                 <agent-status status='agent.status'></agent-status>
             </div>
+        </div>
+
+        <div ng-show='!leagueagents.length'>
+            No agents registered for this league.
         </div>
     </div>
 </div>

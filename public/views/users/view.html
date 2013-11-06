@@ -1,32 +1,5 @@
-<section data-ng-controller='UsersController' data-ng-init='findOne()'>
+<section ng-controller='UsersController' ng-init='findOne()'>
     <h1>{{user.username}}</h1>
-
-    <div class='panel panel-info'>
-        <div class='panel-heading'>Owned Agents</div>
-        <div class='panel-body'>
-            <div class='panel panel-primary' ng-repeat='agent in user.agents'>
-                <div class='panel-heading'>{{agent.name}}</div>
-                <div class='panel-body'>
-                    <ul>
-                        <li><b>Description:</b> {{agent.description}}</li>
-                        <li><b>League:</b> {{agent.league.name}}</li>
-                        <li><b>Current Cash:</b> {{agent.cash | currency}}</li>
-                    </ul>
-                    <a class='btn btn-default' href='#!/agents/{{agent._id}}'>
-                        View Agent
-                    </a>
-                </div>
-            </div>
-            <div ng-show='user.agents.length == 0'>
-                {{user.username}} has not yet created any agents
-            </div>
-        </div>
-    </div>
-
-    <div ng-class='{"btn-group": isme}'>
-        <a class='btn btn-primary' href='#!/users/profile' ng-show='isme'>
-            Edit Profile
-        </a>
-        <a class='btn btn-default' href='#!/users'>All Users</a>
-    </div>
+    <h2>Agents Owned</h2>
+    <agent-list></agent-list>
 </section>

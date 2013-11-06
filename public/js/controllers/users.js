@@ -1,8 +1,8 @@
 angular.module('tdf.users').controller('UsersController',
     ['$scope', '$routeParams', '$location', '$modal', 'Global', 'Utilities',
-     'Users', 'Agents',
+     'Users', 'Agents', 'Leagues',
     function ($scope, $routeParams, $location, $modal, Global, Utilities,
-              Users, Agents) {
+              Users, Agents, Leagues) {
         $scope.global = Global;
 
         $scope.find = function(query) {
@@ -16,13 +16,21 @@ angular.module('tdf.users').controller('UsersController',
                 userId: $routeParams.userId
             }, function(user) {
                 $scope.user = user;
+                $scope.agents = user.agents;
                 $scope.isme = ($scope.user.id === $scope.global.user._id);
+                Leagues.query(function(leagues) {
+                    $scope.leagues = leagues;
+                });
             });
         };
 
         $scope.getProfile = function() {
             Users.getProfile({}, function(user) {
                 $scope.user = user;
+                $scope.agents = user.agents;
+                Leagues.query(function(leagues) {
+                    $scope.leagues = leagues;
+                });
             });
         };
 
