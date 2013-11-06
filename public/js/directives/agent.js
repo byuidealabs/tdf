@@ -8,4 +8,14 @@ angular.module('tdf').directive('agentList',
                 agents: '='
             }
         };
+    }])
+.directive('agentStatus',
+    [function() {
+        return {
+            restrict: 'E',
+            templateUrl: 'views/directives/agent/agentstatus.html',
+            scope: {
+                status: '='
+            }
+        };
     }]);

@@ -13,13 +13,8 @@
                     <div class='col-lg-2'><b>Owner</b></div>
                     <div class='col-lg-6'>{{agent.user.username}}</div>
                 </div>
-                <hr />
-                <div class='row'>
-                    <div class='col-lg-2'><b>Current Cash</b></div>
-                    <div class='col-lg-6'>
-                        {{agent.status.cash}}
-                    </div>
-                </div>
+                <br />
+                <agent-status status='agent.status'></agent-status>
             </div>
         </div>
     </div>
