@@ -37,7 +37,7 @@ AgentSchema.statics = {
     load: function(id, cb) {
         this.findOne({
             _id: id
-        }).populate('user', 'username').populate('league', 'name').exec(cb);
+        }).populate('user', 'username').populate('league', 'name startCash shortSellLimit leverageLimit').exec(cb);
     }
 };
 
@@ -51,7 +51,7 @@ AgentSchema.set('toJSON', {
 AgentSchema.virtual('status').get(function() {
     var curr_portfolio = _.last(this.portfolio);
 
-    var cash = 100000; // TODO tie into league default
+    var cash = this.league.startCash;
     if (curr_portfolio !== undefined) {
         cash = curr_portfolio.composition.cash;
     }

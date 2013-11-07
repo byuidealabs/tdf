@@ -26,7 +26,10 @@ angular.module('tdf.leagues').controller('LeaguesController',
                 isOpenLeague: true,
                 maxAgents: 100,
                 maxrUserAgents: 100,
-                principalAgentRequired: false
+                principalAgentRequired: false,
+		startCash: 100000,
+		shortSellLimit: 0,
+		leverageLimit: 0
             };
         };
 
