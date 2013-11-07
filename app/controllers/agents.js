@@ -128,7 +128,6 @@ exports.destroy = function(req, res) {
  * Show an agent
  */
 exports.show = function(req, res) {
-    //TODO add current value and historical values
     var agent = req.agent.toJSON();
     var user = req.user;
 
