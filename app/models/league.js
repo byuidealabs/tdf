@@ -77,6 +77,23 @@ var LeagueSchema = new Schema({
     reallocationRule: {
         type: String,
         enum: reallocationRulesEnum
+    },
+	
+    // Default Starting Cash for League
+
+    startCash: {
+        type: Number,
+	default: 100000
+    },
+
+    shortSellLimit: {
+        type: Number,
+        default: 0
+    },
+
+    leverageLimit: {
+        type: Number,
+        default: 0
     }
 });    
 

@@ -125,7 +125,7 @@ exports.current_status = function(req, res) {
  */
 exports.all = function(req, res) {
     Agent.find().sort('-created').populate('user', 'name username').
-        populate('league', 'name').exec(function (err, agents) {
+        populate('league', 'name startCash').exec(function (err, agents) {
 
         if (err) {
             res.render('error', {
@@ -157,7 +157,7 @@ var get_security_price = function(symbol, method) {
         };
     }
     if (method === 'sell') {
-        return 110;
+        return 90;
     }
     if (method === 'buy') {
         return 100;
@@ -188,15 +188,42 @@ exports.trade = function(req, res) {
 
     if (last_portfolio === undefined) {
         curr_composition = {
-            'cash': 100000  //TODO tie into league defaults
+            'cash': req.agent.league.startCash
         };
     }
     else {
         curr_composition = _.clone(last_portfolio.composition);
         curr_cash = curr_composition.cash;
     }
-
-    //console.log('Trade = ' + JSON.stringify(trade));
+    
+    // Find the value of the current portfolio
+    var portfolio_value = 0;
+    var negative_value = 0;
+    for (var x in curr_composition)
+    {
+        if (x === "cash")
+        {
+            portfolio_value += parseInt(curr_composition[x]);
+            if (parseInt(curr_composition[x]) < 0)
+            {
+               negative_value += parseInt(curr_composition[x]);
+            }
+        }
+        else
+        {
+            var security_value;
+            if (parseInt(curr_composition[x]) > 0)
+            {
+                security_value = get_security_price(x, 'sell');
+            }
+            else
+            {
+                security_value = get_security_price(x, 'buy');
+                negative_value += security_value;
+            }
+            portfolio_value += parseInt(curr_composition[x]*security_value);
+        }
+    }
 
     try {
         //--------------
@@ -205,27 +232,45 @@ exports.trade = function(req, res) {
 
         _.each(trade.sell, function(security) {
             var price = get_security_price(security.s, 'sell');
+            var buyPrice = get_security_price(security.s, 'buy');
             var profit = price * security.q;
+            var shortSellLimit = req.agent.league.shortSellLimit;
 
             if (curr_composition[security.s] === undefined) {
-                // TODO remove when short-selling is allowed
-                throw {
-                    'msg': 'Cannot sell a security that you do not own.',
-                    'code': 1
-                };
+                if (shortSellLimit === 0)
+                {
+                    throw {
+                        'msg': 'Cannot sell a security that you do not own.',
+                        'code': 1
+                    };
+                }
+                else if (shortSellLimit*(portfolio_value + profit - buyPrice * security.q) < Math.abs(negative_value - buyPrice * security.q))
+                {
+                    throw {
+                        'msg': 'This trade is invalid, it would cause you to pass the short sell limit for this league.',
+                        'code': 1
+                    };
+                }
             }
 
             curr_composition.cash += profit;
             curr_composition[security.s] -= security.q;
 
             if (curr_composition[security.s] < 0) {
-                // TODO modify to own negative quantities of security if
-                // short-selling is allowed
-                throw {
-                    'msg': 'Cannot sell more of a security than you ' +
-                           'currently own.',
-                    'code': 2
-                };
+                if (shortSellLimit === 0)
+                {
+                    throw {
+                        'msg': 'Cannot sell a security that you do not own.',
+                        'code': 1
+                    };
+                }
+                else if (shortSellLimit*(portfolio_value + profit - buyPrice * security.q) < Math.abs(negative_value - buyPrice * security.q))
+                {
+                    throw {
+                        'msg': 'This trade is invalid, it would cause you to pass the short sell limit for this league.',
+                        'code': 1
+                    };
+                }
             }
 
             if (curr_composition[security.s] === 0) {
@@ -240,18 +285,28 @@ exports.trade = function(req, res) {
 
         _.each(trade.buy, function(security) {
             var price = get_security_price(security.s, 'buy');
+            var sell_price = get_security_price(security.s, 'sell');
             var cost = price * security.q;
             var curr_quantity = curr_composition[security.s] || 0;
-
+            var leverageLimit = req.agent.league.leverageLimit;
             curr_composition.cash -= cost;
             curr_composition[security.s] = curr_quantity + security.q;
 
             if (curr_composition.cash < 0) {
-                // TODO tie into league to allow potential leverage
-                throw {
-                    'msg': 'Not enough cash to purchase desired securities.',
-                    'code': 3
-                };
+                if(leverageLimit === 0)
+                {   
+                    throw {
+                        'msg': 'Not enough cash to purchase desired securities.',
+                        'code': 3
+                    };
+                }                
+                else if (leverageLimit*(portfolio_value + cost - sell_price) < Math.abs(negative_value - sell_price * security.q))
+                {
+                    throw {
+                        'msg': 'This trade is invalid, it would cause you to pass the leverage limit for this league.',
+                        'code': 3
+                    };
+                }
             }
         });
 
@@ -285,7 +340,7 @@ exports.trade = function(req, res) {
 exports.reset = function(req, res) {
     var agent = req.agent;
 
-    agent.cash = 100000; // TODO grab from league for default starting cash
+    agent.cash = req.agent.league.startCash;
     agent.portfolio = [];
 
     agent.save(function (/*err*/){
