@@ -1,29 +1,29 @@
-<div class="navbar-inner" data-ng-controller="HeaderController">
-    <ul class="nav navbar-nav">
+<div class='navbar-inner' ng-controller='HeaderController' ng-init='setMenu()'>
+    <ul class='nav navbar-nav'>
         <li>
-            <a class="navbar-brand" href="/">Tour de Finance</a>
+            <a class='navbar-brand' href='/'>Tour de Finance</a>
         </li>
-        <li data-ng-repeat="item in menu" data-ng-show="global.user"
-                ui-route="/{{item.link}}" ng-class="{active: $uiRoute}">
-            <a href="#!/{{item.link}}">{{item.title}}</a>
-        </li>
-    </ul>
-    <ul class="nav navbar-nav pull-right" data-ng-hide="global.authenticated">
-        <li><a href="signup">Signup</a>
-        </li>
-        <li class="divider-vertical"></li>
-        <li><a href="signin">Signin</a>
+        <li data-ng-repeat='item in menu' data-ng-show='true'
+                ui-route='/{{item.link}}' ng-class='{active: $uiRoute}'>
+            <a href='#!/{{item.link}}'>{{item.title}}</a>
         </li>
     </ul>
-    <ul class="nav navbar-nav pull-right" data-ng-show="global.authenticated">
-        <li class="dropdown">
-            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+    <ul class='nav navbar-nav pull-right' data-ng-hide='global.authenticated'>
+        <li><a href='signup'>Signup</a>
+        </li>
+        <li class='divider-vertical'></li>
+        <li><a href='signin'>Signin</a>
+        </li>
+    </ul>
+    <ul class='nav navbar-nav pull-right' data-ng-show='global.authenticated'>
+        <li class='dropdown'>
+            <a href='#' class='dropdown-toggle' data-toggle='dropdown'>
                 {{global.user.name}} ({{global.user.username}})
-                <b class="caret"></b>
+                <b class='caret'></b>
 	    </a>
-            <ul class="dropdown-menu">
-                <li><a href="/signout">Signout</a></li>
-                <li><a href="/#!/users/profile">Edit Profile</a></li>
+            <ul class='dropdown-menu'>
+                <li><a href='/signout'>Signout</a></li>
+                <li><a href='/#!/users/profile'>Edit Profile</a></li>
             </ul>
         </li>
     </ul>
