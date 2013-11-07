@@ -130,7 +130,7 @@ angular.module('tdf').factory('Metrics',
 			    delta = delta + (sub_array[k+1] - sub_array[k]);
 			}
 			delta = delta/sub_n;
-			console.log(delta);
+			//console.log(delta);
 			arr_score[l] = (delta - r_f)/sd;
 		    }
 		}
