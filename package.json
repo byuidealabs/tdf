@@ -30,6 +30,8 @@
         "passport-github": "latest",
         "passport-google-oauth": "latest",
         "underscore": "latest",
+        "request": "latest",
+        "csv": "latest",
         "async": "latest",
         "view-helpers": "latest",
         "mean-logger": "latest",

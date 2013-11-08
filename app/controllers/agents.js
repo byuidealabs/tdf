@@ -5,6 +5,8 @@
 var mongoose = require('mongoose'),
     Agent = mongoose.model('Agent'),
     Crypto = require('crypto'),
+    request = require('request'),
+    csv = require('csv'),
     _ = require('underscore');
 
 //=============================================================================
@@ -34,7 +36,7 @@ var randomAscii = function(len){
     return verificationCode;
 };
 
-var get_security_price = function(symbol, method) {
+/*var get_security_price = function(symbol, method) {
     if (symbol === 'notasymbol') {
         throw {
             'msg': 'Unknown security: ' + symbol + '.',
@@ -53,6 +55,73 @@ var get_security_price = function(symbol, method) {
     if (method === 'buy') {
         return 100;
     }
+};*/
+
+/**
+ * Gets a table of quotes for the given symbols and executes the callback
+ * on the result.
+ *
+ * http://greenido.wordpress.com/2009/12/22/yahoo-finance-hidden-api/
+ */
+var getQuotes = function(req, res, symbols, cb) {
+    var yUrl = 'http://download.finance.yahoo.com/d/quotes.csv' +
+               '?f=sbal1&s=';
+
+    var symbol_str = _.reduce(symbols, function(memo, symbol) {
+        var pre = '';
+        if (symbol.length) {
+            pre = '+';
+        }
+        return memo + pre + symbol;
+    });
+    var url = yUrl + symbol_str;
+    console.log(JSON.stringify(symbols));
+    console.log(url);
+    request(url, function(error, request, body) {
+        if (error) {
+            cb(req, res, error, null);
+        }
+        else {
+            csv().from.string(body).to.array(function(quotesarray) {
+                var quotes = {};
+                _.each(quotesarray, function(quote) {
+                    quotes[_.first(quote)] = {
+                        'ask': quote[1],
+                        'bid': quote[2],
+                        'last': quote[3]
+                    };
+                });
+                cb(req, res, null, quotes);
+            });
+        }
+    });
+};
+
+/**
+ * Returns the portfolio value.
+ *
+ * Assumes quotes has a symbol for everything in the current composition.
+ */
+var portfolioValue = function(composition, quotes, negative_only) {
+    var value = 0;
+    var curr_value = 0;
+    _.each(composition, function(quantity, symbol) {
+        if (symbol === 'cash') {
+            curr_value = quantity;
+        }
+        else {
+            // TODO error check symbol existing in quotes
+            // TODO error check symbol has a quantity
+            // TODO tie in value computation with admin (don't necessarily be
+            //      bid
+            curr_value = (quotes[symbol].bid * quantity);
+        }
+
+        if (!negative_only || curr_value < 0) {
+            value += curr_value;
+        }
+    });
+    return value;
 };
 
 //=============================================================================
@@ -183,6 +252,148 @@ exports.resetapikey = function(req, res) {
 //  Exports: Trading System
 //=============================================================================
 
+
+/**
+ * Real codes:
+ *  1. Could not connect to Yahoo finance
+ */
+var __execute_trade = function(req, res, error, quotes) {
+    try {
+        if (error) {
+            throw {
+                'msg': 'Error connecting to Yahoo Finance',
+                'code': 1
+            };
+        }
+
+        var trade = req.body.trade || req.body;
+        var agent = req.agent;
+        var last_portfolio = _.last(agent.portfolio);
+        var curr_composition;
+
+        if (last_portfolio === undefined) {
+            curr_composition = {
+                'cash': req.agent.league.startCash
+            };
+        }
+        else {
+            curr_composition = _.clone(last_portfolio.composition);
+        }
+
+        var portfolio_value = portfolioValue(curr_composition, quotes, false);
+        var negative_value = portfolioValue(curr_composition, quotes, true);
+
+        //--------------
+        // Sell first...
+        //--------------
+
+        _.each(trade.sell, function(security) {
+            // TODO tie bid/ask to admin
+            // TODO error checking of non-existent
+            var price = quotes[security.s].bid;
+            var buyPrice = quotes[security.s].ask;
+            var profit = price * security.q;
+            var shortSellLimit = req.agent.league.shortSellLimit;
+
+            if (curr_composition[security.s] === undefined) {
+                if (shortSellLimit === 0) {
+                    throw {
+                        'msg': 'Cannot sell a security that you do not own.',
+                        'code': 1
+                    };
+                }
+                else if (shortSellLimit*(portfolio_value + profit -
+                                         buyPrice * security.q) <
+                         Math.abs(negative_value - buyPrice * security.q)) {
+                    throw {
+                        'msg': 'This trade is invalid, it would cause you ' +
+                               'to pass the short sell limit for this league.',
+                        'code': 1
+                    };
+                }
+            }
+
+            curr_composition.cash += profit;
+            curr_composition[security.s] -= security.q;
+
+            if (curr_composition[security.s] < 0) {
+                if (shortSellLimit === 0) {
+                    throw {
+                        'msg': 'Cannot sell a security that you do not own.',
+                        'code': 1
+                    };
+                }
+                else if (shortSellLimit*(portfolio_value + profit -
+                                         buyPrice * security.q) <
+                         Math.abs(negative_value - buyPrice * security.q)) {
+                    throw {
+                        'msg': 'This trade is invalid, it would cause you ' +
+                               'to pass the short sell limit for this league.',
+                        'code': 1
+                    };
+                }
+            }
+
+            if (curr_composition[security.s] === 0) {
+                delete curr_composition[security.s];
+            }
+
+        });
+
+        //---------
+        // Then buy
+        //---------
+
+        _.each(trade.buy, function(security) {
+            // TODO tie in admin bid/ask
+            // TODO error checking
+            var price = quotes[security.s].ask;
+            var sell_price = quotes[security.s].bid;
+            var cost = price * security.q;
+            var curr_quantity = curr_composition[security.s] || 0;
+            var leverageLimit = req.agent.league.leverageLimit;
+            curr_composition.cash -= cost;
+            curr_composition[security.s] = curr_quantity + security.q;
+
+            if (curr_composition.cash < 0) {
+                if(leverageLimit === 0) {
+                    throw {
+                        'msg': 'Not enough cash to purchase desired ' +
+                               'securities.',
+                        'code': 3
+                    };
+                }
+                else if (leverageLimit*(portfolio_value + cost - sell_price) <
+                         Math.abs(negative_value - sell_price * security.q)) {
+                    throw {
+                        'msg': 'This trade is invalid, it would cause you ' +
+                               'to pass the leverage limit for this league.',
+                        'code': 3
+                    };
+                }
+            }
+        });
+
+        //----------------------
+        // Save changes to agent
+        //----------------------
+
+        agent.portfolio.push({composition: curr_composition});
+        agent.save(function () {
+            res.jsonp(agent);
+        });
+    }
+    catch (err) {
+        //-------------------------
+        // An error was encountered
+        //-------------------------
+
+        res.jsonp({
+            error: err
+        });
+    }
+};
+
 /**
  * Allow a trade to be made
  *
@@ -199,9 +410,40 @@ exports.resetapikey = function(req, res) {
  */
 exports.trade = function(req, res) {
 
-    var agent = req.agent;
     var trade = req.body.trade || req.body;  // Depending on source of data
-    var last_portfolio = _.last(req.agent.portfolio);
+
+    // Filter out trades with zero quantity
+    trade.buy = _.filter(trade.buy, function(security) {
+        return security.q !== 0;
+    });
+    trade.sell = _.filter(trade.sell, function(security) {
+        return security.q !== 0;
+    });
+
+    // Get list of all unique trade symbols
+    var buysymbols = _.map(trade.buy, function(security) {
+        return security.s;
+    });
+    var sellsymbols = _.map(trade.sell, function(security) {
+        return security.s;
+    });
+    var symbols = _.union(buysymbols, sellsymbols);
+
+    // Add symbols from current composition
+    var last_portfolio = _.last(req.agent.portfolio).composition;
+    if (last_portfolio !== undefined) {
+        var cashless = _.omit(last_portfolio, 'cash');
+        var portfolio_symbols = _.map(cashless, function(security, symbol) {
+            return symbol;
+        });
+        symbols = _.union(symbols, portfolio_symbols);
+        // TODO what happens if a portfolio has a security that yahoo does not?
+    }
+
+    // Trade
+    getQuotes(req, res, symbols, __execute_trade);
+
+    /*var last_portfolio = _.last(req.agent.portfolio);
     var curr_composition;
     var curr_cash;
 
@@ -331,7 +573,7 @@ exports.trade = function(req, res) {
         //----------------------
 
         agent.portfolio.push({composition: curr_composition});
-        agent.save(function (/*err*/) {
+        agent.save(function () {
             res.jsonp(agent);
         });
     }
@@ -344,7 +586,7 @@ exports.trade = function(req, res) {
         res.jsonp({
             error: err
         });
-    }
+    }*/
 };
 
 /**
