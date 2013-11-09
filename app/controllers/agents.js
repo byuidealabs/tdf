@@ -210,18 +210,6 @@ exports.show = function(req, res) {
 };
 
 /**
- * Gives the current status (most recent portfolio composition) of the
- * agent.
- *
- * TODO
- */
-exports.current_status = function(req, res) {
-    var agent = req.agent;
-    var current_portfolio = _.last(agent.portfolio);
-    res.jsonp(current_portfolio);
-};
-
-/**
  * List of agents
  */
 exports.all = function(req, res) {

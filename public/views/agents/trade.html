@@ -9,8 +9,10 @@
     </h1>
 
     <div class='panel panel-info'>
-        <div class='panel-heading'>Current Cash</div>
-        <div class='panel-body'><h2>{{agent.cash | currency}}</h2></div>
+        <div class='panel-heading'>Current Status</div>
+        <div class='panel-body'>
+            <agent-status status='agent.status'></agent-status>
+        </div>
     </div>
     <div class='panel panel-primary'>
         <div class='panel-heading'>Trade</div>
@@ -118,13 +120,13 @@
                 <div class='panel-body'>
                     <ul>
                         <li ng-repeat='(symbol, quantity) in trade.composition'>
-                            <b>{{symbol}}:</b>
-                            <span ng-hide='symbol === "cash"'>
-                                {{quantity}} shares
-                            </span>
-                            <span ng-show='symbol === "cash"'>
+                            <div ng-hide='symbol === "cash00"'>
+                                <b>{{symbol}}:</b> {{quantity}} shares
+                            </div>
+                            <div ng-show='symbol === "cash00"'>
+                                <b>Uninvested Cash:</b>
                                 {{quantity | currency}}
-                            </span>
+                            </div>
                         </li>
                     </ul>
                     <div ng-show='!trade.composition ||

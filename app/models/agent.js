@@ -53,7 +53,7 @@ AgentSchema.virtual('status').get(function() {
 
     var cash = this.league.startCash;
     if (curr_portfolio !== undefined) {
-        cash = curr_portfolio.composition.cash;
+        cash = curr_portfolio.composition.cash00;
     }
 
     var securities_value = 0; //TODO

@@ -91,13 +91,13 @@
                 <div class='panel-body'>
                     <ul>
                         <li ng-repeat='(symbol, quantity) in trade.composition'>
-                            <b>{{symbol}}:</b>
-                            <span ng-hide='symbol === "cash"'>
-                                {{quantity}} shares
-                            </span>
-                            <span ng-show='symbol === "cash"'>
+                            <div ng-hide='symbol === "cash00"'>
+                                <b>{{symbol}}:</b> {{quantity}} shares
+                            </div>
+                            <div ng-show='symbol === "cash00"'>
+                                <b>Uninvested Cash:</b>
                                 {{quantity | currency}}
-                            </span>
+                            </div>
                         </li>
                     </ul>
                     <div ng-show='!trade.composition ||
