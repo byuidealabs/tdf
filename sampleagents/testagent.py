@@ -3,11 +3,13 @@ import json
 
 HEADERS = {'Content-Type': 'application/json'}
 SITE = 'http://localhost:3000/agents/trade/'
-AGENT_ID = '52741243e93c0ce429000003'
+# AGENT_ID = '52741243e93c0ce429000003'             # Lab Agent
+AGENT_ID = '527e640b6f8aaab26a000002'               # Personal Agent
 OTHER_ID = '5277c1ccb33812240e000003'
 BOGUS_ID = '012345678900000000000000'
 
-API_KEY = 'ponweyqvgqbyonttkffyllubodaidawg'
+# API_KEY = 'ponweyqvgqbyonttkffyllubodaidawg'      # Lab Agent
+API_KEY = 'mosxwaqxrutualrdaoyrdgwrtdyksuhv'        # Personal Agent
 ALT_KEY = 'mnvanhaajotdowwcdrqfcwujolajchct'
 
 # USER ACCOUNT:
@@ -31,7 +33,7 @@ if __name__ == '__main__':
 
     # Create trade 1: buy 100 shares GOOG
     buy = {
-        'buy': [{'s': 'GOOG', 'q': 100}],
+        'buy': [{'s': 'GOOG', 'q': 10}],
         'sell': [],
         'apikey': API_KEY
     }
@@ -45,7 +47,7 @@ if __name__ == '__main__':
 
     sell = {
         'buy': [],
-        'sell': [{'s': 'GOOG', 'q': 50}],
+        'sell': [{'s': 'GOOG', 'q': 5}],
         'apikey': API_KEY
     }
 
@@ -57,8 +59,8 @@ if __name__ == '__main__':
     #-------------------------------
 
     comp = {
-        'buy': [{'s': 'NFLX', 'q': 125}, {'s': 'AAPL', 'q': 65}],
-        'sell': [{'s': 'GOOG', 'q': 50}],
+        'buy': [{'s': 'NFLX', 'q': 13}, {'s': 'AAPL', 'q': 7}],
+        'sell': [{'s': 'GOOG', 'q': 5}],
         'apikey': API_KEY
     }
 
@@ -164,7 +166,7 @@ if __name__ == '__main__':
 
     sall = {
         'buy': [],
-        'sell': [{'s': 'AAPL', 'q': 65}, {'s': 'NFLX', 'q': 125}],
+        'sell': [{'s': 'AAPL', 'q': 7}, {'s': 'NFLX', 'q': 13}],
         'apikey': API_KEY
     }
     r = requests.put(SITE + AGENT_ID, data=json.dumps(sall), headers=HEADERS)

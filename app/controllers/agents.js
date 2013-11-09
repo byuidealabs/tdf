@@ -65,7 +65,8 @@ var randomAscii = function(len){
  */
 var getQuotes = function(req, res, symbols, cb) {
     var yUrl = 'http://download.finance.yahoo.com/d/quotes.csv' +
-               '?f=sbal1&s=';
+               '?f=sb2b3l1&s=';
+               // Should be symbol, ask, bid, last
 
     var symbol_str = _.reduce(symbols, function(memo, symbol) {
         var pre = '';
@@ -75,8 +76,6 @@ var getQuotes = function(req, res, symbols, cb) {
         return memo + pre + symbol;
     });
     var url = yUrl + symbol_str;
-    console.log(JSON.stringify(symbols));
-    console.log(url);
     request(url, function(error, request, body) {
         if (error) {
             cb(req, res, error, null);
@@ -252,10 +251,37 @@ exports.resetapikey = function(req, res) {
 //  Exports: Trading System
 //=============================================================================
 
+/**
+ * Looks up the price of the security represented by symbol in quotes.
+ *
+ * Scheme defines the price, and is one of 'bid', 'ask', and 'last'.
+ *
+ * If a lookup fails with the given scheme, a second lookup occures with
+ * scheme of last. If that fails, an error is thrown (the symbol does not
+ * exist in yahoo finance)
+ */
+var __get_security_value = function(quotes, symbol, scheme) {
+    var value = quotes[symbol][scheme];
+    if (scheme === 'last' && isNaN(value)) {
+        throw {
+            'msg': 'Trade on unknown security ' + symbol,
+            'code': 2
+        };
+    }
+    else if (scheme !== 'last' && isNaN(value)) {
+        // In case bid/ask are not returned on this security
+        return __get_security_value(quotes, symbol, 'last');
+    }
+    else {
+        return parseFloat(value);
+    }
+};
+
 
 /**
  * Real codes:
  *  1. Could not connect to Yahoo finance
+ *  2. Unknown symbol
  */
 var __execute_trade = function(req, res, error, quotes) {
     try {
@@ -290,9 +316,9 @@ var __execute_trade = function(req, res, error, quotes) {
         _.each(trade.sell, function(security) {
             // TODO tie bid/ask to admin
             // TODO error checking of non-existent
-            var price = quotes[security.s].bid;
-            var buyPrice = quotes[security.s].ask;
-            var profit = price * security.q;
+            var sell_price = __get_security_value(quotes, security.s, 'bid');
+            var buy_price = __get_security_value(quotes, security.s, 'ask');
+            var profit = sell_price * security.q;
             var shortSellLimit = req.agent.league.shortSellLimit;
 
             if (curr_composition[security.s] === undefined) {
@@ -303,8 +329,8 @@ var __execute_trade = function(req, res, error, quotes) {
                     };
                 }
                 else if (shortSellLimit*(portfolio_value + profit -
-                                         buyPrice * security.q) <
-                         Math.abs(negative_value - buyPrice * security.q)) {
+                                         buy_price * security.q) <
+                         Math.abs(negative_value - buy_price * security.q)) {
                     throw {
                         'msg': 'This trade is invalid, it would cause you ' +
                                'to pass the short sell limit for this league.',
@@ -312,9 +338,6 @@ var __execute_trade = function(req, res, error, quotes) {
                     };
                 }
             }
-
-            curr_composition.cash += profit;
-            curr_composition[security.s] -= security.q;
 
             if (curr_composition[security.s] < 0) {
                 if (shortSellLimit === 0) {
@@ -324,8 +347,8 @@ var __execute_trade = function(req, res, error, quotes) {
                     };
                 }
                 else if (shortSellLimit*(portfolio_value + profit -
-                                         buyPrice * security.q) <
-                         Math.abs(negative_value - buyPrice * security.q)) {
+                                         buy_price * security.q) <
+                         Math.abs(negative_value - buy_price * security.q)) {
                     throw {
                         'msg': 'This trade is invalid, it would cause you ' +
                                'to pass the short sell limit for this league.',
@@ -347,13 +370,16 @@ var __execute_trade = function(req, res, error, quotes) {
         _.each(trade.buy, function(security) {
             // TODO tie in admin bid/ask
             // TODO error checking
-            var price = quotes[security.s].ask;
-            var sell_price = quotes[security.s].bid;
-            var cost = price * security.q;
+            var buy_price = __get_security_value(quotes, security.s, 'ask');
+            var sell_price = __get_security_value(quotes, security.s, 'bid');
+            var cost = buy_price * security.q;
             var curr_quantity = curr_composition[security.s] || 0;
             var leverageLimit = req.agent.league.leverageLimit;
             curr_composition.cash -= cost;
             curr_composition[security.s] = curr_quantity + security.q;
+
+            console.log('buying at: ' + buy_price);
+            console.log('cost: ' + cost);
 
             if (curr_composition.cash < 0) {
                 if(leverageLimit === 0) {
@@ -430,9 +456,9 @@ exports.trade = function(req, res) {
     var symbols = _.union(buysymbols, sellsymbols);
 
     // Add symbols from current composition
-    var last_portfolio = _.last(req.agent.portfolio).composition;
+    var last_portfolio = _.last(req.agent.portfolio);
     if (last_portfolio !== undefined) {
-        var cashless = _.omit(last_portfolio, 'cash');
+        var cashless = _.omit(last_portfolio.composition, 'cash');
         var portfolio_symbols = _.map(cashless, function(security, symbol) {
             return symbol;
         });
