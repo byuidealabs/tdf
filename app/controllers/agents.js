@@ -65,8 +65,8 @@ var randomAscii = function(len){
  */
 var getQuotes = function(req, res, symbols, cb) {
     var yUrl = 'http://download.finance.yahoo.com/d/quotes.csv' +
-               '?f=sb2b3l1&s=';
-               // Should be symbol, ask, bid, last
+               '?f=sb2b3l1e1&s=';
+               // Should be symbol, ask, bid, last, error
 
     var symbol_str = _.reduce(symbols, function(memo, symbol) {
         var pre = '';
@@ -81,13 +81,16 @@ var getQuotes = function(req, res, symbols, cb) {
             cb(req, res, error, null);
         }
         else {
-            csv().from.string(body).to.array(function(quotesarray) {
+            csv().from.string(body.replace(/<(?:.|\n)*?>/gm, ''))
+                .to.array(function(quotesarray) {
+
                 var quotes = {};
                 _.each(quotesarray, function(quote) {
-                    quotes[_.first(quote)] = {
+                    quotes[_.first(quote).toUpperCase()] = {
                         'ask': quote[1],
                         'bid': quote[2],
-                        'last': quote[3]
+                        'last': quote[3],
+                        'error': (quote[4] !== 'N/A')
                     };
                 });
                 cb(req, res, null, quotes);
@@ -105,7 +108,7 @@ var portfolioValue = function(composition, quotes, negative_only) {
     var value = 0;
     var curr_value = 0;
     _.each(composition, function(quantity, symbol) {
-        if (symbol === 'cash') {
+        if (symbol === 'cash00') {
             curr_value = quantity;
         }
         else {
@@ -261,8 +264,24 @@ exports.resetapikey = function(req, res) {
  * exist in yahoo finance)
  */
 var __get_security_value = function(quotes, symbol, scheme) {
+    symbol = symbol.toUpperCase();
+
+    if (quotes[symbol] === undefined) {
+        throw {
+            'msg': 'Could not look up symbol ' + symbol,
+            'code': 3
+        };
+    }
+    if (quotes[symbol][scheme] === undefined) {
+        throw {
+            'msg': 'Could not look up ' + scheme + ' of security ' + symbol,
+            'code': 4
+        };
+    }
+
     var value = quotes[symbol][scheme];
-    if (scheme === 'last' && isNaN(value)) {
+    var error = quotes[symbol].error;
+    if (error || (scheme === 'last' && (isNaN(value) || value === 0))) {
         throw {
             'msg': 'Trade on unknown security ' + symbol,
             'code': 2
@@ -282,6 +301,8 @@ var __get_security_value = function(quotes, symbol, scheme) {
  * Real codes:
  *  1. Could not connect to Yahoo finance
  *  2. Unknown symbol
+ *  3. Could not look up symbol (should never see)
+ *  4. Could not look up scheme (bid/ask/last) of symbol (should never see)
  */
 var __execute_trade = function(req, res, error, quotes) {
     try {
@@ -299,7 +320,7 @@ var __execute_trade = function(req, res, error, quotes) {
 
         if (last_portfolio === undefined) {
             curr_composition = {
-                'cash': req.agent.league.startCash
+                'cash00': req.agent.league.startCash
             };
         }
         else {
@@ -313,15 +334,18 @@ var __execute_trade = function(req, res, error, quotes) {
         // Sell first...
         //--------------
 
+        console.log(quotes);
+
         _.each(trade.sell, function(security) {
             // TODO tie bid/ask to admin
             // TODO error checking of non-existent
-            var sell_price = __get_security_value(quotes, security.s, 'bid');
-            var buy_price = __get_security_value(quotes, security.s, 'ask');
+            var symbol = security.s.toUpperCase();
+            var sell_price = __get_security_value(quotes, symbol, 'bid');
+            var buy_price = __get_security_value(quotes, symbol, 'ask');
             var profit = sell_price * security.q;
             var shortSellLimit = req.agent.league.shortSellLimit;
 
-            if (curr_composition[security.s] === undefined) {
+            if (curr_composition[symbol] === undefined) {
                 if (shortSellLimit === 0) {
                     throw {
                         'msg': 'Cannot sell a security that you do not own.',
@@ -339,7 +363,10 @@ var __execute_trade = function(req, res, error, quotes) {
                 }
             }
 
-            if (curr_composition[security.s] < 0) {
+            curr_composition.cash00 += profit;
+            curr_composition[symbol] -= security.q;
+
+            if (curr_composition[symbol] < 0) {
                 if (shortSellLimit === 0) {
                     throw {
                         'msg': 'Cannot sell a security that you do not own.',
@@ -357,8 +384,8 @@ var __execute_trade = function(req, res, error, quotes) {
                 }
             }
 
-            if (curr_composition[security.s] === 0) {
-                delete curr_composition[security.s];
+            if (curr_composition[symbol] === 0) {
+                delete curr_composition[symbol];
             }
 
         });
@@ -370,18 +397,16 @@ var __execute_trade = function(req, res, error, quotes) {
         _.each(trade.buy, function(security) {
             // TODO tie in admin bid/ask
             // TODO error checking
-            var buy_price = __get_security_value(quotes, security.s, 'ask');
-            var sell_price = __get_security_value(quotes, security.s, 'bid');
+            var symbol = security.s.toUpperCase();
+            var buy_price = __get_security_value(quotes, symbol, 'ask');
+            var sell_price = __get_security_value(quotes, symbol, 'bid');
             var cost = buy_price * security.q;
-            var curr_quantity = curr_composition[security.s] || 0;
+            var curr_quantity = curr_composition[symbol] || 0;
             var leverageLimit = req.agent.league.leverageLimit;
-            curr_composition.cash -= cost;
-            curr_composition[security.s] = curr_quantity + security.q;
+            curr_composition.cash00 -= cost;
+            curr_composition[symbol] = curr_quantity + security.q;
 
-            console.log('buying at: ' + buy_price);
-            console.log('cost: ' + cost);
-
-            if (curr_composition.cash < 0) {
+            if (curr_composition.cash00 < 0) {
                 if(leverageLimit === 0) {
                     throw {
                         'msg': 'Not enough cash to purchase desired ' +
@@ -458,7 +483,7 @@ exports.trade = function(req, res) {
     // Add symbols from current composition
     var last_portfolio = _.last(req.agent.portfolio);
     if (last_portfolio !== undefined) {
-        var cashless = _.omit(last_portfolio.composition, 'cash');
+        var cashless = _.omit(last_portfolio.composition, 'cash00');
         var portfolio_symbols = _.map(cashless, function(security, symbol) {
             return symbol;
         });
@@ -624,7 +649,6 @@ exports.trade = function(req, res) {
 exports.reset = function(req, res) {
     var agent = req.agent;
 
-    agent.cash = req.agent.league.startCash;
     agent.portfolio = [];
 
     agent.save(function (/*err*/){

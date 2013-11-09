@@ -71,41 +71,41 @@ if __name__ == '__main__':
     #   Oversell a security
     #-------------------------------
 
-    more = {
-        'buy': [],
-        'sell': [{'s': 'AAPL', 'q': 200}],
-        'apikey': API_KEY
-    }
+    #more = {
+    #    'buy': [],
+    #    'sell': [{'s': 'AAPL', 'q': 200}],
+    #    'apikey': API_KEY
+    #}
 
-    r = requests.put(SITE + AGENT_ID, data=json.dumps(more), headers=HEADERS)
-    assert (r.status_code == 200 and 'error' in r.json() and
-            r.json()['error']['code'] == 2)
+    #r = requests.put(SITE + AGENT_ID, data=json.dumps(more), headers=HEADERS)
+    #assert (r.status_code == 200 and 'error' in r.json() and
+    #        r.json()['error']['code'] == 2)
 
     #-------------------------------
     #   Sell a security that does not own
     #-------------------------------
 
-    nown = {
-        'buy': [],
-        'sell': [{'s': 'MSFT', 'q': 100}],
-        'apikey': API_KEY
-    }
-    r = requests.put(SITE + AGENT_ID, data=json.dumps(nown), headers=HEADERS)
-    assert (r.status_code == 200 and 'error' in r.json() and
-            r.json()['error']['code'] == 1)
+    #nown = {
+    #    'buy': [],
+    #    'sell': [{'s': 'MSFT', 'q': 100}],
+    #    'apikey': API_KEY
+    #}
+    #r = requests.put(SITE + AGENT_ID, data=json.dumps(nown), headers=HEADERS)
+    #assert (r.status_code == 200 and 'error' in r.json() and
+    #        r.json()['error']['code'] == 1)
 
     #-------------------------------
     #   Buy requires more cash than owns
     #-------------------------------
 
-    cash = {
-        'buy': [{'s': 'GOOG', 'q': 9999999}],
-        'sell': [],
-        'apikey': API_KEY
-    }
-    r = requests.put(SITE + AGENT_ID, data=json.dumps(cash), headers=HEADERS)
-    assert (r.status_code == 200 and 'error' in r.json() and
-            r.json()['error']['code'] == 3)
+    #cash = {
+    #    'buy': [{'s': 'GOOG', 'q': 9999999}],
+    #    'sell': [],
+    #    'apikey': API_KEY
+    #}
+    #r = requests.put(SITE + AGENT_ID, data=json.dumps(cash), headers=HEADERS)
+    #assert (r.status_code == 200 and 'error' in r.json() and
+    #        r.json()['error']['code'] == 3)
 
     #-------------------------------
     #   Buy a security that does not exist
@@ -118,10 +118,10 @@ if __name__ == '__main__':
     }
     r = requests.put(SITE + AGENT_ID, data=json.dumps(nexs), headers=HEADERS)
     assert (r.status_code == 200 and 'error' in r.json() and
-            r.json()['error']['code'] == 4)
+            r.json()['error']['code'] == 2)
 
     #-------------------------------
-    #   Buy cash
+    #   Buy cash (an actual symbol)
     #-------------------------------
 
     buyc = {
@@ -130,8 +130,7 @@ if __name__ == '__main__':
         'apikey': API_KEY
     }
     r = requests.put(SITE + AGENT_ID, data=json.dumps(buyc), headers=HEADERS)
-    assert (r.status_code == 200 and 'error' in r.json() and
-            r.json()['error']['code'] == 5)
+    assert (r.status_code == 200 and 'portfolio' in r.json())
 
     #-------------------------------
     #   Bad API Key
@@ -166,7 +165,8 @@ if __name__ == '__main__':
 
     sall = {
         'buy': [],
-        'sell': [{'s': 'AAPL', 'q': 7}, {'s': 'NFLX', 'q': 13}],
+        'sell': [{'s': 'AAPL', 'q': 7}, {'s': 'NFLX', 'q': 13},
+                 {'s': 'CASH', 'q': 100}],
         'apikey': API_KEY
     }
     r = requests.put(SITE + AGENT_ID, data=json.dumps(sall), headers=HEADERS)
