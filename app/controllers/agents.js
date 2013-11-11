@@ -115,7 +115,9 @@ exports.show = function(req, res) {
         agent = _.omit(agent, 'portfolio', 'apikey');
         agent.status = _.omit(agent.status, 'current_portfolio');
     }
-    res.jsonp(agent);
+    req.agent.setStatus(false, function(agent) {
+        res.jsonp(agent);
+    });
 };
 
 /**
@@ -363,11 +365,9 @@ var __setup_trade = function(req, res, quotes_cb) {
     // Add symbols from current composition
     var last_portfolio = _.last(req.agent.portfolio);
     if (last_portfolio !== undefined) {
-        var cashless = _.omit(last_portfolio.composition, 'cash00');
-        var portfolio_symbols = _.map(cashless, function(security, symbol) {
-            return symbol;
-        });
-        symbols = _.union(symbols, portfolio_symbols);
+        symbols = _.union(symbols,
+                          dataconn.compositionSymbols(
+                              last_portfolio.composition));
         // TODO what happens if a portfolio has a security that yahoo does not?
     }
 

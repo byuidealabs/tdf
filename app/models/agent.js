@@ -3,6 +3,7 @@
  */
 var mongoose = require('mongoose'),
     Schema = mongoose.Schema,
+    dataconn = require('../controllers/dataconn.js'),
     _ = require('underscore');
 
 /**
@@ -37,8 +38,52 @@ AgentSchema.statics = {
     load: function(id, cb) {
         this.findOne({
             _id: id
-        }).populate('user', 'username').populate('league', 'name startCash shortSellLimit leverageLimit').exec(cb);
+        }).populate('user', 'username')
+          .populate('league', 'name startCash shortSellLimit leverageLimit')
+          .exec(cb);
     }
+};
+
+/**
+ * Methods
+ */
+AgentSchema.methods.setStatus = function(isPrivate, cb) {
+    var agent = this.toJSON();
+    var curr_portfolio = _.last(agent.portfolio);
+
+    var finalize_status = function(curr_composition, securities_value, cash,
+                                   cb) {
+        agent.status = {
+            'current_composition': curr_composition,
+            'securities_value': securities_value,
+            'cash': cash,
+            'total_value': (cash + securities_value)
+        };
+
+        if (isPrivate) {
+            agent.status = _.pick(agent.status, 'total_value');
+        }
+
+        cb(agent);
+    };
+
+    if (curr_portfolio === undefined) {
+        finalize_status(null, 0, agent.league.startCash, cb);
+    }
+    else {
+        var symbols = dataconn.compositionSymbols(curr_portfolio.composition);
+        dataconn.yahooQuotes(null, null, symbols, cb,
+            function(req, res, err, quotes, cb) {
+                var composition = curr_portfolio.composition;
+                var cash = composition.cash00;
+                var total_value = dataconn.yahooPortfolioValue(composition,
+                                                               quotes,
+                                                               false);
+                var value = total_value - cash;
+                finalize_status(composition, value, cash, cb);
+            });
+    }
+
 };
 
 /**
@@ -48,7 +93,7 @@ AgentSchema.set('toJSON', {
     virtuals: true
 });
 
-AgentSchema.virtual('status').get(function() {
+/**AgentSchema.virtual('status').get(function() {
     var curr_portfolio = _.last(this.portfolio);
 
     var cash = this.league.startCash;
@@ -56,13 +101,13 @@ AgentSchema.virtual('status').get(function() {
         cash = curr_portfolio.composition.cash00;
     }
 
-    var securities_value = 0; //TODO
+    var securities_value = dataconn.; //TODO
     return {
         'current_composition': curr_portfolio,
         'securities_value': securities_value,
         'cash': cash,
         'total_value': (cash + securities_value)
     };
-});
+});**/
 
 mongoose.model('Agent', AgentSchema);

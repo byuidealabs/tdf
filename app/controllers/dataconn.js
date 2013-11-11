@@ -7,6 +7,20 @@ var request = require('request'),
     _ = require('underscore');
 
 //=============================================================================
+//  Utilities
+//=============================================================================
+
+/**
+ * Extracts a list of unique symbols in a portfolio composition.
+ */
+exports.compositionSymbols = function(composition) {
+    var cashless = _.omit(composition, 'cash00');
+    return _.map(cashless, function(security, symbol) {
+        return symbol;
+    });
+};
+
+//=============================================================================
 //  Yahoo Finance
 //=============================================================================
 
