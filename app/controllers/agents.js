@@ -4,9 +4,8 @@
 
 var mongoose = require('mongoose'),
     Agent = mongoose.model('Agent'),
+    dataconn = require('./dataconn.js'),
     Crypto = require('crypto'),
-    request = require('request'),
-    csv = require('csv'),
     _ = require('underscore');
 
 //=============================================================================
@@ -34,96 +33,6 @@ var randomAscii = function(len){
         verificationCode += String.fromCharCode(c3);
     }
     return verificationCode;
-};
-
-/*var get_security_price = function(symbol, method) {
-    if (symbol === 'notasymbol') {
-        throw {
-            'msg': 'Unknown security: ' + symbol + '.',
-            'code': 4
-        };
-    }
-    if (symbol === 'cash') {
-        throw {
-            'msg': 'Cannot trade cash. Please trade securities.',
-            'code': 5
-        };
-    }
-    if (method === 'sell') {
-        return 110;
-    }
-    if (method === 'buy') {
-        return 100;
-    }
-};*/
-
-/**
- * Gets a table of quotes for the given symbols and executes the callback
- * on the result.
- *
- * http://greenido.wordpress.com/2009/12/22/yahoo-finance-hidden-api/
- */
-var getQuotes = function(req, res, symbols, cb) {
-    var yUrl = 'http://download.finance.yahoo.com/d/quotes.csv' +
-               '?f=sb2b3l1e1&s=';
-               // Should be symbol, ask, bid, last, error
-
-    var symbol_str = _.reduce(symbols, function(memo, symbol) {
-        var pre = '';
-        if (symbol.length) {
-            pre = '+';
-        }
-        return memo + pre + symbol;
-    });
-    var url = yUrl + symbol_str;
-    request(url, function(error, request, body) {
-        if (error) {
-            cb(req, res, error, null);
-        }
-        else {
-            csv().from.string(body.replace(/<(?:.|\n)*?>/gm, ''))
-                .to.array(function(quotesarray) {
-
-                var quotes = {};
-                _.each(quotesarray, function(quote) {
-                    quotes[_.first(quote).toUpperCase()] = {
-                        'ask': quote[1],
-                        'bid': quote[2],
-                        'last': quote[3],
-                        'error': (quote[4] !== 'N/A')
-                    };
-                });
-                cb(req, res, null, quotes);
-            });
-        }
-    });
-};
-
-/**
- * Returns the portfolio value.
- *
- * Assumes quotes has a symbol for everything in the current composition.
- */
-var portfolioValue = function(composition, quotes, negative_only) {
-    var value = 0;
-    var curr_value = 0;
-    _.each(composition, function(quantity, symbol) {
-        if (symbol === 'cash00') {
-            curr_value = quantity;
-        }
-        else {
-            // TODO error check symbol existing in quotes
-            // TODO error check symbol has a quantity
-            // TODO tie in value computation with admin (don't necessarily be
-            //      bid
-            curr_value = (quotes[symbol].bid * quantity);
-        }
-
-        if (!negative_only || curr_value < 0) {
-            value += curr_value;
-        }
-    });
-    return value;
 };
 
 //=============================================================================
@@ -292,7 +201,7 @@ var __get_security_value = function(quotes, symbol, scheme) {
  *  3. Could not look up symbol (should never see)
  *  4. Could not look up scheme (bid/ask/last) of symbol (should never see)
  */
-var __execute_trade = function(req, res, error, quotes) {
+var __execute_trade = function(req, res, error, quotes, portfolioValue) {
     try {
         if (error) {
             throw {
@@ -321,8 +230,6 @@ var __execute_trade = function(req, res, error, quotes) {
         //--------------
         // Sell first...
         //--------------
-
-        console.log(quotes);
 
         _.each(trade.sell, function(security) {
             // TODO tie bid/ask to admin
@@ -433,22 +340,7 @@ var __execute_trade = function(req, res, error, quotes) {
     }
 };
 
-/**
- * Allow a trade to be made
- *
- * If trade is successful, responds with the new agent
- * Otherwise, responds with {error: {'msg': <message>, 'code': <code>}}
- *
- * Error codes are as follows:
- *  1. Attempted to sell a security that does not own
- *  2. Attempted to sell more of a security than already owns
- *  3. Attempted to buy more than has cash to purchase
- *  4. Attempted to buy or sell on a nonexistant security (symbol doesn't
- *     match any known security)
- *  5. Attempted to trade cash
- */
-exports.trade = function(req, res) {
-
+var __setup_trade = function(req, res, quotes_cb) {
     var trade = req.body.trade || req.body;  // Depending on source of data
 
     // Filter out trades with zero quantity
@@ -480,152 +372,26 @@ exports.trade = function(req, res) {
     }
 
     // Trade
-    getQuotes(req, res, symbols, __execute_trade);
+    quotes_cb(req, res, symbols, dataconn.yahooPortfolioValue,
+              __execute_trade);
+};
 
-    /*var last_portfolio = _.last(req.agent.portfolio);
-    var curr_composition;
-    var curr_cash;
-
-    if (last_portfolio === undefined) {
-        curr_composition = {
-            'cash': req.agent.league.startCash
-        };
-    }
-    else {
-        curr_composition = _.clone(last_portfolio.composition);
-        curr_cash = curr_composition.cash;
-    }
-
-    // Find the value of the current portfolio
-    var portfolio_value = 0;
-    var negative_value = 0;
-    for (var x in curr_composition) {
-        if (x === 'cash') {
-            portfolio_value += parseInt(curr_composition[x]);
-            if (parseInt(curr_composition[x]) < 0) {
-                negative_value += parseInt(curr_composition[x]);
-            }
-        }
-        else {
-            var security_value;
-            if (parseInt(curr_composition[x]) > 0) {
-                security_value = get_security_price(x, 'sell');
-            }
-            else {
-                security_value = get_security_price(x, 'buy');
-                negative_value += security_value;
-            }
-            portfolio_value += parseInt(curr_composition[x]*security_value);
-        }
-    }
-
-    try {
-        //--------------
-        // Sell first...
-        //--------------
-
-        _.each(trade.sell, function(security) {
-            var price = get_security_price(security.s, 'sell');
-            var buyPrice = get_security_price(security.s, 'buy');
-            var profit = price * security.q;
-            var shortSellLimit = req.agent.league.shortSellLimit;
-
-            if (curr_composition[security.s] === undefined) {
-                if (shortSellLimit === 0) {
-                    throw {
-                        'msg': 'Cannot sell a security that you do not own.',
-                        'code': 1
-                    };
-                }
-                else if (shortSellLimit*(portfolio_value + profit -
-                                         buyPrice * security.q) <
-                         Math.abs(negative_value - buyPrice * security.q)) {
-                    throw {
-                        'msg': 'This trade is invalid, it would cause you ' +
-                               'to pass the short sell limit for this league.',
-                        'code': 1
-                    };
-                }
-            }
-
-            curr_composition.cash += profit;
-            curr_composition[security.s] -= security.q;
-
-            if (curr_composition[security.s] < 0) {
-                if (shortSellLimit === 0) {
-                    throw {
-                        'msg': 'Cannot sell a security that you do not own.',
-                        'code': 1
-                    };
-                }
-                else if (shortSellLimit*(portfolio_value + profit -
-                                         buyPrice * security.q) <
-                         Math.abs(negative_value - buyPrice * security.q)) {
-                    throw {
-                        'msg': 'This trade is invalid, it would cause you ' +
-                               'to pass the short sell limit for this league.',
-                        'code': 1
-                    };
-                }
-            }
-
-            if (curr_composition[security.s] === 0) {
-                delete curr_composition[security.s];
-            }
-
-        });
-
-        //---------
-        // Then buy
-        //---------
-
-        _.each(trade.buy, function(security) {
-            var price = get_security_price(security.s, 'buy');
-            var sell_price = get_security_price(security.s, 'sell');
-            var cost = price * security.q;
-            var curr_quantity = curr_composition[security.s] || 0;
-            var leverageLimit = req.agent.league.leverageLimit;
-            curr_composition.cash -= cost;
-            curr_composition[security.s] = curr_quantity + security.q;
-
-            if (curr_composition.cash < 0) {
-                if(leverageLimit === 0) {
-                    throw {
-                        'msg': 'Not enough cash to purchase desired ' +
-                               'securities.',
-                        'code': 3
-                    };
-                }
-                else if (leverageLimit*(portfolio_value + cost - sell_price) <
-                         Math.abs(negative_value - sell_price * security.q)) {
-                    throw {
-                        'msg': 'This trade is invalid, it would cause you ' +
-                               'to pass the leverage limit for this league.',
-                        'code': 3
-                    };
-                }
-            }
-        });
-
-        //----------------------
-        // Save changes to agent
-        //----------------------
-
-        agent.portfolio.push({composition: curr_composition});
-        agent.save(function () {
-            res.jsonp(agent);
-        });
-    }
-    catch (err) {
-
-        //-------------------------
-        // An error was encountered
-        //-------------------------
-
-        res.jsonp({
-            error: err
-        });
-    }*/
+/**
+ * Allow a trade to be made
+ *
+ * If trade is successful, responds with the new agent
+ * Otherwise, responds with {error: {'msg': <message>, 'code': <code>}}
+ *
+ * Error codes are as follows:
+ *  1. Attempted to sell a security that does not own
+ *  2. Attempted to sell more of a security than already owns
+ *  3. Attempted to buy more than has cash to purchase
+ *  4. Attempted to buy or sell on a nonexistant security (symbol doesn't
+ *     match any known security)
+ *  5. Attempted to trade cash
+ */
+exports.trade = function(req, res) {
+    __setup_trade(req, res, dataconn.yahooQuotes);
 };
 
 /**

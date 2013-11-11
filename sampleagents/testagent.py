@@ -3,13 +3,13 @@ import json
 
 HEADERS = {'Content-Type': 'application/json'}
 SITE = 'http://localhost:3000/agents/trade/'
-# AGENT_ID = '52741243e93c0ce429000003'             # Lab Agent
-AGENT_ID = '527e640b6f8aaab26a000002'               # Personal Agent
+AGENT_ID = '52741243e93c0ce429000003'             # Lab Agent
+# AGENT_ID = '527e640b6f8aaab26a000002'               # Personal Agent
 OTHER_ID = '5277c1ccb33812240e000003'
 BOGUS_ID = '012345678900000000000000'
 
-# API_KEY = 'ponweyqvgqbyonttkffyllubodaidawg'      # Lab Agent
-API_KEY = 'mosxwaqxrutualrdaoyrdgwrtdyksuhv'        # Personal Agent
+API_KEY = 'ponweyqvgqbyonttkffyllubodaidawg'      # Lab Agent
+# API_KEY = 'mosxwaqxrutualrdaoyrdgwrtdyksuhv'        # Personal Agent
 ALT_KEY = 'mnvanhaajotdowwcdrqfcwujolajchct'
 
 # USER ACCOUNT:
