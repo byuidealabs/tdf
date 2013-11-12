@@ -1,8 +1,8 @@
 angular.module('tdf.users').controller('UsersController',
     ['$scope', '$routeParams', '$location', '$modal', 'Global', 'Utilities',
-     'Users', 'Agents', 'Leagues',
+     'Users', 'Agents', 'Leagues', '_',
     function ($scope, $routeParams, $location, $modal, Global, Utilities,
-              Users, Agents, Leagues) {
+              Users, Agents, Leagues, _) {
         $scope.global = Global;
 
         $scope.find = function(query) {
@@ -16,21 +16,30 @@ angular.module('tdf.users').controller('UsersController',
                 userId: $routeParams.userId
             }, function(user) {
                 $scope.user = user;
-                $scope.agents = user.agents;
                 $scope.isme = ($scope.user.id === $scope.global.user._id);
-                Leagues.query(function(leagues) {
-                    $scope.leagues = leagues;
-                });
+
+                $scope.findUserLeaguesAndAgents(user);
             });
         };
 
         $scope.getProfile = function() {
             Users.getProfile({}, function(user) {
                 $scope.user = user;
-                $scope.agents = user.agents;
-                Leagues.query(function(leagues) {
-                    $scope.leagues = leagues;
+
+                $scope.findUserLeaguesAndAgents(user);
+            });
+        };
+
+        $scope.findUserLeaguesAndAgents = function(user) {
+            Agents.query(function(agents) {
+                // TODO make more efficient query so backend only has to
+                // return this user's agents
+                $scope.agents = _.filter(agents, function(agent) {
+                    return agent.user._id === user.id;
                 });
+            });
+            Leagues.query(function(leagues) {
+                $scope.leagues = leagues;
             });
         };
 

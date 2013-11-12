@@ -3,7 +3,6 @@
  */
 var mongoose = require('mongoose'),
     User = mongoose.model('User'),
-    Agent = mongoose.model('Agent'),
     _ = require('underscore');
 
 /**
@@ -76,12 +75,7 @@ exports.create = function(req, res, next) {
  */
 exports.show = function(req, res) {
     var profile = _.pick(req.profile, 'id', 'username');
-    Agent.find({user: profile.id}, 'name description league cash')
-        .populate('league', 'name')
-        .exec(function(err, agents) {
-            profile.agents = agents;
-            res.jsonp(profile);
-        });
+    res.jsonp(profile);
 };
 
 /**
@@ -93,12 +87,7 @@ exports.me = function(req, res) {
 
 exports.profile = function(req, res) {
     var profile = _.pick(req.user, '_id', 'name', 'username', 'email');
-    Agent.find({user: profile._id}, 'name description league cash')
-        .populate('league', 'name')
-        .exec(function(err, agents) {
-            profile.agents = agents;
-            res.jsonp(profile);
-        });
+    res.jsonp(profile);
 };
 
 /**
