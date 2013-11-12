@@ -43,7 +43,7 @@ exports.yahooQuotes = function(req, res, symbols, portfolioValue, cb) {
         return memo + pre + symbol;
     });
     var url = yUrl + symbol_str;
-    request(url, function(error, request, body) {
+    request(url, function(error, rst, body) {
         if (error) {
             cb(req, res, error, null);
         }
@@ -83,6 +83,9 @@ exports.yahooPortfolioValue = function(composition, quotes, negative_only) {
             // TODO error check symbol has a quantity
             // TODO tie in value computation with admin (don't necessarily be
             //      bid
+            if (quotes[symbol] === undefined) {
+                console.log('Undefined symbol ' + symbol);
+            }
             curr_value = (quotes[symbol].bid * quantity);
         }
 
@@ -92,4 +95,3 @@ exports.yahooPortfolioValue = function(composition, quotes, negative_only) {
     });
     return value;
 };
-

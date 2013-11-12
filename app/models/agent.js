@@ -64,6 +64,8 @@ AgentSchema.methods.setStatus = function(isPrivate, cb) {
             agent.status = _.pick(agent.status, 'total_value');
         }
 
+        console.log('Status on agent ' + this._id + ' set.');
+
         cb(agent);
     };
 
@@ -83,7 +85,10 @@ AgentSchema.methods.setStatus = function(isPrivate, cb) {
                 finalize_status(composition, value, cash, cb);
             });
     }
+};
 
+AgentSchema.methods.ownedBy = function(user) {
+    return user !== undefined && user._id.equals(this.user._id);
 };
 
 /**

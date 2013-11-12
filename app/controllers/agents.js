@@ -111,11 +111,11 @@ exports.show = function(req, res) {
     var agent = req.agent.toJSON();
     var user = req.user;
 
-    if (user === undefined || !user._id.equals(agent.user._id)) {
+    if (!agent.ownedBy(user)) {
         agent = _.omit(agent, 'portfolio', 'apikey');
         agent.status = _.omit(agent.status, 'current_portfolio');
     }
-    req.agent.setStatus(false, function(agent) {
+    req.agent.setStatus(!agent.ownedBy(user), function(agent) {
         res.jsonp(agent);
     });
 };
@@ -124,8 +124,22 @@ exports.show = function(req, res) {
  * List of agents
  */
 exports.all = function(req, res) {
+    var user = req.user;
     Agent.find().sort('-created').populate('user', 'name username').
         populate('league', 'name startCash').exec(function (err, agents) {
+
+        var setStatusOnAgent = function(i, cb) {
+            if (i < agents.length) {
+                agents[i].setStatus(!agents[i].ownedBy(user), function(agent) {
+                    console.log(JSON.stringify(agent));
+                    agents[i] = agent;
+                    cb(i+1, cb);
+                });
+            }
+            else {
+                res.jsonp(agents);
+            }
+        };
 
         if (err) {
             res.render('error', {
@@ -133,7 +147,8 @@ exports.all = function(req, res) {
             });
         }
         else {
-            res.jsonp(agents);
+            //res.jsonp(agents);
+            setStatusOnAgent(0, setStatusOnAgent);
         }
     });
 };
@@ -328,7 +343,9 @@ var __execute_trade = function(req, res, error, quotes, portfolioValue) {
 
         agent.portfolio.push({composition: curr_composition});
         agent.save(function () {
-            res.jsonp(agent);
+            req.agent.setStatus(false, function(agent) {
+                res.jsonp(agent);
+            });
         });
     }
     catch (err) {

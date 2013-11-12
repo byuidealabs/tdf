@@ -38,7 +38,7 @@ module.exports = function(grunt) {
                     file: 'server.js',
                     args: [],
                     ignoredFiles: ['README.md', 'node_modules/**', '.DS_Store',
-                                   '**/*.swp*'],
+                                   '**/*.swp*', '**/*.swp:1'],
                     watchedExtensions: ['js'],
                     watchedFolders: ['app', 'config'],
                     debug: true,
