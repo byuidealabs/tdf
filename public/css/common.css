@@ -5,23 +5,36 @@
 
 .content {
     margin-top:50px;
-    width:100%
+    width:100%;
+    padding-bottom:100px;
 }
 
 footer {
     position:fixed;
     left:0px;
     bottom:0px;
-    height:30px;
-    width:100%;
-    background:#ddd;
-    -webkit-box-shadow:0 8px 6px 6px black;
-    -moz-box-shadow:0 8px 6px 6px black;
-    box-shadow:0 8px 6px 6px black
+
+    height: 100px;
+    width: 100%;
+    background: #eee;
+    -webkit-box-shadow: 0 8px 6px 6px black;
+    -moz-box-shadow: 0 8px 6px 6px black;
+    box-shadow: 0 8px 6px 6px black
 }
 
 footer p {
     padding:5px 0 12px 10px
+}
+
+footer a {
+    position: relative;
+    display: block;
+    width: 187px;
+    margin: 5px auto;
+}
+
+footer img {
+    height: 90px;
 }
 
 .modal {

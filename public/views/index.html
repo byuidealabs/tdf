@@ -1,3 +1,17 @@
 <section data-ng-controller="IndexController">
-	<h1>This is the home view</h1>
+    <h1>Welcome to the Tour de Finance</h1>
+    <img src='img/TDFPage.jpg' />
+
+    <a class='btn btn-success' href='/#!/leagues'>
+        Current Standings
+    </a>
+
+    <div class='btn-group' ng-hide='global.user'>
+        <a class='btn btn-primary' href='signin'>
+            Log In
+        </a>
+        <a class='btn btn-primary' href='signup'>
+            Sign Up
+        </a>
+    </div>
 </section>
