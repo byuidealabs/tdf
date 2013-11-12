@@ -21,10 +21,15 @@ exports.compositionSymbols = function(composition) {
 };
 
 /**
- * Extracts a list of unique symbols in the entire agent's history.
+ * Extracts a list of unique symbols in the entire portfolio's history.
  */
 exports.agentSymbols = function(portfolio) {
-
+    var symbols = [];
+    _.each(portfolio, function(instance) {
+        symbols = _.union(symbols,
+                          exports.compositionSymbols(instance.composition));
+    });
+    return symbols;
 };
 
 //=============================================================================

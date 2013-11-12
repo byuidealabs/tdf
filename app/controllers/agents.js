@@ -112,8 +112,6 @@ exports.show = function(req, res) {
     var user = req.user;
     var isPrivate = !agent.ownedBy(user);
 
-    console.log(JSON.stringify(agent));
-
     agent.setStatus(isPrivate, function(agent) {
         if (isPrivate) {
             agent = _.omit(agent, 'portfolio', 'apikey');
@@ -134,7 +132,6 @@ exports.all = function(req, res) {
         var setStatusOnAgent = function(i, cb) {
             if (i < agents.length) {
                 agents[i].setStatus(!agents[i].ownedBy(user), function(agent) {
-                    //console.log(JSON.stringify(agent));
                     agents[i] = agent;
                     cb(i+1, cb);
                 });

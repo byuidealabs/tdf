@@ -49,6 +49,7 @@ AgentSchema.statics = {
  */
 AgentSchema.methods.setStatus = function(isPrivate, cb) {
     var agent = this.toJSON();
+    var that = this;
     var curr_portfolio = _.last(agent.portfolio);
 
     console.log(JSON.stringify(curr_portfolio));
@@ -63,12 +64,12 @@ AgentSchema.methods.setStatus = function(isPrivate, cb) {
         };
 
         if (isPrivate) {
-            agent.status = _.pick(agent.status, 'total_value');
+            agent.status = _.pick(that.agent.status, 'total_value');
         }
 
-        console.log('Status on agent ' + this._id + ' set.');
-
-        cb(agent);
+        that.setHistory(isPrivate, function(agent) {
+            cb(agent);
+        });
     };
 
     if (curr_portfolio === undefined) {
@@ -87,6 +88,19 @@ AgentSchema.methods.setStatus = function(isPrivate, cb) {
                 finalize_status(composition, value, cash, cb);
             });
     }
+};
+AgentSchema.methods.setHistory = function(isPrivate, cb) {
+    var agent = this.toJSON();
+    var that = this;
+    var portfolio = that.portfolio;
+
+    // TODO tie into an admin perhaps (or let user choose?)
+    var totalTicks = 10;
+    var tickSpacing = 600; // 10 minutes
+
+    var symbols = dataconn.agentSymbols(portfolio);
+    console.log(symbols);
+    cb(that);
 };
 
 AgentSchema.methods.ownedBy = function(user) {
