@@ -20,6 +20,13 @@ exports.compositionSymbols = function(composition) {
     });
 };
 
+/**
+ * Extracts a list of unique symbols in the entire agent's history.
+ */
+exports.agentSymbols = function(portfolio) {
+
+};
+
 //=============================================================================
 //  Yahoo Finance
 //=============================================================================
@@ -34,36 +41,40 @@ exports.yahooQuotes = function(req, res, symbols, portfolioValue, cb) {
     var yUrl = 'http://download.finance.yahoo.com/d/quotes.csv' +
                '?f=sb2b3l1e1&s=';
                // Should be symbol, ask, bid, last, error
+    if (!symbols || symbols.length === 0) {
+        cb(req, res, null, [], portfolioValue);
+    }
+    else {
+        var symbol_str = _.reduce(symbols, function(memo, symbol) {
+            var pre = '';
+            if (symbol.length) {
+                pre = '+';
+            }
+            return memo + pre + symbol;
+        });
+        var url = yUrl + symbol_str;
+        request(url, function(error, rst, body) {
+            if (error) {
+                cb(req, res, error, null);
+            }
+            else {
+                csv().from.string(body.replace(/<(?:.|\n)*?>/gm, ''))
+                    .to.array(function(quotesarray) {
 
-    var symbol_str = _.reduce(symbols, function(memo, symbol) {
-        var pre = '';
-        if (symbol.length) {
-            pre = '+';
-        }
-        return memo + pre + symbol;
-    });
-    var url = yUrl + symbol_str;
-    request(url, function(error, rst, body) {
-        if (error) {
-            cb(req, res, error, null);
-        }
-        else {
-            csv().from.string(body.replace(/<(?:.|\n)*?>/gm, ''))
-                .to.array(function(quotesarray) {
-
-                var quotes = {};
-                _.each(quotesarray, function(quote) {
-                    quotes[_.first(quote).toUpperCase()] = {
-                        'ask': quote[1],
-                        'bid': quote[2],
-                        'last': quote[3],
-                        'error': (quote[4] !== 'N/A')
-                    };
+                    var quotes = {};
+                    _.each(quotesarray, function(quote) {
+                        quotes[_.first(quote).toUpperCase()] = {
+                            'ask': quote[1],
+                            'bid': quote[2],
+                            'last': quote[3],
+                            'error': (quote[4] !== 'N/A')
+                        };
+                    });
+                    cb(req, res, null, quotes, portfolioValue);
                 });
-                cb(req, res, null, quotes, portfolioValue);
-            });
-        }
-    });
+            }
+        });
+    }
 };
 
 /**

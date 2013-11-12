@@ -51,6 +51,8 @@ AgentSchema.methods.setStatus = function(isPrivate, cb) {
     var agent = this.toJSON();
     var curr_portfolio = _.last(agent.portfolio);
 
+    console.log(JSON.stringify(curr_portfolio));
+
     var finalize_status = function(curr_composition, securities_value, cash,
                                    cb) {
         agent.status = {
