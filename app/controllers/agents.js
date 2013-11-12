@@ -108,14 +108,15 @@ exports.destroy = function(req, res) {
  * Show an agent
  */
 exports.show = function(req, res) {
-    var agent = req.agent.toJSON();
+    var agent = req.agent;
     var user = req.user;
+    var isPrivate = !agent.ownedBy(user);
 
-    if (!agent.ownedBy(user)) {
-        agent = _.omit(agent, 'portfolio', 'apikey');
-        agent.status = _.omit(agent.status, 'current_portfolio');
-    }
-    req.agent.setStatus(!agent.ownedBy(user), function(agent) {
+    agent.setStatus(isPrivate, function(agent) {
+        if (isPrivate) {
+            agent = _.omit(agent, 'portfolio', 'apikey');
+            agent.status = _.omit(agent.status, 'current_portfolio');
+        }
         res.jsonp(agent);
     });
 };
