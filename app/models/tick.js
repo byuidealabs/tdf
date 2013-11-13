@@ -21,6 +21,18 @@ var TickSchema = new Schema({
 });
 
 //=============================================================================
+//  Statics
+//=============================================================================
+
+/**
+ * Finds the historical prices for the stock of the given symbol.
+ */
+TickSchema.statics.historical = function(symbol, cb) {
+    var historical = this.find();
+    cb(historical);
+};
+
+//=============================================================================
 //  Finalize
 //=============================================================================
 

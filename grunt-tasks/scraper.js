@@ -46,10 +46,19 @@ module.exports = function(grunt) {
             timeout_ms = 1000 * options.tickrate;
         }
 
+        request('http://localhost:3000/tick', function() {
+            grunt.log.writeln('Data scraped. Next scrape in ' +
+                              get_time_msg(timeout_ms) + '.');
+            setTimeout(function() {
+                done();
+                grunt.task.run('scraper');
+            }, timeout_ms);
+        });
+
         grunt.log.writeln('Scraping Data in ' + get_time_msg(timeout_ms) +
                           '...');
 
-        setTimeout(function() {
+        /*setTimeout(function() {
 
             // TODO dynamically determine url
             request('http://localhost:3000/tick', function() {
@@ -58,6 +67,6 @@ module.exports = function(grunt) {
                 grunt.task.run('scraper');
             });
 
-        }, timeout_ms);
+        }, timeout_ms);*/
     });
 };

@@ -38,3 +38,13 @@ exports.tick = function(req, res) {
         });
     });
 };
+
+/**
+ * Gets the historical prices for the last n ticks.
+ */
+exports.historical = function(req, res) {
+    var symbol = req.symbol;
+    var n = req.n;
+
+    res.jsonp({symbol: symbol, n: n});
+};
