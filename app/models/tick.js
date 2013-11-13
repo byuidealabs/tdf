@@ -49,6 +49,13 @@ TickSchema.statics.historical = function(n, cb) {
     });
 };
 
+TickSchema.statics.mostRecent = function(cb) {
+    this.historical(1, function(results) {
+        console.log(JSON.stringify(results));
+        cb(_.last(_.values(results)));
+    });
+};
+
 //=============================================================================
 //  Finalize
 //=============================================================================
