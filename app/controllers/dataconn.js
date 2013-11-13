@@ -46,6 +46,7 @@ exports.yahooQuotes = function(req, res, symbols, portfolioValue, cb) {
     var yUrl = 'http://download.finance.yahoo.com/d/quotes.csv' +
                '?f=sb2b3l1e1&s=';
                // Should be symbol, ask, bid, last, error
+    // TODO Simplify (less arguments, don't need to reshape final
     if (!symbols || symbols.length === 0) {
         cb(req, res, null, [], portfolioValue);
     }

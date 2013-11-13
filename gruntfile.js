@@ -50,8 +50,13 @@ module.exports = function(grunt) {
                 }
             }
         },
+        scraper: {
+            options: {
+                tickrate: 300
+            }
+        },
         concurrent: {
-            tasks: ['nodemon', 'watch'],
+            tasks: ['nodemon', 'watch', 'scraper'],
             options: {
                 logConcurrentOutput: true
             }
@@ -75,6 +80,8 @@ module.exports = function(grunt) {
         }
     });
 
+    grunt.loadTasks('./grunt-tasks');
+
     //Load NPM tasks
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-contrib-jshint');
@@ -94,4 +101,6 @@ module.exports = function(grunt) {
 
     //Bower task.
     grunt.registerTask('install', ['bower']);
+
+
 };
