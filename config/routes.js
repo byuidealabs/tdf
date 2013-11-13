@@ -138,6 +138,12 @@ module.exports = function(app, passport, auth) {
 
     var ticks = require('../app/controllers/ticks');
     app.get('/tick', ticks.tick);
+    app.get('/tick/:n', ticks.historical);
+
+    app.param('n', function(req, res, next, value) {
+        req.n = parseInt(value);
+        next();
+    });
 
     //=========================================================================
     //  Home

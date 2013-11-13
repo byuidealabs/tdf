@@ -54,19 +54,5 @@ module.exports = function(grunt) {
                 grunt.task.run('scraper');
             }, timeout_ms);
         });
-
-        grunt.log.writeln('Scraping Data in ' + get_time_msg(timeout_ms) +
-                          '...');
-
-        /*setTimeout(function() {
-
-            // TODO dynamically determine url
-            request('http://localhost:3000/tick', function() {
-                grunt.log.writeln('Done.');
-                done();
-                grunt.task.run('scraper');
-            });
-
-        }, timeout_ms);*/
     });
 };
