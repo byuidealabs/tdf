@@ -1,4 +1,4 @@
-<section ng-controller='testLinesController'>
+<!--<section ng-controller='testLinesController'>
     <h1>Testing Line Graph</h1>
     <line-graph data='d3data'></line-graph>
 
@@ -28,9 +28,12 @@
             </form>
         </div>
     </div>
+</section>-->
+<h1>New Line Graph Test</h1>
+<section ng-controller='TestFlotController'>
+            <div class="chartContainer" style="width:600px; height:400px; margin-left:auto; margin-right:auto"><chart ng-model='data'> </chart> </div>
 </section>
-
-<section ng-controller='TestMetricsController'>
+<!--<section ng-controller='TestMetricsController'>
 
     <div ng-repeat='test in tests'>
         <h2>Test {{$index + 1}}</h2>
@@ -45,6 +48,7 @@
         <p>Moving Score = {{testMovingScore(test.values, test.metric)}}</p>
         <p>Expected Moving Score = {{test.expected_moving}}</p>
     </div>
+
     <!--<h2>Test 1</h2>
 
     <p>Testing with metric '{{test1.metric}}' and values {{test1.values}}</p>
@@ -53,6 +57,6 @@
     <p>Expected Score = {{test1.expected_score}}<p>
     <br />
     <p>Moving Score = {{testMovingScore(test1.values, test1.metric)}}</p>
-    <p>Expected Moving Score = {{test1.expected_moving}}</p>-->
+    <p>Expected Moving Score = {{test1.expected_moving}}</p>
 
-</section>
+</section>-->
