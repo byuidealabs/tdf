@@ -67,29 +67,39 @@ AgentSchema.methods.setStatus = function(isPrivate, Tick, cb) {
                 'total_value': (cash + securities_value)
             };
         }
-
-        load_history(agent, cb);
+        cb(agent);
     };
 
-    var load_history = function(agent, cb) {
+    var load_history = function(agent, quotes, cb) {
 
         // TODO determine length to load
         Tick.historical(50, function(histories) {
             agent.history = {};
 
             _.each(histories, function(history, time) {
+                var ticktime = new Date(time);
                 var most_recent_comp = null;
                 var most_recent_date = null;
                 _.each(agent.portfolio, function(port) {
-                    if (port.timestamp < time &&
+                    console.log('');
+                    console.log(port.timestamp);
+                    console.log(ticktime);
+                    console.log(port.timestamp.getTime() < ticktime.getTime());
+                    if (port.timestamp.getTime() < ticktime.getTime() &&
                         (most_recent_date === null ||
-                         port.timestamp > most_recent_date)) {
+                         port.timestamp.getTime() >
+                          most_recent_date.getTime())) {
                         most_recent_date = port.timestamp;
-                        most_recent_comp = port;
+                        most_recent_comp = port.composition;
                     }
                 });
-                agent.history[time] = {time: most_recent_date,
-                                        comp: most_recent_comp};
+                if (most_recent_comp !== null) {
+                    agent.history[ticktime] = dataconn.portfolioValue(
+                        most_recent_comp, quotes, false);
+                }
+                else {
+                    agent.history[ticktime] = agent.league.startCash;
+                }
             });
 
             cb(agent);
@@ -107,7 +117,9 @@ AgentSchema.methods.setStatus = function(isPrivate, Tick, cb) {
                                                         quotes,
                                                         false);
             var value = total_value - cash;
-            finalize_status(composition, value, cash, cb);
+            finalize_status(composition, value, cash, function(agent) {
+                load_history(agent, quotes, cb);
+            });
         });
     }
 };
