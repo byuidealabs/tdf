@@ -81,10 +81,6 @@ AgentSchema.methods.setStatus = function(isPrivate, Tick, cb) {
                 var most_recent_comp = null;
                 var most_recent_date = null;
                 _.each(agent.portfolio, function(port) {
-                    console.log('');
-                    console.log(port.timestamp);
-                    console.log(ticktime);
-                    console.log(port.timestamp.getTime() < ticktime.getTime());
                     if (port.timestamp.getTime() < ticktime.getTime() &&
                         (most_recent_date === null ||
                          port.timestamp.getTime() >
