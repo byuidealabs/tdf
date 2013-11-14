@@ -1,8 +1,6 @@
 <section ng-controller='AgentsController'
     ng-init='findOne(); getDefaultTrade()'>
 
-    {{agent}}
-
     <h1>
         Trade on {{agent.name}}
         <a class='btn btn-default' href='/#!/agents/{{agent._id}}'>

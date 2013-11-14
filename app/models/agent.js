@@ -68,7 +68,32 @@ AgentSchema.methods.setStatus = function(isPrivate, Tick, cb) {
             };
         }
 
-        cb(agent);
+        load_history(agent, cb);
+    };
+
+    var load_history = function(agent, cb) {
+
+        // TODO determine length to load
+        Tick.historical(50, function(histories) {
+            agent.history = {};
+
+            _.each(histories, function(history, time) {
+                var most_recent_comp = null;
+                var most_recent_date = null;
+                _.each(agent.portfolio, function(port) {
+                    if (port.timestamp < time &&
+                        (most_recent_date === null ||
+                         port.timestamp > most_recent_date)) {
+                        most_recent_date = port.timestamp;
+                        most_recent_comp = port;
+                    }
+                });
+                agent.history[time] = {time: most_recent_date,
+                                        comp: most_recent_comp};
+            });
+
+            cb(agent);
+        });
     };
 
     if (curr_portfolio === undefined) {
