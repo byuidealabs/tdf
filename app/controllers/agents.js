@@ -4,7 +4,8 @@
 
 var mongoose = require('mongoose'),
     Agent = mongoose.model('Agent'),
-    dataconn = require('./dataconn.js'),
+    Tick = mongoose.model('Tick'),
+    dataconn = require('./dataconn'),
     Crypto = require('crypto'),
     _ = require('underscore');
 
@@ -112,7 +113,7 @@ exports.show = function(req, res) {
     var user = req.user;
     var isPrivate = !agent.ownedBy(user);
 
-    agent.setStatus(isPrivate, function(agent) {
+    agent.setStatus(isPrivate, Tick, function(agent) {
         if (isPrivate) {
             agent = _.omit(agent, 'portfolio', 'apikey');
             agent.status = _.omit(agent.status, 'current_portfolio');
@@ -131,7 +132,8 @@ exports.all = function(req, res) {
 
         var setStatusOnAgent = function(i, cb) {
             if (i < agents.length) {
-                agents[i].setStatus(!agents[i].ownedBy(user), function(agent) {
+                agents[i].setStatus(!agents[i].ownedBy(user), Tick,
+                                    function(agent) {
                     agents[i] = agent;
                     cb(i+1, cb);
                 });
@@ -195,7 +197,8 @@ var __get_security_value = function(quotes, symbol, scheme) {
 
     var value = quotes[symbol][scheme];
     var error = quotes[symbol].error;
-    if (error || (scheme === 'last' && (isNaN(value) || value === 0))) {
+    if ((error && error !== 'false') ||
+        (scheme === 'last' && (isNaN(value) || value === 0))) {
         throw {
             'msg': 'Trade on unknown security ' + symbol,
             'code': 2
@@ -213,20 +216,12 @@ var __get_security_value = function(quotes, symbol, scheme) {
 
 /**
  * Real codes:
- *  1. Could not connect to Yahoo finance
  *  2. Unknown symbol
- *  3. Could not look up symbol (should never see)
+ *  3. Could not look up symbol
  *  4. Could not look up scheme (bid/ask/last) of symbol (should never see)
  */
-var __execute_trade = function(req, res, error, quotes, portfolioValue) {
+var __execute_trade = function(req, res, quotes) {
     try {
-        if (error) {
-            throw {
-                'msg': 'Error connecting to Yahoo Finance',
-                'code': 1
-            };
-        }
-
         var trade = req.body.trade || req.body;
         var agent = req.agent;
         var last_portfolio = _.last(agent.portfolio);
@@ -241,8 +236,10 @@ var __execute_trade = function(req, res, error, quotes, portfolioValue) {
             curr_composition = _.clone(last_portfolio.composition);
         }
 
-        var portfolio_value = portfolioValue(curr_composition, quotes, false);
-        var negative_value = portfolioValue(curr_composition, quotes, true);
+        var portfolio_value = dataconn.portfolioValue(curr_composition,
+                                                      quotes, false);
+        var negative_value = dataconn.portfolioValue(curr_composition,
+                                                     quotes, true);
 
         //--------------
         // Sell first...
@@ -343,7 +340,7 @@ var __execute_trade = function(req, res, error, quotes, portfolioValue) {
 
         agent.portfolio.push({composition: curr_composition});
         agent.save(function () {
-            req.agent.setStatus(false, function(agent) {
+            req.agent.setStatus(false, Tick, function(agent) {
                 res.jsonp(agent);
             });
         });
@@ -359,7 +356,7 @@ var __execute_trade = function(req, res, error, quotes, portfolioValue) {
     }
 };
 
-var __setup_trade = function(req, res, quotes_cb) {
+/*var __setup_trade = function(req, res, quotes_cb) {
     var trade = req.body.trade || req.body;  // Depending on source of data
 
     // Filter out trades with zero quantity
@@ -391,7 +388,7 @@ var __setup_trade = function(req, res, quotes_cb) {
     // Trade
     quotes_cb(req, res, symbols, dataconn.yahooPortfolioValue,
               __execute_trade);
-};
+};*/
 
 /**
  * Allow a trade to be made
@@ -408,7 +405,9 @@ var __setup_trade = function(req, res, quotes_cb) {
  *  5. Attempted to trade cash
  */
 exports.trade = function(req, res) {
-    __setup_trade(req, res, dataconn.yahooQuotes);
+    Tick.mostRecent(function(quotes) {
+        __execute_trade(req, res, quotes);
+    });
 };
 
 /**

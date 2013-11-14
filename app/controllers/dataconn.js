@@ -42,13 +42,13 @@ exports.agentSymbols = function(portfolio) {
  *
  * http://greenido.wordpress.com/2009/12/22/yahoo-finance-hidden-api/
  */
-exports.yahooQuotes = function(req, res, symbols, portfolioValue, cb) {
+exports.yahooQuotes = function(symbols, cb) {
     var yUrl = 'http://download.finance.yahoo.com/d/quotes.csv' +
                '?f=sb2b3l1e1&s=';
                // Should be symbol, ask, bid, last, error
     // TODO Simplify (less arguments, don't need to reshape final
     if (!symbols || symbols.length === 0) {
-        cb(req, res, null, [], portfolioValue);
+        cb(null, []);
     }
     else {
         var symbol_str = _.reduce(symbols, function(memo, symbol) {
@@ -61,7 +61,7 @@ exports.yahooQuotes = function(req, res, symbols, portfolioValue, cb) {
         var url = yUrl + symbol_str;
         request(url, function(error, rst, body) {
             if (error) {
-                cb(req, res, error, null);
+                cb(error, null);
             }
             else {
                 csv().from.string(body.replace(/<(?:.|\n)*?>/gm, ''))
@@ -76,7 +76,7 @@ exports.yahooQuotes = function(req, res, symbols, portfolioValue, cb) {
                             'error': (quote[4] !== 'N/A')
                         };
                     });
-                    cb(req, res, null, quotes, portfolioValue);
+                    cb(null, quotes);
                 });
             }
         });
@@ -88,7 +88,7 @@ exports.yahooQuotes = function(req, res, symbols, portfolioValue, cb) {
  *
  * Assumes quotes has a symbol for everything in the current composition.
  */
-exports.yahooPortfolioValue = function(composition, quotes, negative_only) {
+exports.portfolioValue = function(composition, quotes, negative_only) {
     var value = 0;
     var curr_value = 0;
     _.each(composition, function(quantity, symbol) {

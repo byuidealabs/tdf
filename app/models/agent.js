@@ -47,60 +47,44 @@ AgentSchema.statics = {
 /**
  * Methods
  */
-AgentSchema.methods.setStatus = function(isPrivate, cb) {
+AgentSchema.methods.setStatus = function(isPrivate, Tick, cb) {
     var agent = this.toJSON();
-    var that = this;
     var curr_portfolio = _.last(agent.portfolio);
 
-    console.log(JSON.stringify(curr_portfolio));
 
     var finalize_status = function(curr_composition, securities_value, cash,
                                    cb) {
-        agent.status = {
-            'current_composition': curr_composition,
-            'securities_value': securities_value,
-            'cash': cash,
-            'total_value': (cash + securities_value)
-        };
-
         if (isPrivate) {
-            agent.status = _.pick(that.agent.status, 'total_value');
+            agent.status = {
+                'total_value': (cash + securities_value)
+            };
+        }
+        else {
+            agent.status = {
+                'current_composition': curr_composition,
+                'securities_value': securities_value,
+                'cash': cash,
+                'total_value': (cash + securities_value)
+            };
         }
 
-        that.setHistory(isPrivate, function(agent) {
-            cb(agent);
-        });
+        cb(agent);
     };
 
     if (curr_portfolio === undefined) {
         finalize_status(null, 0, agent.league.startCash, cb);
     }
     else {
-        var symbols = dataconn.compositionSymbols(curr_portfolio.composition);
-        dataconn.yahooQuotes(null, null, symbols, cb,
-            function(req, res, err, quotes, cb) {
-                var composition = curr_portfolio.composition;
-                var cash = composition.cash00;
-                var total_value = dataconn.yahooPortfolioValue(composition,
-                                                               quotes,
-                                                               false);
-                var value = total_value - cash;
-                finalize_status(composition, value, cash, cb);
-            });
+        Tick.mostRecent(function(quotes) {
+            var composition = curr_portfolio.composition;
+            var cash = composition.cash00;
+            var total_value = dataconn.portfolioValue(composition,
+                                                        quotes,
+                                                        false);
+            var value = total_value - cash;
+            finalize_status(composition, value, cash, cb);
+        });
     }
-};
-AgentSchema.methods.setHistory = function(isPrivate, cb) {
-    var agent = this.toJSON();
-    var that = this;
-    var portfolio = that.portfolio;
-
-    // TODO tie into an admin perhaps (or let user choose?)
-    var totalTicks = 10;
-    var tickSpacing = 600; // 10 minutes
-
-    var symbols = dataconn.agentSymbols(portfolio);
-    console.log(symbols);
-    cb(that);
 };
 
 AgentSchema.methods.ownedBy = function(user) {
@@ -113,22 +97,5 @@ AgentSchema.methods.ownedBy = function(user) {
 AgentSchema.set('toJSON', {
     virtuals: true
 });
-
-/**AgentSchema.virtual('status').get(function() {
-    var curr_portfolio = _.last(this.portfolio);
-
-    var cash = this.league.startCash;
-    if (curr_portfolio !== undefined) {
-        cash = curr_portfolio.composition.cash00;
-    }
-
-    var securities_value = dataconn.; //TODO
-    return {
-        'current_composition': curr_portfolio,
-        'securities_value': securities_value,
-        'cash': cash,
-        'total_value': (cash + securities_value)
-    };
-});**/
 
 mongoose.model('Agent', AgentSchema);

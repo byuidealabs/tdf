@@ -18,8 +18,7 @@ var SYMBOLS = ['GOOG', 'AAPL', 'NFLX', 'MSFT'];
  * Execute a tick
  */
 exports.tick = function(req, res) {
-    dataconn.yahooQuotes(req, res, SYMBOLS, null,
-                         function(req, res, err, quotes) {
+    dataconn.yahooQuotes(SYMBOLS, function(err, quotes) {
         var securities = [];
         _.each(quotes, function(data, symbol) {
             var security = {
