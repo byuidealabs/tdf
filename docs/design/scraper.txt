@@ -1,0 +1,68 @@
+=============
+Data Formats:
+=============
+
+key: [item1, item2, ...] = list; {key->value, ...} = object/dictionary/map
+
+agent
+-----
+
+...details...
+portfolio: [{timestamp->Date, composition->{symbol->S, quantity->Q}}, ...]
+
+tick
+----
+
+time    |   ask     bid     last    error
+-----------------------------------------
+    1   |   ..      ..      ..      ..
+    2   |   ..      ..      ..      ..
+    ..  |
+
+portfoliovalue (per agent)
+--------------------------
+
+time    |   value       portfolio
+---------------------------------
+    1   |   $$$         {s1->$$, s2->$$, ...} (perhaps only top 5 + aggregate of rest)
+    2   |   $$$         ...
+    ..  |
+
+===========
+Definitions
+===========
+
+curr_portfolio = most recent of agent.portfolio
+
+=========
+Functions
+=========
+
+scraper
+-------
+
+(may be renamed to ticker)
+
+1. Over all leagues: symbols = union(symbols, returned symbols)
+    a. Set league status (pre-trial, trial, competition, post-competition) if changed
+    b. return list of symbols if active, empty list otherwise
+2. For each symbol in symbols:
+    a. Fetch ask, bid, last, and error; store results in tick
+3. For each agent
+    a. Update portfolio value and each symbol value
+        i. For each symbol in curr_portfolio,
+           symbolvalue = symbol.quantity * symbol.bid (or whatever admin sets);
+           value += symbolvalue (initialvalue = current cash)
+        ii. Store this value in portfoliovalue
+    b. Stop-out agent if value <= 0
+
+trader
+------
+
+1. Determine symbol set (symbols in current portfolio union symbols in buy)
+2. For each symbol in symbols:
+    a. Fetch (but don't store) ask, bid, last, and error
+3. Execute trade
+    a. Sell everything in sell (checking if limits are passed)
+    b. Buy everything in buy (again checking if limits are passed)
+    c. If no error was encountered, store trade in agent.portfolio. Otherwise discard trade.
