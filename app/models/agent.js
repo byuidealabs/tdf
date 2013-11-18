@@ -74,7 +74,9 @@ AgentSchema.methods.setStatus = function(isPrivate, Tick, cb) {
 
         // TODO determine length to load
         Tick.historical(50, function(histories) {
-            agent.history = {};
+            agent.status.history = {};
+
+            console.log('reached');
 
             _.each(histories, function(history, time) {
                 var ticktime = new Date(time);
@@ -90,11 +92,11 @@ AgentSchema.methods.setStatus = function(isPrivate, Tick, cb) {
                     }
                 });
                 if (most_recent_comp !== null) {
-                    agent.history[ticktime] = dataconn.portfolioValue(
+                    agent.status.history[ticktime] = dataconn.portfolioValue(
                         most_recent_comp, quotes, false);
                 }
                 else {
-                    agent.history[ticktime] = agent.league.startCash;
+                    agent.status.history[ticktime] = agent.league.startCash;
                 }
             });
 
@@ -102,11 +104,13 @@ AgentSchema.methods.setStatus = function(isPrivate, Tick, cb) {
         });
     };
 
-    if (curr_portfolio === undefined) {
-        finalize_status(null, 0, agent.league.startCash, cb);
-    }
-    else {
-        Tick.mostRecent(function(quotes) {
+    Tick.mostRecent(function(quotes) {
+        if (curr_portfolio === undefined) {
+            finalize_status(null, 0, agent.league.startCash, function(agent) {
+                load_history(agent, quotes, cb);
+            });
+        }
+        else {
             var composition = curr_portfolio.composition;
             var cash = composition.cash00;
             var total_value = dataconn.portfolioValue(composition,
@@ -116,8 +120,8 @@ AgentSchema.methods.setStatus = function(isPrivate, Tick, cb) {
             finalize_status(composition, value, cash, function(agent) {
                 load_history(agent, quotes, cb);
             });
-        });
-    }
+        }
+    });
 };
 
 AgentSchema.methods.ownedBy = function(user) {

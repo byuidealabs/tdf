@@ -1,15 +1,23 @@
-<div ng-show='status.cash'>
-    <div class='row'>
-        <div class='col-lg-2'><b>Current Cash</b></div>
-        <div class='col-lg-6'>{{status.cash | currency}}</div>
-    </div>
-    <div class='row'>
-        <div class='col-lg-2'><b>Value of Securities</b></div>
-        <div class='col-lg-6'>{{status.securities_value | currency}}</div>
-    </div>
-    <hr />
-</div>
 <div class='row'>
-    <div class='col-lg-2'><b>Total Value</b></div>
-    <div class='col-lg-6'>{{status.total_value | currency}}</div>
+    <div class='col-lg-4'>
+        <div ng-show='status.cash'>
+            <div class='row'>
+                <div class='col-lg-6'><b>Current Cash</b></div>
+                <div class='col-lg-4'>{{status.cash | currency}}</div>
+            </div>
+            <div class='row'>
+                <div class='col-lg-6'><b>Value of Securities</b></div>
+                <div class='col-lg-4'>{{status.securities_value | currency}}</div>
+            </div>
+            <hr />
+        </div>
+        <div class='row'>
+            <div class='col-lg-6'><b>Total Value</b></div>
+            <div class='col-lg-4'>{{status.total_value | currency}}</div>
+        </div>
+    </div>
+    <div class='col-lg-8'>
+        <div chart data='chartData' options='chartOptions'
+            style='width: 100%; height: 100px'></div>
+    </div>
 </div>

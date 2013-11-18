@@ -1,8 +1,8 @@
 angular.module('tdf.leagues').controller('LeaguesController',
     ['$scope', '$routeParams', '$location', 'Global', 'Utilities', 'Leagues',
-    'Agents',
+    'Agents', '_', '$filter',
     function($scope, $routeParams, $location, Global, Utilities, Leagues,
-             Agents) {
+             Agents, _, $filter) {
         $scope.global = Global;
 
         $scope.options = {
@@ -79,5 +79,45 @@ angular.module('tdf.leagues').controller('LeaguesController',
                 });
             });
         };
+
+        $scope.chartOptions = {
+            xaxis: {
+                mode: 'time',
+                timeformat: '%Y/%m/%d'
+            },
+            yaxis: {
+                tickFormatter: function(tick) {
+                    return $filter('currency')(tick);
+                }
+            },
+            legend: {
+                show: true,
+                container: '#chart-legend'
+            }
+        };
+
+        $scope.$watch('agents', function(agents) {
+            var chartData = [];
+            _.each(agents, function(agent) {
+                var points = _.pairs(agent.status.history);
+                points = _.map(points, function(pair) {
+                    var key = new Date(pair[0]);
+                    var value = pair[1];
+
+                    return [key.getTime(), value];
+                });
+                points = points.reverse();
+
+                var data = {
+                    data: points,
+                    lines: {
+                        show: true
+                    },
+                    label: agent.name + ' (' + agent.user.username + ')'
+                };
+                chartData = _.union(chartData, [data]);
+            });
+            $scope.chartData = chartData;
+        });
 
     }]);

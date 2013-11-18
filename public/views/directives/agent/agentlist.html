@@ -15,7 +15,7 @@
         <div class='panel panel-primary'
             ng-repeat='agent in leagueagents = (agents | filter:{league._id: league._id})'>
             <div class='panel-heading'>
-                {{agent.name}}
+                {{agent.name}} (Owned by {{agent.user.username}})
 
                 <div class='pull-right'
                     ng-show='global.user._id == agent.user._id'>
@@ -53,11 +53,6 @@
 
             </div>
             <div class='panel-body'>
-                <div class='row'>
-                    <div class='col-lg-2'><b>Owner</b></div>
-                    <div class='col-lg-6'>{{agent.user.username}}</div>
-                </div>
-                <br />
                 <agent-status status='agent.status'></agent-status>
             </div>
         </div>
