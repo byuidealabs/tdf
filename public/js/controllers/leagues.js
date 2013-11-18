@@ -27,9 +27,9 @@ angular.module('tdf.leagues').controller('LeaguesController',
                 maxAgents: 100,
                 maxrUserAgents: 100,
                 principalAgentRequired: false,
-		startCash: 100000,
-		shortSellLimit: 0,
-		leverageLimit: 0
+                startCash: 100000,
+                shortSellLimit: 0,
+                leverageLimit: 0
             };
         };
 
@@ -92,7 +92,8 @@ angular.module('tdf.leagues').controller('LeaguesController',
             },
             legend: {
                 show: true,
-                container: '#chart-legend'
+                container: '#chart-legend',
+                noColumns: 2
             }
         };
 
