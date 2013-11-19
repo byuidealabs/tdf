@@ -21,8 +21,6 @@ var update_portfolio_values = function(agents, quotes, cb) {
     var composition = {};
     var totalvalue = 0;
 
-    console.log(JSON.stringify(curr_portfolio));
-
     _.each(curr_portfolio.composition, function(quantity, symbol) {
         if (symbol === 'cash00') {
             totalvalue += quantity;
