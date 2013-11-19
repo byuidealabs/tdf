@@ -5,7 +5,50 @@
 var mongoose = require('mongoose'),
     Tick = mongoose.model('Tick'),
     dataconn = require('./dataconn'),
+    Agent = mongoose.model('Agent'),
     _ = require('underscore');
+
+//=============================================================================
+//  Helper functions
+//=============================================================================
+
+var update_portfolio_values = function(agents, quotes, cb) {
+    var agent = _.first(agents);
+    var restagents = _.rest(agents);
+
+    var curr_portfolio = _.last(agent.portfolio) ||
+        {composition: {cash00: agent.league.startCash}};
+    var composition = {};
+    var totalvalue = 0;
+
+    console.log(JSON.stringify(curr_portfolio));
+
+    _.each(curr_portfolio.composition, function(quantity, symbol) {
+        if (symbol === 'cash00') {
+            totalvalue += quantity;
+        }
+        else {
+            var pricetype = 'bid';  //TODO get from league
+            var sellprice = quotes[symbol][pricetype];
+            var securityprice = sellprice * quantity;
+            totalvalue += securityprice;
+            composition[symbol] = securityprice;
+        }
+    });
+    agent.portfoliovalue.push({
+        composition: composition,
+        totalvalue: totalvalue
+    });
+
+    agent.save(function() {
+        if (!restagents.length) {
+            cb();
+        }
+        else {
+            update_portfolio_values(restagents, quotes, cb);
+        }
+    });
+};
 
 //=============================================================================
 //  Exports
@@ -18,7 +61,12 @@ var SYMBOLS = ['GOOG', 'AAPL', 'NFLX', 'MSFT'];
  * Execute a tick
  */
 exports.tick = function(req, res) {
-    dataconn.yahooQuotes(SYMBOLS, function(err, quotes) {
+
+    // 1. Get symbols (union of allowed symbols in all leagues)
+    var allsymbols = SYMBOLS; // TODO
+
+    // 2. Fetch and store yahoo data
+    dataconn.yahooQuotes(allsymbols, function(err, quotes) {
         var securities = [];
         _.each(quotes, function(data, symbol) {
             var security = {
@@ -32,8 +80,15 @@ exports.tick = function(req, res) {
         });
 
         var tick = new Tick({securities: securities});
-        tick.save(function(/*err*/) {
-            res.jsonp(tick);
+        tick.save(function() {
+            // 3. Update portfolio values
+            Agent.find()
+                .populate('league', 'startCash')
+                .exec(function(err, agents) {
+                    update_portfolio_values(agents, quotes, function() {
+                        res.jsonp(tick);
+                    });
+                });
         });
     });
 };

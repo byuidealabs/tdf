@@ -52,7 +52,7 @@ module.exports = function(grunt) {
         },
         scraper: {
             options: {
-                tickrate: 300
+                tickrate: 30
             }
         },
         concurrent: {

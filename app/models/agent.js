@@ -21,6 +21,11 @@ var AgentSchema = new Schema({
     portfolio: [{
         timestamp: {type: Date, default: Date.now},
         composition: {}
+    }],
+    portfoliovalue: [{
+        timestamp: {type: Date, default: Date.now},
+        composition: {},
+        totalvalue: Number
     }]
 });
 
@@ -73,7 +78,7 @@ AgentSchema.methods.setStatus = function(isPrivate, Tick, cb) {
     var load_history = function(agent, quotes, cb) {
 
         // TODO determine length to load
-        Tick.historical(50, function(histories) {
+        /*Tick.historical(50, function(histories) {
             agent.status.history = {};
 
             console.log('reached');
@@ -101,7 +106,8 @@ AgentSchema.methods.setStatus = function(isPrivate, Tick, cb) {
             });
 
             cb(agent);
-        });
+        });*/
+        cb(agent);
     };
 
     Tick.mostRecent(function(quotes) {
