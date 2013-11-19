@@ -1,5 +1,5 @@
 // underscore.js injection service.
-angular.module('underscore').factory('_',
+angular.module('tdf').factory('_',
     [
     function() {
         return window._;

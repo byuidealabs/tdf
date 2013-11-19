@@ -17,27 +17,6 @@ angular.module('tdf').directive('agentList',
             },
             controller: function($scope) {
 
-                $scope.chartOptions = {
-                    xaxis: {
-                        mode: 'time',
-                        timeformat: '%m/%d %H:%m'
-                    },
-                    yaxis: {
-                        tickFormatter: function(tick) {
-                            return $filter('currency')(tick);
-                        }
-                    },
-                    grid: {
-                        hoverable: true
-                    },
-                    tooltip: true,
-                    tooltipOpts: {
-                        content: '%y on %x',
-                        xDateFormat: '%b %e, %Y %I:%M:%S %p'
-                    }
-                };
-
-
                 $scope.$watch('agent', function(agent) {
                     if (agent === undefined) {
                         return;
@@ -58,6 +37,27 @@ angular.module('tdf').directive('agentList',
                         }
                     }];
                 });
+
+                $scope.chartOptions = {
+                    xaxis: {
+                        mode: 'time',
+                        timeformat: '%m/%d %H:%m'
+                    },
+                    yaxis: {
+                        tickFormatter: function(tick) {
+                            return $filter('currency')(tick);
+                        }
+                    },
+                    grid: {
+                        hoverable: true
+                    },
+                    tooltip: true,
+                    tooltipOpts: {
+                        content: '%y on %x',
+                        xDateFormat: '%b %e, %Y %I:%M:%S %p'
+                    }
+                };
+
             }
         };
     }]);
