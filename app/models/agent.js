@@ -75,45 +75,10 @@ AgentSchema.methods.setStatus = function(isPrivate, Tick, cb) {
         cb(agent);
     };
 
-    var load_history = function(agent, quotes, cb) {
-
-        // TODO determine length to load
-        /*Tick.historical(50, function(histories) {
-            agent.status.history = {};
-
-            console.log('reached');
-
-            _.each(histories, function(history, time) {
-                var ticktime = new Date(time);
-                var most_recent_comp = null;
-                var most_recent_date = null;
-                _.each(agent.portfolio, function(port) {
-                    if (port.timestamp.getTime() < ticktime.getTime() &&
-                        (most_recent_date === null ||
-                         port.timestamp.getTime() >
-                          most_recent_date.getTime())) {
-                        most_recent_date = port.timestamp;
-                        most_recent_comp = port.composition;
-                    }
-                });
-                if (most_recent_comp !== null) {
-                    agent.status.history[ticktime] = dataconn.portfolioValue(
-                        most_recent_comp, quotes, false);
-                }
-                else {
-                    agent.status.history[ticktime] = agent.league.startCash;
-                }
-            });
-
-            cb(agent);
-        });*/
-        cb(agent);
-    };
-
     Tick.mostRecent(function(quotes) {
         if (curr_portfolio === undefined) {
             finalize_status(null, 0, agent.league.startCash, function(agent) {
-                load_history(agent, quotes, cb);
+                cb(agent);
             });
         }
         else {
@@ -124,7 +89,7 @@ AgentSchema.methods.setStatus = function(isPrivate, Tick, cb) {
                                                         false);
             var value = total_value - cash;
             finalize_status(composition, value, cash, function(agent) {
-                load_history(agent, quotes, cb);
+                cb(agent);
             });
         }
     });
