@@ -1,8 +1,8 @@
 angular.module('tdf.leagues').controller('LeaguesController',
     ['$scope', '$routeParams', '$location', 'Global', 'Utilities', 'Leagues',
-    'Agents', '_', '$filter',
+    'Agents', '_', '$filter', 'Colors',
     function($scope, $routeParams, $location, Global, Utilities, Leagues,
-             Agents, _, $filter) {
+             Agents, _, $filter, Colors) {
         $scope.global = Global;
 
         $scope.options = {
@@ -123,6 +123,7 @@ angular.module('tdf.leagues').controller('LeaguesController',
 
         $scope.$watch('agents', function(agents) {
             var chartData = [];
+            var index = 0;
             _.each(agents, function(agent) {
                 var points = _.map(agent.portfoliovalue, function(data) {
                     var key = new Date(data.timestamp);
@@ -132,6 +133,7 @@ angular.module('tdf.leagues').controller('LeaguesController',
                 });
                 var data = {
                     data: points,
+                    color: Colors.atindex(index),
                     lines: {
                         show: true
                     },
@@ -141,6 +143,8 @@ angular.module('tdf.leagues').controller('LeaguesController',
                     label: agent.name + ' (' + agent.user.username + ')'
                 };
                 chartData.push(data);
+
+                index++;
             });
             $scope.chartData = chartData;
         });
