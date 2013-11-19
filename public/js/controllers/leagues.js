@@ -83,7 +83,7 @@ angular.module('tdf.leagues').controller('LeaguesController',
         $scope.chartOptions = {
             xaxis: {
                 mode: 'time',
-                timeformat: '%Y/%m/%d'
+                timeformat: '%m/%d %H:%m'
             },
             yaxis: {
                 tickFormatter: function(tick) {
@@ -113,7 +113,8 @@ angular.module('tdf.leagues').controller('LeaguesController',
                     },
                     points: {
                         show:false
-                    }
+                    },
+                    label: agent.name + ' (' + agent.user.username + ')'
                 };
                 chartData.push(data);
             });

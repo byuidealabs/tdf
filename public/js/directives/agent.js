@@ -20,7 +20,7 @@ angular.module('tdf').directive('agentList',
                 $scope.chartOptions = {
                     xaxis: {
                         mode: 'time',
-                        timeformat: '%Y/%m/%d'
+                        timeformat: '%m/%d %H:%m'
                     },
                     yaxis: {
                         tickFormatter: function(tick) {
