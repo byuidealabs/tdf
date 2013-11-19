@@ -26,6 +26,14 @@ angular.module('tdf').directive('agentList',
                         tickFormatter: function(tick) {
                             return $filter('currency')(tick);
                         }
+                    },
+                    grid: {
+                        hoverable: true
+                    },
+                    tooltip: true,
+                    tooltipOpts: {
+                        content: '%y on %x',
+                        xDateFormat: '%b %e, %Y %I:%M:%S %p'
                     }
                 };
 
@@ -46,7 +54,7 @@ angular.module('tdf').directive('agentList',
                             show: true
                         },
                         points: {
-                            show: true
+                            show: false
                         }
                     }];
                 });

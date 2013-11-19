@@ -94,6 +94,14 @@ angular.module('tdf.leagues').controller('LeaguesController',
                 show: true,
                 container: '#chart-legend',
                 noColumns: 2
+            },
+            grid: {
+                hoverable: true
+            },
+            tooltip: true,
+            tooltipOpts: {
+                content: '%s: %y on %x',
+                xDateFormat: '%b %e, %Y %I:%M:%S %p'
             }
         };
 
