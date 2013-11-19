@@ -74,35 +74,51 @@ angular.module('tdf.leagues').controller('LeaguesController',
             function(league) {
                 $scope.league = league;
                 $scope.leagues = [league];
+
+                $scope.setLeagueChartOptions(league);
+
                 Agents.query(function(agents) {
                     $scope.agents = agents;
                 });
             });
         };
 
-        $scope.chartOptions = {
-            xaxis: {
-                mode: 'time',
-                timeformat: '%m/%d %H:%m'
-            },
-            yaxis: {
-                tickFormatter: function(tick) {
-                    return $filter('currency')(tick);
+
+        $scope.setLeagueChartOptions = function(league) {
+            var league_start = new Date(league.created).getTime(); // TODO
+            $scope.chartOptions = {
+                xaxis: {
+                    mode: 'time',
+                    timeformat: '%m/%d %H:%m',
+                    panRange: [league_start, Date.now()]
+                },
+                yaxis: {
+                    tickFormatter: function(tick) {
+                        return $filter('currency')(tick);
+                    },
+                    zoomRange: [0.05, 5],
+                    panRange: false
+                },
+                zoom: {
+                    interactive: true
+                },
+                pan: {
+                    interactive: true
+                },
+                legend: {
+                    show: true,
+                    container: '#chart-legend',
+                    noColumns: 2
+                },
+                grid: {
+                    hoverable: true
+                },
+                tooltip: true,
+                tooltipOpts: {
+                    content: '%s: %y on %x',
+                    xDateFormat: '%b %e, %Y %I:%M:%S %p'
                 }
-            },
-            legend: {
-                show: true,
-                container: '#chart-legend',
-                noColumns: 2
-            },
-            grid: {
-                hoverable: true
-            },
-            tooltip: true,
-            tooltipOpts: {
-                content: '%s: %y on %x',
-                xDateFormat: '%b %e, %Y %I:%M:%S %p'
-            }
+            };
         };
 
         $scope.$watch('agents', function(agents) {

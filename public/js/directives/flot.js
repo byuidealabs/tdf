@@ -8,14 +8,15 @@ angular.module('tdf').directive('chart',
                 var chart = null;
 
                 var data = attrs.data;
-                var opts = scope[attrs.options] || {};
+                var opts = attrs.options;
 
                 scope.$watch(data, function(v){
                     if (v === undefined) {
                         return;
                     }
-                    if(!chart) {
-                        chart = $.plot(elem, v , opts);
+                    if (!chart) {
+                        var options = scope[opts] || {};
+                        chart = $.plot(elem, v , options);
                         elem.show();
                     }
                     else {
@@ -23,6 +24,14 @@ angular.module('tdf').directive('chart',
                         chart.setupGrid();
                         chart.draw();
                     }
+                });
+
+                scope.$watch(opts, function(v) {
+                    if (v === undefined) {
+                        return;
+                    }
+                    var data = scope[data] || [];
+                    chart = $.plot(elem, data, v);
                 });
             }
         };
