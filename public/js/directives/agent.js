@@ -13,7 +13,7 @@ angular.module('tdf').directive('agentList',
             restrict: 'E',
             templateUrl: 'views/directives/agent/agentstatus.html',
             scope: {
-                status: '='
+                agent: '='
             },
             controller: function($scope) {
 
@@ -30,24 +30,24 @@ angular.module('tdf').directive('agentList',
                 };
 
 
-                $scope.$watch('status', function(v) {
-                    if (v === undefined) {
+                $scope.$watch('agent', function(agent) {
+                    if (agent === undefined) {
                         return;
                     }
-                    var data = _.pairs(v.history);
-                    data = _.map(data, function(pair) {
-                        var key = new Date(pair[0]);
-                        var value = pair[1];
+                    var points = _.map(agent.portfoliovalue, function(data) {
+                        var key = new Date(data.timestamp);
+                        var value = data.totalvalue;
 
                         return [key.getTime(), value];
                     });
-                    data = data.reverse();
                     $scope.chartData = [{
-                        data: data,
+                        data: points,
                         lines: {
                             show: true
+                        },
+                        points: {
+                            show: true
                         }
-
                     }];
                 });
             }

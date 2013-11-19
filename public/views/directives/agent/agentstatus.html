@@ -1,21 +1,21 @@
 <div class='row'>
     <div class='col-lg-4'>
-        <div ng-show='status.cash'>
+        <div ng-show='agent.status.cash'>
             <div class='row'>
                 <div class='col-lg-6'><b>Current Cash</b></div>
-                <div class='col-lg-4'>{{status.cash | currency}}</div>
+                <div class='col-lg-4'>{{agent.status.cash | currency}}</div>
             </div>
             <div class='row'>
                 <div class='col-lg-6'><b>Value of Securities</b></div>
                 <div class='col-lg-4'>
-                    {{status.securities_value | currency}}
+                    {{agent.status.securities_value | currency}}
                 </div>
             </div>
             <hr />
         </div>
         <div class='row'>
             <div class='col-lg-6'><b>Total Value</b></div>
-            <div class='col-lg-4'>{{status.total_value | currency}}</div>
+            <div class='col-lg-4'>{{agent.status.total_value | currency}}</div>
         </div>
     </div>
     <div class='col-lg-8'>

@@ -100,23 +100,22 @@ angular.module('tdf.leagues').controller('LeaguesController',
         $scope.$watch('agents', function(agents) {
             var chartData = [];
             _.each(agents, function(agent) {
-                var points = _.pairs(agent.status.history);
-                points = _.map(points, function(pair) {
-                    var key = new Date(pair[0]);
-                    var value = pair[1];
+                var points = _.map(agent.portfoliovalue, function(data) {
+                    var key = new Date(data.timestamp);
+                    var value = data.totalvalue;
 
                     return [key.getTime(), value];
                 });
-                points = points.reverse();
-
                 var data = {
                     data: points,
                     lines: {
                         show: true
                     },
-                    label: agent.name + ' (' + agent.user.username + ')'
+                    points: {
+                        show:false
+                    }
                 };
-                chartData = _.union(chartData, [data]);
+                chartData.push(data);
             });
             $scope.chartData = chartData;
         });

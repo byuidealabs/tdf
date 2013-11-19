@@ -1,8 +1,6 @@
 <section ng-controller='AgentsController' ng-init='findOne()'>
     <h1>{{agent.name}}</h1>
 
-    {{agent}}
-
     <div class='panel panel-info'>
         <div class='panel-heading'>Details</div>
         <div class='panel-body'>
@@ -70,7 +68,7 @@
             <div class='clearfix'></div>
         </div>
         <div class='panel-body'>
-            <agent-status status='agent.status'></agent-status>
+            <agent-status agent='agent'></agent-status>
         </div>
     </div>
 
