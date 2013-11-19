@@ -220,16 +220,14 @@ var __get_security_value = function(quotes, symbol, scheme) {
  *  3. Could not look up symbol
  *  4. Could not look up scheme (bid/ask/last) of symbol (should never see)
  */
-var __execute_trade = function(req, res, quotes) {
+var __execute_trade = function(agent, trade, quotes, res) {
     try {
-        var trade = req.body.trade || req.body;
-        var agent = req.agent;
         var last_portfolio = _.last(agent.portfolio);
         var curr_composition;
 
         if (last_portfolio === undefined) {
             curr_composition = {
-                'cash00': req.agent.league.startCash
+                'cash00': agent.league.startCash
             };
         }
         else {
@@ -252,7 +250,7 @@ var __execute_trade = function(req, res, quotes) {
             var sell_price = __get_security_value(quotes, symbol, 'bid');
             var buy_price = __get_security_value(quotes, symbol, 'ask');
             var profit = sell_price * security.q;
-            var shortSellLimit = req.agent.league.shortSellLimit;
+            var shortSellLimit = agent.league.shortSellLimit;
 
             if (curr_composition[symbol] === undefined) {
                 if (shortSellLimit === 0) {
@@ -311,7 +309,7 @@ var __execute_trade = function(req, res, quotes) {
             var sell_price = __get_security_value(quotes, symbol, 'bid');
             var cost = buy_price * security.q;
             var curr_quantity = curr_composition[symbol] || 0;
-            var leverageLimit = req.agent.league.leverageLimit;
+            var leverageLimit = agent.league.leverageLimit;
             curr_composition.cash00 -= cost;
             curr_composition[symbol] = curr_quantity + security.q;
 
@@ -340,7 +338,7 @@ var __execute_trade = function(req, res, quotes) {
 
         agent.portfolio.push({composition: curr_composition});
         agent.save(function () {
-            req.agent.setStatus(false, Tick, function(agent) {
+            agent.setStatus(false, Tick, function(agent) {
                 res.jsonp(agent);
             });
         });
@@ -356,39 +354,28 @@ var __execute_trade = function(req, res, quotes) {
     }
 };
 
-/*var __setup_trade = function(req, res, quotes_cb) {
-    var trade = req.body.trade || req.body;  // Depending on source of data
+var __setup_trade = function(agent, trade, cb) {
 
-    // Filter out trades with zero quantity
-    trade.buy = _.filter(trade.buy, function(security) {
-        return security.q !== 0;
-    });
-    trade.sell = _.filter(trade.sell, function(security) {
-        return security.q !== 0;
-    });
+    var symbols = [];
 
-    // Get list of all unique trade symbols
+    // Get symbols from current composition
+    var last_portfolio = _.last(agent.portfolio);
+    if (last_portfolio !== undefined) {
+        var composition = last_portfolio.composition;
+        symbols = _.union(symbols,
+                          dataconn.compositionSymbols(composition));
+    }
+
+    // Get symbols from buy
     var buysymbols = _.map(trade.buy, function(security) {
         return security.s;
     });
-    var sellsymbols = _.map(trade.sell, function(security) {
-        return security.s;
+    symbols = _.union(symbols, buysymbols);
+
+    dataconn.yahooQuotes(symbols, function(err, quotes) {
+        cb(quotes);
     });
-    var symbols = _.union(buysymbols, sellsymbols);
-
-    // Add symbols from current composition
-    var last_portfolio = _.last(req.agent.portfolio);
-    if (last_portfolio !== undefined) {
-        symbols = _.union(symbols,
-                          dataconn.compositionSymbols(
-                              last_portfolio.composition));
-        // TODO what happens if a portfolio has a security that yahoo does not?
-    }
-
-    // Trade
-    quotes_cb(req, res, symbols, dataconn.yahooPortfolioValue,
-              __execute_trade);
-};*/
+};
 
 /**
  * Allow a trade to be made
@@ -405,9 +392,26 @@ var __execute_trade = function(req, res, quotes) {
  *  5. Attempted to trade cash
  */
 exports.trade = function(req, res) {
-    Tick.mostRecent(function(quotes) {
-        __execute_trade(req, res, quotes);
+
+    // 1. Determine current symbol set
+    var agent = req.agent;
+    var trade = req.body.trade || req.body;  // Depending on source of data
+
+    // Filter out trades with zero quantity
+    trade.buy = _.filter(trade.buy, function(security) {
+        return security.q !== 0;
     });
+    trade.sell = _.filter(trade.sell, function(security) {
+        return security.q !== 0;
+    });
+
+    __setup_trade(agent, trade, function(quotes) {
+        __execute_trade(agent, trade, quotes, res);
+    });
+
+    /*Tick.mostRecent(function(quotes) {
+        __execute_trade(req, res, quotes);
+    });*/
 };
 
 /**
