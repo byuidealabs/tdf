@@ -24,22 +24,16 @@
             <div class='panel-heading'>Competition Phases</div>
             <div class='panel-body'>
 
-                <div class='form-group'>
-                    <label class='control-label col-lg-3'
-                        for='trialStart'>
-                        Trial Period Start (GMT)
-                    </label>
+                <league-time ng-model='league.trialStart'>
+                    Trial Period Start (GMT)
+                </league-time>
+                <league-time ng-model='league.competitionStart'>
+                    Competetion Period Start (GMT)
+                </league-time>
+                <league-time ng-model='league.competitionEnd'>
+                    Competition Period End (GMT)
+                </league-time>
 
-                    <div class='col-lg-2'>
-                        <input type='date' class='form-control'
-                            ng-model='trialStart.Day' required />
-                    </div>
-                    <div class='col-lg-2'>
-                        <input type='time' class='form-control'
-                            ng-model='trialStart.Time' required />
-                    </div>
-
-                </div>
             </div>
         </div>
 

@@ -79,12 +79,20 @@ angular.module('tdf.leagues').controller('LeaguesController',
                 $scope.setLeagueChartOptions(league);
 
                 // Set up trial phase start date/time
-                var momentTrialStart = moment.parseZone(
+                /*var momentTrialStart = moment.parseZone(
                     league.trialStart.toString());
                 $scope.trialStart = {
                     Day: momentTrialStart.format('YYYY-MM-DD'),
                     Time: momentTrialStart.format('HH:mm')
-                };
+                };*/
+
+                // Set up competition phase start date/time
+                /*var momentCompStart = moment.parseZone(
+                    league.competitionStart.toString());
+                $scope.compStart = {
+                    Day: momentCompStart.format('YYY-MM-DD'),
+                    Time: momentCompStart.format('HH:mm')
+                };*/
 
                 Agents.query(function(agents) {
                     $scope.agents = agents;
@@ -158,12 +166,20 @@ angular.module('tdf.leagues').controller('LeaguesController',
             $scope.chartData = chartData;
         });
 
-        $scope.$watch('trialStart', function(trialStart) {
+        /*$scope.$watch('trialStart', function(trialStart) {
             if (!trialStart || !trialStart.Day || !trialStart.Time) {
                 return;
             }
             $scope.league.trialStart = new Date(trialStart.Day + ' ' +
                                                 trialStart.Time + ' GMT');
         }, true);
+
+        $scope.$watch('compStart', function(compStart) {
+            if (!compStart || !compStart.Day || !compStart.Time) {
+                return;
+            }
+            $scope.league.compStart = new Date(compStart.Day + ' ' +
+                                               compStart.Time + ' GMT');
+        }, true);*/
 
     }]);
