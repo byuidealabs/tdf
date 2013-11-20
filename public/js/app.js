@@ -1,6 +1,5 @@
 window.app = angular.module('tdf', ['ngCookies', 'ngResource', 'ngRoute',
-                            'ui.bootstrap', 'd3',
-                            'tdf.utilities', 'timer',
+                            'ui.bootstrap', 'd3', 'tdf.utilities', 'timer',
                             'tdf.system', 'tdf.articles', 'tdf.users',
                             'tdf.leagues', 'tdf.agents']);
 

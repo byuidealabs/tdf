@@ -2,7 +2,6 @@
  * Module dependencies
  */
 var mongoose = require('mongoose'),
-    config = require('../../config/config'),
     Schema = mongoose.Schema;
 
 var winnerMetricsEnum = ['Greatest Value',
@@ -26,7 +25,7 @@ var LeagueSchema = new Schema({
     },
 
     // User Settings
-    
+
     isOpenLeague: {
         // If league is open, anybody with access to server can join league
         type: Boolean,
@@ -50,12 +49,9 @@ var LeagueSchema = new Schema({
     },
 
     // Simulation Settings
-    
+
     trialStart: {
         // Start of trial period
-        type: Date
-    },
-    trialEnd: {
         type: Date
     },
     competitionStart: {
@@ -63,6 +59,10 @@ var LeagueSchema = new Schema({
     },
     competitionEnd: {
         type: Date
+    },
+    leaguePhase: {
+        type: Number,
+        default: 0
     },
 
     // Metrics Settings
@@ -78,12 +78,12 @@ var LeagueSchema = new Schema({
         type: String,
         enum: reallocationRulesEnum
     },
-	
+
     // Default Starting Cash for League
 
     startCash: {
         type: Number,
-	default: 100000
+        default: 100000
     },
 
     shortSellLimit: {
@@ -95,7 +95,7 @@ var LeagueSchema = new Schema({
         type: Number,
         default: 0
     }
-});    
+});
 
 /**
  * Validations

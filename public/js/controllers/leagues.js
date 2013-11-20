@@ -1,8 +1,8 @@
 angular.module('tdf.leagues').controller('LeaguesController',
     ['$scope', '$routeParams', '$location', 'Global', 'Utilities', 'Leagues',
-    'Agents', '_', '$filter', 'Colors',
+    'Agents', '_', '$filter', 'Colors', 'moment',
     function($scope, $routeParams, $location, Global, Utilities, Leagues,
-             Agents, _, $filter, Colors) {
+             Agents, _, $filter, Colors, moment) {
         $scope.global = Global;
 
         $scope.options = {
@@ -68,6 +68,7 @@ angular.module('tdf.leagues').controller('LeaguesController',
         };
 
         $scope.findOne = function() {
+
             Leagues.get({
                 leagueId: $routeParams.leagueId
             },
@@ -76,6 +77,14 @@ angular.module('tdf.leagues').controller('LeaguesController',
                 $scope.leagues = [league];
 
                 $scope.setLeagueChartOptions(league);
+
+                // Set up trial phase start date/time
+                var momentTrialStart = moment.parseZone(
+                    league.trialStart.toString());
+                $scope.trialStart = {
+                    Day: momentTrialStart.format('YYYY-MM-DD'),
+                    Time: momentTrialStart.format('HH:mm')
+                };
 
                 Agents.query(function(agents) {
                     $scope.agents = agents;
@@ -148,5 +157,13 @@ angular.module('tdf.leagues').controller('LeaguesController',
             });
             $scope.chartData = chartData;
         });
+
+        $scope.$watch('trialStart', function(trialStart) {
+            if (!trialStart || !trialStart.Day || !trialStart.Time) {
+                return;
+            }
+            $scope.league.trialStart = new Date(trialStart.Day + ' ' +
+                                                trialStart.Time + ' GMT');
+        }, true);
 
     }]);
