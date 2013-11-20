@@ -126,9 +126,14 @@ exports.show = function(req, res) {
  * List of agents
  */
 exports.all = function(req, res) {
+
+    console.log(JSON.stringify(req.query));
+
     var user = req.user;
-    Agent.find().sort('-created').populate('user', 'name username').
+    Agent.find(req.query).sort('-created').populate('user', 'name username').
         populate('league', 'name startCash').exec(function (err, agents) {
+        console.log(err);
+        console.log(agents);
 
         var setStatusOnAgent = function(i, cb) {
             if (i < agents.length) {

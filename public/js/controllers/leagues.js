@@ -78,7 +78,9 @@ angular.module('tdf.leagues').controller('LeaguesController',
 
                 $scope.setLeagueChartOptions(league);
 
-                Agents.query(function(agents) {
+                Agents.query({
+                    league: league._id
+                }, function(agents) {
                     $scope.agents = agents;
                 });
             });
@@ -86,7 +88,6 @@ angular.module('tdf.leagues').controller('LeaguesController',
 
 
         $scope.setLeagueChartOptions = function(league) {
-            var leagueStart = new Date(league.created).getTime();
             var trialStart = new Date(league.trialStart).getTime();
             var competitionStart = new Date(league.competitionStart).getTime();
             var competitionEnd = new Date(league.competitionEnd).getTime();
