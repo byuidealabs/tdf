@@ -127,13 +127,9 @@ exports.show = function(req, res) {
  */
 exports.all = function(req, res) {
 
-    console.log(JSON.stringify(req.query));
-
     var user = req.user;
     Agent.find(req.query).sort('-created').populate('user', 'name username').
         populate('league', 'name startCash').exec(function (err, agents) {
-        console.log(err);
-        console.log(agents);
 
         var setStatusOnAgent = function(i, cb) {
             if (i < agents.length) {
@@ -428,7 +424,7 @@ exports.trade = function(req, res) {
 exports.reset = function(req, res) {
     var agent = req.agent;
 
-    agent.portfolio = [];
+    agent.portfolio.push({composition: {cash00: agent.league.startCash}});
 
     agent.save(function (/*err*/){
         res.jsonp(agent);
