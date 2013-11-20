@@ -2,7 +2,7 @@ angular.module('tdf.leagues').controller('LeaguesController',
     ['$scope', '$routeParams', '$location', 'Global', 'Utilities', 'Leagues',
     'Agents', '_', '$filter', 'Colors', 'moment',
     function($scope, $routeParams, $location, Global, Utilities, Leagues,
-             Agents, _, $filter, Colors, moment) {
+             Agents, _, $filter, Colors) {
         $scope.global = Global;
 
         $scope.options = {
@@ -78,22 +78,6 @@ angular.module('tdf.leagues').controller('LeaguesController',
 
                 $scope.setLeagueChartOptions(league);
 
-                // Set up trial phase start date/time
-                /*var momentTrialStart = moment.parseZone(
-                    league.trialStart.toString());
-                $scope.trialStart = {
-                    Day: momentTrialStart.format('YYYY-MM-DD'),
-                    Time: momentTrialStart.format('HH:mm')
-                };*/
-
-                // Set up competition phase start date/time
-                /*var momentCompStart = moment.parseZone(
-                    league.competitionStart.toString());
-                $scope.compStart = {
-                    Day: momentCompStart.format('YYY-MM-DD'),
-                    Time: momentCompStart.format('HH:mm')
-                };*/
-
                 Agents.query(function(agents) {
                     $scope.agents = agents;
                 });
@@ -102,12 +86,15 @@ angular.module('tdf.leagues').controller('LeaguesController',
 
 
         $scope.setLeagueChartOptions = function(league) {
-            var league_start = new Date(league.created).getTime(); // TODO
+            var leagueStart = new Date(league.created).getTime();
+            var trialStart = new Date(league.trialStart).getTime();
+            var competitionStart = new Date(league.competitionStart).getTime();
+            var competitionEnd = new Date(league.competitionEnd).getTime();
             $scope.chartOptions = {
                 xaxis: {
                     mode: 'time',
                     timeformat: '%m/%d %H:%m',
-                    panRange: [league_start, Date.now()]
+                    panRange: [trialStart, competitionEnd]
                 },
                 yaxis: {
                     tickFormatter: function(tick) {
@@ -128,7 +115,36 @@ angular.module('tdf.leagues').controller('LeaguesController',
                     noColumns: 2
                 },
                 grid: {
-                    hoverable: true
+                    hoverable: true,
+                    markings: [
+                        {
+                            xaxis: {
+                                to: trialStart
+                            },
+                            color: 'rgba(210, 50, 45, .5)'
+                        },
+                        {
+                            xaxis: {
+                                from: trialStart,
+                                to: competitionStart
+                            },
+                            color: 'rgba(240, 173, 78, .5)'
+                        },
+                        {
+                            xaxis: {
+                                from: competitionStart,
+                                to: competitionEnd
+                            },
+                            color: 'rgba(71, 164, 71, .5)'
+                        },
+                        {
+                            xaxis: {
+                                from: Date.now(),
+                                to: Date.now()
+                            },
+                            color: 'rgb(210, 50, 45)'
+                        }
+                    ]
                 },
                 tooltip: true,
                 tooltipOpts: {
@@ -165,21 +181,5 @@ angular.module('tdf.leagues').controller('LeaguesController',
             });
             $scope.chartData = chartData;
         });
-
-        /*$scope.$watch('trialStart', function(trialStart) {
-            if (!trialStart || !trialStart.Day || !trialStart.Time) {
-                return;
-            }
-            $scope.league.trialStart = new Date(trialStart.Day + ' ' +
-                                                trialStart.Time + ' GMT');
-        }, true);
-
-        $scope.$watch('compStart', function(compStart) {
-            if (!compStart || !compStart.Day || !compStart.Time) {
-                return;
-            }
-            $scope.league.compStart = new Date(compStart.Day + ' ' +
-                                               compStart.Time + ' GMT');
-        }, true);*/
 
     }]);
