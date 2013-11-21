@@ -422,11 +422,7 @@ exports.trade = function(req, res) {
  * TODO: Check if league is in competition; if so, don't allow reset.
  */
 exports.reset = function(req, res) {
-    var agent = req.agent;
-
-    agent.portfolio.push({composition: {cash00: agent.league.startCash}});
-
-    agent.save(function (/*err*/){
+    req.agent.resetPortfolio(function(agent) {
         res.jsonp(agent);
     });
 };

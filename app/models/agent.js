@@ -100,6 +100,24 @@ AgentSchema.methods.ownedBy = function(user) {
 };
 
 /**
+ * Resets the agent's portfolio by adding a new composition with the league's
+ * default cash and no securities.
+ *
+ * pre: agent object must have league.startCash populated.
+ * post: agent's default portfolio composition added to portfolio list,
+ *      agent is saved, and the callback cb is called with the new agent
+ *      object.
+ */
+AgentSchema.methods.resetPortfolio = function(cb) {
+    var agent = this;
+    agent.portfolio.push({composition: {cash00: agent.league.startCash}});
+
+    agent.save(function() {
+        cb(agent);
+    });
+};
+
+/**
  * Virtuals
  */
 AgentSchema.set('toJSON', {

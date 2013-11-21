@@ -1,8 +1,11 @@
-/**
- * Module dependencies
- */
+//=============================================================================
+//  Module Dependencies
+//=============================================================================
+
 var mongoose = require('mongoose'),
-    Schema = mongoose.Schema;
+    Schema = mongoose.Schema,
+    _ = require('underscore'),
+    Agent = mongoose.model('Agent');
 
 var winnerMetricsEnum = ['Greatest Value',
                          'Sharpe Ratio'];
@@ -10,9 +13,10 @@ var winnerMetricsEnum = ['Greatest Value',
 var reallocationRulesEnum = ['No Reallocation',
                              'Redistribution'];
 
-/**
- * League Schema
- */
+//=============================================================================
+//  League Schema
+//=============================================================================
+
 var LeagueSchema = new Schema({
     created: {
         type: Date,
@@ -97,18 +101,20 @@ var LeagueSchema = new Schema({
     }
 });
 
-/**
- * Validations
- */
+//=============================================================================
+//  Validations
+//=============================================================================
+
 LeagueSchema.path('name').validate(function(name) {
     return name.length;
 }, 'Name cannot be blank');
 
 // TODO Add more validations on all fields
 
-/**
- * Statics
- */
+//=============================================================================
+//  Statics
+//=============================================================================
+
 LeagueSchema.statics = {
     load: function(id, cb) {
         this.findOne({
@@ -116,5 +122,87 @@ LeagueSchema.statics = {
         }).exec(cb);
     }
 };
+
+//=============================================================================
+//  Methods
+//=============================================================================
+
+var reset_agents = function(agents, cb) {
+    if (!agents.length) {
+        cb();
+    }
+    else {
+        var agent = _.first(agents);
+        var restagents = _.rest(agents);
+
+        agent.resetPortfolio(function() {
+            reset_agents(restagents, cb);
+        });
+    }
+};
+
+var promoteToPostCompetition = function(league, cb) {
+    var competitionEndTime = new Date(league.competitionEnd).getTime();
+    if (league.leaguePhase === 2 && Date.now() > competitionEndTime) {
+
+        console.log('Promoting league ' + league.name +
+                    ' to post-competition phase');
+
+        league.leaguePhase = 3;
+        league.save(function() {
+            cb();
+        });
+    }
+    else {
+        cb();
+    }
+};
+
+var promoteToCompetition = function(league, cb) {
+    var competitionStartTime = new Date(league.competitionStart).getTime();
+    if (league.leaguePhase === 1 && Date.now() > competitionStartTime) {
+
+        console.log('Promoting league ' + league.name +
+                    ' to competition phase');
+
+        league.leaguePhase = 2;
+        league.save(function() {
+            Agent.find({league: league})
+                .populate('league', 'startCash')
+                .exec(function(err, agents) {
+                    reset_agents(agents, function() {
+                        promoteToPostCompetition(league, cb);
+                    });
+                });
+        });
+    }
+    else {
+        promoteToPostCompetition(league, cb);
+    }
+};
+
+var promoteToTrial = function(league, cb) {
+    var trialStartTime = new Date(league.trialStart).getTime();
+    if (league.leaguePhase === 0 && Date.now() > trialStartTime) {
+
+        console.log('Promoting league ' + league.name + ' to trial phase');
+
+        league.leaguePhase = 1;
+        league.save(function() {
+            promoteToCompetition(league, cb);
+        });
+    }
+    else {
+        promoteToCompetition(league, cb);
+    }
+};
+
+LeagueSchema.methods.promote = function(cb) {
+    promoteToTrial(this, cb);
+};
+
+//=============================================================================
+//  Module Registration
+//=============================================================================
 
 mongoose.model('League', LeagueSchema);
