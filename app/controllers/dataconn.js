@@ -79,11 +79,28 @@ var query_yahoo = function(symbols_list, quotes, cb) {
                     .to.array(function(quotesarray) {
 
                     _.each(quotesarray, function(quote) {
+                        var error = (quote[4] !== 'N/A');
+
+                        var ask = quote[1];
+                        if (isNaN(ask)) {
+                            ask = -1;
+                            error = true;
+                        }
+                        var bid = quote[2];
+                        if (isNaN(bid)) {
+                            bid = -1;
+                            error = true;
+                        }
+                        var last = quote[3];
+                        if (isNaN(last)) {
+                            quote = -1;
+                            error = true;
+                        }
                         quotes[quote[0].toUpperCase()] = {
-                            'ask': quote[1],
-                            'bid': quote[2],
-                            'last': quote[3],
-                            'error': (quote[4] !== 'N/A')
+                            'ask': ask,
+                            'bid': bid,
+                            'last': last,
+                            'error': error
                         };
                     });
                     query_yahoo(rest_symbols, quotes, cb);
@@ -111,36 +128,6 @@ exports.yahooQuotes = function(symbols, cb) {
         query_yahoo(symbols_list, quotes, function(error, quotes) {
             cb(error, quotes);
         });
-
-        /*var symbol_str = _.reduce(symbols, function(memo, symbol) {
-            var pre = '';
-            if (symbol.length) {
-                pre = '+';
-            }
-            return memo + pre + symbol;
-        });
-        var url = yUrl + symbol_str;
-        request(url, function(error, rst, body) {
-            if (error) {
-                cb(error, null);
-            }
-            else {
-                csv().from.string(body.replace(/<(?:.|\n)*?>/gm, ''))
-                    .to.array(function(quotesarray) {
-
-                    var quotes = {};
-                    _.each(quotesarray, function(quote) {
-                        quotes[_.first(quote).toUpperCase()] = {
-                            'ask': quote[1],
-                            'bid': quote[2],
-                            'last': quote[3],
-                            'error': (quote[4] !== 'N/A')
-                        };
-                    });
-                    cb(null, quotes);
-                });
-            }
-        });*/
     }
 };
 

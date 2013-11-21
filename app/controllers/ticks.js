@@ -35,7 +35,7 @@ var promote_leagues = function(leagues, symbols, cb) {
 
 var tick_leagues = function(cb) {
     League.find().exec(function(err, leagues) {
-        promote_leagues(leagues, [], cb);
+        promote_leagues(leagues, SYMBOLS, cb); // Scrapes s&p 500 by default
     });
 };
 
@@ -108,7 +108,8 @@ exports.tick = function(req, res) {
         dataconn.yahooQuotes(allsymbols, function(err, quotes) {
             var securities = securities_list(quotes);
             var tick = new Tick({securities: securities});
-            tick.save(function() {
+            tick.save(function(err) {
+                console.log(err);
                 // 3. Update portfolio values
                 Agent.find()
                     .populate('league', 'startCash')
