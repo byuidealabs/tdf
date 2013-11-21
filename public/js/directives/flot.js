@@ -1,6 +1,6 @@
 angular.module('tdf').directive('chart',
-    ['_',
-    function(_) {
+    ['$',
+    function($) {
         return{
             restrict: 'EA',
             link: function(scope, elem, attrs){
@@ -8,21 +8,31 @@ angular.module('tdf').directive('chart',
                 var chart = null;
 
                 var data = attrs.data;
-                var opts = scope[attrs.options] || {};
+                var opts = attrs.options;
 
-                scope.$watch(data, function(v){
-                    if (v === undefined) {
+                scope.$watch(data, function(points){
+                    if (points === undefined) {
                         return;
                     }
-                    if(!chart) {
-                        chart = $.plot(elem, v , opts);
+                    if (!chart) {
+                        var options = scope[opts] || {};
+                        chart = $.plot(elem, points , options);
                         elem.show();
                     }
                     else {
-                        chart.setData(v);
+                        chart.setData(points);
                         chart.setupGrid();
                         chart.draw();
                     }
+                });
+
+                scope.$watch(opts, function(options) {
+                    if (options === undefined) {
+                        return;
+                    }
+                    var points = scope[data] || [];
+                    chart = $.plot(elem, points, options);
+                    elem.show();
                 });
             }
         };

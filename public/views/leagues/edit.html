@@ -1,101 +1,150 @@
 <section ng-controller='LeaguesController' ng-init='findOne()'>
     <h1>Edit League</h1>
     <form class='form-horizontal' ng-submit='update()'>
-        <div class='form-group'>
-            <label class='control-label col-lg-4' for='name'>
-                League Name
-            </label>
-            <div class='col-lg-6'>
-                <input type='text' class='form-control'
-                    ng-model='league.name' id='name' placeholder='Name' 
-                    required>
+
+        <div class='panel panel-info'>
+            <div class='panel-heading'>General Settings</div>
+            <div class='panel-body'>
+
+                <div class='form-group'>
+                    <label class='control-label col-lg-3' for='name'>
+                        League Name
+                    </label>
+                    <div class='col-lg-6'>
+                        <input type='text' class='form-control'
+                            ng-model='league.name' id='name'
+                            placeholder='Name' required>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class='panel panel-info'>
+            <div class='panel-heading'>Competition Phases</div>
+            <div class='panel-body'>
+
+                <league-time ng-model='league.trialStart'>
+                    Trial Period Start (GMT)
+                </league-time>
+                <league-time ng-model='league.competitionStart'>
+                    Competetion Period Start (GMT)
+                </league-time>
+                <league-time ng-model='league.competitionEnd'>
+                    Competition Period End (GMT)
+                </league-time>
+
+            </div>
+        </div>
+
+        <div class='panel panel-info'>
+            <div class='panel-heading'>Security and Restrictions</div>
+            <div class='panel-body'>
+
+                <div class='form-group'>
+                    <label class='control-label col-lg-3' for='isOpenLeague'>
+                        Security
+                    </label>
+                    <div class='col-lg-3'>
+                        <select class='form-control' id='isOpenLeague'
+                            ng-model='league.isOpenLeague'
+                            ng-options='o.value as o.label
+                                for o in options.isOpenLeague'>
+                        </select>
+                    </div>
+                </div>
+
+                <div class='form-group'>
+                    <label class='control-label col-lg-3' for='maxAgents'>
+                        Maximum Allowed Agents
+                    </label>
+                    <div class='col-lg-2'>
+                        <input type='number' class='form-control'
+                            ng-model='league.maxAgents' id='maxAgents'
+                            required>
+                    </div>
+                </div>
+
+                <div class='form-group'>
+                    <label class='control-label col-lg-3' for='maxrUserAgents'>
+                        Maximum Allowed Agents per User
+                    </label>
+                    <div class='col-lg-2'>
+                        <input type='number' class='form-control'
+                            ng-model='league.maxrUserAgents'
+                            id='maxrUserAgents' required>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class='panel panel-info'>
+            <div class='panel-heading'>Winning Metrics</div>
+            <div class='panel-body'>
+
+                <div class='form-group'>
+                    <label class='control-label col-lg-3'
+                        for='principalAgentRequired'>
+                        Eligible Agents
+                    </label>
+                    <div class='col-lg-4'>
+                        <select class='form-control'
+                            id='principalAgentRequired'
+                            ng-model='league.principalAgentRequired'
+                            ng-options='o.value as o.label
+                                for o in options.eligibleAgents'>
+                        </select>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class='panel panel-info'>
+            <div class='panel-heading'>Trade Settings</div>
+            <div class='panel-body'>
+
+                <div class='form-group'>
+                    <label class='control-label col-lg-3' for='startCash'>
+                        Starting Cash
+                    </label>
+                    <div class='col-lg-2'>
+                        <input type='number' class='form-control'
+                            ng-model='league.startCash' id='startCash'
+                            required>
+                    </div>
+                </div>
+
+                <div class='form-group'>
+                    <label class='control-label col-lg-3' for='shortSellLimit'>
+                        Short Sell Limit
+                    </label>
+                    <div class='col-lg-2'>
+                        <input type='number' class='form-control'
+                            ng-model='league.shortSellLimit' id='shortSellLimit'
+                            required>
+                        <!--(0 means short selling is not allowed)-->
+                    </div>
+                </div>
+
+                <div class='form-group'>
+                    <label class='control-label col-lg-3' for='leverageLimit'>
+                        Leverage Limit
+                    </label>
+                    <div class='col-lg-2'>
+                        <input type='number' class='form-control'
+                            ng-model='league.leverageLimit' id='leverageLimit'
+                            required>
+                        <!--(0 means leveraging is not allowed)-->
+                    </div>
+                </div>
+
             </div>
         </div>
 
         <div class='form-group'>
-            <label class='control-label col-lg-4' for='isOpenLeague'>
-                Security
-            </label>
-            <div class='col-lg-3'>
-                <select class='form-control' id='isOpenLeague'
-                    ng-model='league.isOpenLeague'
-                    ng-options='o.value as o.label 
-                        for o in options.isOpenLeague'>
-                </select>
-            </div>
-        </div>
-
-        <div class='form-group'>
-            <label class='control-label col-lg-4' for='maxAgents'>
-                Maximum Allowed Agents
-            </label>
-            <div class='col-lg-2'>
-                <input type='number' class='form-control'
-                    ng-model='league.maxAgents' id='maxAgents' required>
-            </div>
-        </div>
-
-        <div class='form-group'>
-            <label class='control-label col-lg-4' for='maxrUserAgents'>
-                Maximum Allowed Agents per User
-            </label>
-            <div class='col-lg-2'>
-                <input type='number' class='form-control'
-                    ng-model='league.maxrUserAgents' id='maxrUserAgents'
-                    required>
-            </div>
-        </div>
-
-        <div class='form-group'>
-            <label class='control-label col-lg-4' for='principalAgentRequired'>
-                Eligible Agents
-            </label>
-            <div class='col-lg-4'>
-                <select class='form-control' id='principalAgentRequired'
-                    ng-model='league.principalAgentRequired'
-                    ng-options='o.value as o.label
-                        for o in options.eligibleAgents'>
-                </select>
-            </div>
-        </div>
-
-        <div class='form-group'>
-            <label class='control-label col-lg-4' for='startCash'>
-                Starting Cash
-            </label>
-            <div class='col-lg-2'>
-                <input type='number' class='form-control'
-                    ng-model='league.startCash' id='startCash'
-                    required>
-            </div>
-        </div>
-
-        <div class='form-group'>
-            <label class='control-label col-lg-4' for='shortSellLimit'>
-                Short Sell Limit 
-            </label>
-            <div class='col-lg-2'>
-                <input type='number' class='form-control'
-                    ng-model='league.shortSellLimit' id='shortSellLimit'
-                    required>
-                (0 means short selling is not allowed)
-            </div>
-        </div>
-
-        <div class='form-group'>
-            <label class='control-label col-lg-4' for='leverageLimit'>
-                Leverage Limit
-            </label>
-            <div class='col-lg-2'>
-                <input type='number' class='form-control'
-                    ng-model='league.leverageLimit' id='leverageLimit'
-                    required>
-                (0 means leveraging is not allowed)
-            </div>
-        </div>
-
-        <div class='form-group'>
-            <div class='col-lg-offset-4 col-lg-6'>
+            <div class='col-lg-offset-3 col-lg-6'>
                 <input type='submit' class='btn btn-primary'>
             </div>
         </div>

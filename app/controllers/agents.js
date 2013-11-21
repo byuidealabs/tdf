@@ -126,8 +126,9 @@ exports.show = function(req, res) {
  * List of agents
  */
 exports.all = function(req, res) {
+
     var user = req.user;
-    Agent.find().sort('-created').populate('user', 'name username').
+    Agent.find(req.query).sort('-created').populate('user', 'name username').
         populate('league', 'name startCash').exec(function (err, agents) {
 
         var setStatusOnAgent = function(i, cb) {
@@ -421,11 +422,7 @@ exports.trade = function(req, res) {
  * TODO: Check if league is in competition; if so, don't allow reset.
  */
 exports.reset = function(req, res) {
-    var agent = req.agent;
-
-    agent.portfolio = [];
-
-    agent.save(function (/*err*/){
+    req.agent.resetPortfolio(function(agent) {
         res.jsonp(agent);
     });
 };

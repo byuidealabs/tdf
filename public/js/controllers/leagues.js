@@ -1,8 +1,8 @@
 angular.module('tdf.leagues').controller('LeaguesController',
     ['$scope', '$routeParams', '$location', 'Global', 'Utilities', 'Leagues',
-    'Agents', '_', '$filter',
+    'Agents', '_', '$filter', 'Colors', 'moment',
     function($scope, $routeParams, $location, Global, Utilities, Leagues,
-             Agents, _, $filter) {
+             Agents, _, $filter, Colors) {
         $scope.global = Global;
 
         $scope.options = {
@@ -68,37 +68,96 @@ angular.module('tdf.leagues').controller('LeaguesController',
         };
 
         $scope.findOne = function() {
+
             Leagues.get({
                 leagueId: $routeParams.leagueId
             },
             function(league) {
                 $scope.league = league;
                 $scope.leagues = [league];
-                Agents.query(function(agents) {
+
+                $scope.setLeagueChartOptions(league);
+
+                Agents.query({
+                    league: league._id
+                }, function(agents) {
                     $scope.agents = agents;
                 });
             });
         };
 
-        $scope.chartOptions = {
-            xaxis: {
-                mode: 'time',
-                timeformat: '%Y/%m/%d'
-            },
-            yaxis: {
-                tickFormatter: function(tick) {
-                    return $filter('currency')(tick);
+
+        $scope.setLeagueChartOptions = function(league) {
+            var trialStart = new Date(league.trialStart).getTime();
+            var competitionStart = new Date(league.competitionStart).getTime();
+            var competitionEnd = new Date(league.competitionEnd).getTime();
+            $scope.chartOptions = {
+                xaxis: {
+                    mode: 'time',
+                    timeformat: '%m/%d %H:%m',
+                    panRange: [trialStart, competitionEnd]
+                },
+                yaxis: {
+                    tickFormatter: function(tick) {
+                        return $filter('currency')(tick);
+                    },
+                    zoomRange: [0.05, 5],
+                    panRange: false
+                },
+                zoom: {
+                    interactive: true
+                },
+                pan: {
+                    interactive: true
+                },
+                legend: {
+                    show: true,
+                    container: '#chart-legend',
+                    noColumns: 2
+                },
+                grid: {
+                    hoverable: true,
+                    markings: [
+                        {
+                            xaxis: {
+                                to: trialStart
+                            },
+                            color: 'rgba(210, 50, 45, .5)'
+                        },
+                        {
+                            xaxis: {
+                                from: trialStart,
+                                to: competitionStart
+                            },
+                            color: 'rgba(240, 173, 78, .5)'
+                        },
+                        {
+                            xaxis: {
+                                from: competitionStart,
+                                to: competitionEnd
+                            },
+                            color: 'rgba(71, 164, 71, .5)'
+                        },
+                        {
+                            xaxis: {
+                                from: Date.now(),
+                                to: Date.now()
+                            },
+                            color: 'rgb(210, 50, 45)'
+                        }
+                    ]
+                },
+                tooltip: true,
+                tooltipOpts: {
+                    content: '%s: %y on %x',
+                    xDateFormat: '%b %e, %Y %I:%M:%S %p'
                 }
-            },
-            legend: {
-                show: true,
-                container: '#chart-legend',
-                noColumns: 2
-            }
+            };
         };
 
         $scope.$watch('agents', function(agents) {
             var chartData = [];
+            var index = 0;
             _.each(agents, function(agent) {
                 var points = _.map(agent.portfoliovalue, function(data) {
                     var key = new Date(data.timestamp);
@@ -108,14 +167,18 @@ angular.module('tdf.leagues').controller('LeaguesController',
                 });
                 var data = {
                     data: points,
+                    color: Colors.atindex(index),
                     lines: {
                         show: true
                     },
                     points: {
                         show:false
-                    }
+                    },
+                    label: agent.name + ' (' + agent.user.username + ')'
                 };
                 chartData.push(data);
+
+                index++;
             });
             $scope.chartData = chartData;
         });
