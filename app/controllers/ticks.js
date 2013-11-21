@@ -13,7 +13,8 @@ var mongoose = require('mongoose'),
 //  Helper functions
 //=============================================================================
 
-var SYMBOLS = ['GOOG', 'AAPL', 'NFLX', 'MSFT'];
+var sandp500 = require('../data/sandp500.js');
+var SYMBOLS = sandp500.sandp500_list;
 
 var promote_leagues = function(leagues, symbols, cb) {
 
