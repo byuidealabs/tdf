@@ -100,29 +100,26 @@ angular.module('tdf.agents').controller('AgentsController',
         };
 
         $scope.getDefaultTrade = function() {
-            $scope.trade = {
-                buy: [],
-                sell: []
-            };
+            $scope.trade = [];
         };
 
-        $scope.addTrade = function(action) {
-            var newTrade = {
-                s: '',
-                q: 0
-            };
-            if (action === 'buy') {
-                $scope.trade.buy.push(newTrade);
-            }
-            if (action === 'sell') {
-                $scope.trade.sell.push(newTrade);
-            }
+        $scope.addTrade = function() {
+            $scope.trade.push({s: '', q: 0});
+        };
+
+        $scope.removeTrade = function(i) {
+            $scope.trade.splice(i, 1);
         };
 
         $scope.executeTrade = function() {
+            var finaltrades = {};
+            _.each($scope.trade, function(trade) {
+                var curr_quantity = finaltrades[trade.s] || 0;
+                finaltrades[trade.s] = curr_quantity + trade.q;
+            });
             Trades.update({
                 agentId: $routeParams.agentId,
-                trade: $scope.trade
+                trade: finaltrades
             }, function(res) {
                 if (_.contains(_.keys(res), 'error')) {
                     $scope.message = {

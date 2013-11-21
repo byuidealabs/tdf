@@ -215,49 +215,6 @@ var __get_security_value = function(quotes, symbol, scheme) {
 };
 
 /**
- * Adds the agent's desired sale to the current composition, checking for
- * errors.
- */
-var __sell = function(curr_composition, sell, quotes) {
-    _.each(sell, function(security) {
-        // TODO tie bid/ask to admin
-        // TODO error checking of non-existent
-        var symbol = security.s.toUpperCase();
-        var sell_price = __get_security_value(quotes, symbol, 'bid');
-        var profit = sell_price * security.q;
-        var curr_quantity = curr_composition[symbol] || 0;
-
-        curr_composition.cash00 += profit;
-        curr_composition[symbol] = curr_quantity - security.q;
-
-        if (curr_composition[symbol] === 0) {
-            delete curr_composition[symbol];
-        }
-
-    });
-    return curr_composition;
-};
-
-/**
- * Adds the agent's desired purchase to the current composition, checking for
- * errors.
- */
-var __buy = function(curr_composition, buy, quotes) {
-    _.each(buy, function(security) {
-        // TODO tie in admin bid/ask
-        // TODO error checking
-        var symbol = security.s.toUpperCase();
-        var buy_price = __get_security_value(quotes, symbol, 'ask');
-        var cost = buy_price * security.q;
-        var curr_quantity = curr_composition[symbol] || 0;
-
-        curr_composition.cash00 -= cost;
-        curr_composition[symbol] = curr_quantity + security.q;
-    });
-    return curr_composition;
-};
-
-/**
  * Real codes:
  *  2. Unknown symbol
  *  3. Could not look up symbol
@@ -280,11 +237,37 @@ var __execute_trade = function(agent, trade, quotes, res) {
 
         var pre_composition = _.clone(curr_composition);
 
-        // Sell first...
-        curr_composition = __sell(curr_composition, trade.sell, quotes);
+        // Change portfolio composition based on trade
+        _.each(trade, function(quantity, symbol) {
+            symbol = symbol.toUpperCase();
+            var curr_quantity = curr_composition[symbol] || 0;
+            agent.league.tradeMethods = {
+                // TODO move to league persistancy and let admin modify
+                buy: 'ask',
+                sell: 'bid'
+            };
+            var tradeMethod;
+            if (quantity < 0) {
+                tradeMethod = agent.league.tradeMethods.buy;
+            }
+            else if (quantity > 0) {
+                tradeMethod = agent.league.tradeMethods.sell;
+            }
+            else {
+                // Don't trade if q is zero
+                return;
+            }
+            var price = __get_security_value(quotes, symbol, tradeMethod);
+            var trade_rate = price * quantity;
 
-        // Then buy
-        curr_composition = __buy(curr_composition, trade.buy, quotes);
+            curr_composition.cash00 -= trade_rate;
+            curr_composition[symbol] = curr_quantity + quantity;
+
+            if (curr_composition[symbol] === 0) {
+                // Filter out all symbols with zero quantity
+                delete curr_composition[symbol];
+            }
+        });
 
         // Check if any leverage limits are reached
         var value = dataconn.portfolioValue(curr_composition, quotes, false);
@@ -335,11 +318,8 @@ var __setup_trade = function(agent, trade, cb) {
                           dataconn.compositionSymbols(composition));
     }
 
-    // Get symbols from buy
-    var buysymbols = _.map(trade.buy, function(security) {
-        return security.s;
-    });
-    symbols = _.union(symbols, buysymbols);
+    // Get symbols from trade
+    symbols = _.union(symbols, _.keys(trade));
 
     dataconn.yahooQuotes(symbols, function(err, quotes) {
         cb(quotes);
@@ -365,22 +345,11 @@ exports.trade = function(req, res) {
     // 1. Determine current symbol set
     var agent = req.agent;
     var trade = req.body.trade || req.body;  // Depending on source of data
-
-    // Filter out trades with zero quantity
-    trade.buy = _.filter(trade.buy, function(security) {
-        return security.q !== 0;
-    });
-    trade.sell = _.filter(trade.sell, function(security) {
-        return security.q !== 0;
-    });
+    // TODO: error check to see if trade is {string->number, ...}
 
     __setup_trade(agent, trade, function(quotes) {
         __execute_trade(agent, trade, quotes, res);
     });
-
-    /*Tick.mostRecent(function(quotes) {
-        __execute_trade(req, res, quotes);
-    });*/
 };
 
 /**
