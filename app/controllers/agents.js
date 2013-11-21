@@ -218,52 +218,17 @@ var __get_security_value = function(quotes, symbol, scheme) {
  * Adds the agent's desired sale to the current composition, checking for
  * errors.
  */
-var __sell = function(agent, sell, quotes, curr_composition, val, neg_val) {
+var __sell = function(curr_composition, sell, quotes) {
     _.each(sell, function(security) {
         // TODO tie bid/ask to admin
         // TODO error checking of non-existent
         var symbol = security.s.toUpperCase();
         var sell_price = __get_security_value(quotes, symbol, 'bid');
-        var buy_price = __get_security_value(quotes, symbol, 'ask');
         var profit = sell_price * security.q;
-        var shortSellLimit = agent.league.shortSellLimit;
-
-        if (curr_composition[symbol] === undefined) {
-            if (shortSellLimit === 0) {
-                throw {
-                    'msg': 'Cannot sell a security that you do not own.',
-                    'code': 1
-                };
-            }
-            else if (shortSellLimit*(val + profit - buy_price * security.q) <
-                        Math.abs(neg_val - buy_price * security.q)) {
-                throw {
-                    'msg': 'This trade is invalid, it would cause you ' +
-                            'to pass the short sell limit for this league.',
-                    'code': 1
-                };
-            }
-        }
+        var curr_quantity = curr_composition[symbol] || 0;
 
         curr_composition.cash00 += profit;
-        curr_composition[symbol] -= security.q;
-
-        if (curr_composition[symbol] < 0) {
-            if (shortSellLimit === 0) {
-                throw {
-                    'msg': 'Cannot sell a security that you do not own.',
-                    'code': 1
-                };
-            }
-            else if (shortSellLimit*(val + profit - buy_price * security.q) <
-                        Math.abs(neg_val - buy_price * security.q)) {
-                throw {
-                    'msg': 'This trade is invalid, it would cause you ' +
-                            'to pass the short sell limit for this league.',
-                    'code': 1
-                };
-            }
-        }
+        curr_composition[symbol] = curr_quantity - security.q;
 
         if (curr_composition[symbol] === 0) {
             delete curr_composition[symbol];
@@ -277,36 +242,17 @@ var __sell = function(agent, sell, quotes, curr_composition, val, neg_val) {
  * Adds the agent's desired purchase to the current composition, checking for
  * errors.
  */
-var __buy = function(agent, buy, quotes, curr_composition, val, neg_val) {
+var __buy = function(curr_composition, buy, quotes) {
     _.each(buy, function(security) {
         // TODO tie in admin bid/ask
         // TODO error checking
         var symbol = security.s.toUpperCase();
         var buy_price = __get_security_value(quotes, symbol, 'ask');
-        var sell_price = __get_security_value(quotes, symbol, 'bid');
         var cost = buy_price * security.q;
         var curr_quantity = curr_composition[symbol] || 0;
-        var leverageLimit = agent.league.leverageLimit;
+
         curr_composition.cash00 -= cost;
         curr_composition[symbol] = curr_quantity + security.q;
-
-        if (curr_composition.cash00 < 0) {
-            if(leverageLimit === 0) {
-                throw {
-                    'msg': 'Not enough cash to purchase desired ' +
-                            'securities.',
-                    'code': 3
-                };
-            }
-            else if (leverageLimit*(val + cost - sell_price) <
-                        Math.abs(neg_val - sell_price * security.q)) {
-                throw {
-                    'msg': 'This trade is invalid, it would cause you ' +
-                            'to pass the leverage limit for this league.',
-                    'code': 3
-                };
-            }
-        }
     });
     return curr_composition;
 };
@@ -316,6 +262,7 @@ var __buy = function(agent, buy, quotes, curr_composition, val, neg_val) {
  *  2. Unknown symbol
  *  3. Could not look up symbol
  *  4. Could not look up scheme (bid/ask/last) of symbol (should never see)
+ *  5. Leverage limit exceeded
  */
 var __execute_trade = function(agent, trade, quotes, res) {
     try {
@@ -331,18 +278,34 @@ var __execute_trade = function(agent, trade, quotes, res) {
             curr_composition = _.clone(last_portfolio.composition);
         }
 
-        var val = dataconn.portfolioValue(curr_composition, quotes, false);
-        var neg_val = dataconn.portfolioValue(curr_composition, quotes, true);
+        var pre_composition = _.clone(curr_composition);
 
         // Sell first...
-        curr_composition = __sell(agent, trade.sell, quotes, curr_composition,
-                                  val, neg_val);
-        console.log('after sell: ' + curr_composition);
+        curr_composition = __sell(curr_composition, trade.sell, quotes);
 
         // Then buy
-        curr_composition = __buy(agent, trade.buy, quotes, curr_composition,
-                                 val, neg_val);
-        console.log('after buy: ' + curr_composition);
+        curr_composition = __buy(curr_composition, trade.buy, quotes);
+
+        // Check if any leverage limits are reached
+        var value = dataconn.portfolioValue(curr_composition, quotes, false);
+        var neg_value = -1 * dataconn.portfolioValue(curr_composition, quotes,
+                                                     true);
+        var max_neg_value = agent.league.leverageLimit * value;
+
+        if (neg_value > max_neg_value) {
+            var curr_neg_value = -1 * dataconn.portfolioValue(pre_composition,
+                                                              quotes,
+                                                              true);
+            throw {
+                'msg': 'Leverage limit exceeded.',
+                'code': 5,
+                'negative_value': neg_value,
+                'current_value': value,
+                'current_negative_value': curr_neg_value,
+                'leverage_limit': agent.league.leverageLimit,
+                'max_negative_value': max_neg_value
+            };
+        }
 
         // Save changes to agent
         agent.portfolio.push({composition: curr_composition});

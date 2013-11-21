@@ -20,7 +20,33 @@
             <div ng-show='message'
                 class='panel panel-{{message.type}}'>
                 <div class='panel-heading'>{{message.heading}}</div>
-                <div class='panel-body'>{{message.body}}</div>
+                <div class='panel-body' ng-hide='message.body.code'>
+                    {{message.body}}
+                </div>
+                <div class='panel-body' ng-show='message.body.code'>
+                    Error {{message.body.code}}: {{message.body.msg}}
+
+                    <ul ng-show='message.body.code == 5'>
+                        <li>
+                            Current negative portfolio value:
+                            <b>
+                                {{message.body.current_negative_value | currency}}
+                            </b>
+                        </li>
+                        <li>
+                            Total negative portfolio value after trade:
+                            <b>{{message.body.negative_value | currency}}</b>
+                        </li>
+                        <li>
+                            Maximum allowed negative portfolio value:
+                            {{message.body.leverage_limit}} *
+                            {{message.body.current_value | currency}} =
+                            <b>
+                                {{message.body.max_negative_value | currency}}
+                            </b>
+                        </li>
+                    </ul>
+                </div>
             </div>
 
             <form class='form-horizontal' ng-submit='executeTrade()'>
