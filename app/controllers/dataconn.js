@@ -18,9 +18,16 @@ var DISSECT_SIZE = 200; // 200 is the maximum size allowed by yahoo
 /**
  * Extracts a list of unique symbols in a portfolio composition.
  */
-exports.compositionSymbols = function(composition) {
+exports.compositionSymbols = function(composition, only_positive) {
     var cashless = _.omit(composition, 'cash00');
-    return _.map(cashless, function(security, symbol) {
+    if (only_positive) {
+        _.each(cashless, function(quantity, symbol) {
+            if (quantity <= 0) {
+                delete cashless[symbol];
+            }
+        });
+    }
+    return _.map(cashless, function(quantity, symbol) {
         return symbol;
     });
 };
@@ -35,6 +42,44 @@ exports.agentSymbols = function(portfolio) {
                           exports.compositionSymbols(instance.composition));
     });
     return symbols;
+};
+
+/**
+ * Looks up the price of the security represented by symbol in quotes.
+ *
+ * Scheme defines the price, and is one of 'bid', 'ask', and 'last'.
+ *
+ * If a lookup fails with the given scheme, a second lookup occures with
+ * scheme of last. If that fails, an error is thrown (the symbol does not
+ * exist in yahoo finance)
+ */
+exports.get_security_value = function(quotes, symbol, scheme) {
+    symbol = symbol.toUpperCase();
+
+    if (quotes[symbol] === undefined) {
+        throw {
+            'msg': 'Could not look up symbol ' + symbol,
+            'code': 3
+        };
+    }
+    if (quotes[symbol][scheme] === undefined) {
+        throw {
+            'msg': 'Could not look up ' + scheme + ' of security ' + symbol,
+            'code': 4
+        };
+    }
+
+    var value = quotes[symbol][scheme];
+    var error = quotes[symbol].error;
+    if (error && error !== 'false') {
+        throw {
+            'msg': 'Trade on unknown or invalid security ' + symbol,
+            'code': 2,
+        };
+    }
+    else {
+        return parseFloat(value);
+    }
 };
 
 //=============================================================================

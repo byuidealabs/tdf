@@ -218,7 +218,11 @@ var executeRedistribution = function(agents, cb) {
         var agent = _.first(agents);
         var restagents = _.rest(agents);
 
-        var next_composition = _.clone(_.last(agent.portfolio).composition);
+        var last_portfolio = _.last(agent.portfolio);
+        if (last_portfolio === undefined) {
+            last_portfolio = {composition: {cash00: agent.league.startCash}};
+        }
+        var next_composition = _.clone(last_portfolio.composition);
         next_composition.cash00 -= 100;
         agent.portfolio.push({composition: next_composition});
         agent.save(function() {

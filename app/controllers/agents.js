@@ -171,48 +171,6 @@ exports.resetapikey = function(req, res) {
 //  Exports: Trading System
 //=============================================================================
 
-/**
- * Looks up the price of the security represented by symbol in quotes.
- *
- * Scheme defines the price, and is one of 'bid', 'ask', and 'last'.
- *
- * If a lookup fails with the given scheme, a second lookup occures with
- * scheme of last. If that fails, an error is thrown (the symbol does not
- * exist in yahoo finance)
- */
-var __get_security_value = function(quotes, symbol, scheme) {
-    symbol = symbol.toUpperCase();
-
-    if (quotes[symbol] === undefined) {
-        throw {
-            'msg': 'Could not look up symbol ' + symbol,
-            'code': 3
-        };
-    }
-    if (quotes[symbol][scheme] === undefined) {
-        throw {
-            'msg': 'Could not look up ' + scheme + ' of security ' + symbol,
-            'code': 4
-        };
-    }
-
-    var value = quotes[symbol][scheme];
-    var error = quotes[symbol].error;
-    if ((error && error !== 'false') ||
-        (scheme === 'last' && (isNaN(value) || value === 0))) {
-        throw {
-            'msg': 'Trade on unknown or invalid security ' + symbol,
-            'code': 2,
-        };
-    }
-    else if (scheme !== 'last' && isNaN(value)) {
-        // In case bid/ask are not returned on this security
-        return __get_security_value(quotes, symbol, 'last');
-    }
-    else {
-        return parseFloat(value);
-    }
-};
 
 /**
  * Real codes:
@@ -257,7 +215,8 @@ var __execute_trade = function(agent, trade, quotes, res) {
                 // Don't trade if q is zero
                 return;
             }
-            var price = __get_security_value(quotes, symbol, tradeMethod);
+            var price = dataconn.get_security_value(quotes, symbol,
+                                                    tradeMethod);
             var trade_rate = price * quantity;
 
             curr_composition.cash00 -= trade_rate;
