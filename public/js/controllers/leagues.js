@@ -15,6 +15,10 @@ angular.module('tdf.leagues').controller('LeaguesController',
                     value: false},
                 {label: 'User must select one eligible agent',
                     value: true}
+            ],
+            redistribute: [
+                {label: 'No', value: false},
+                {label: 'Yes', value: true}
             ]
         };
 

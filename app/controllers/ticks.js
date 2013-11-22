@@ -108,8 +108,7 @@ exports.tick = function(req, res) {
         dataconn.yahooQuotes(allsymbols, function(err, quotes) {
             var securities = securities_list(quotes);
             var tick = new Tick({securities: securities});
-            tick.save(function(err) {
-                console.log(err);
+            tick.save(function(/*err*/) {
                 // 3. Update portfolio values
                 Agent.find()
                     .populate('league', 'startCash')

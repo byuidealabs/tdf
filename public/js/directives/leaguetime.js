@@ -6,7 +6,8 @@ angular.module('tdf').directive('leagueTime',
             transclude: true,
             templateUrl: 'views/directives/league/leaguetime.html',
             scope: {
-                ngModel: '='
+                ngModel: '=',
+                required: '='
             },
             controller: function($scope) {
 

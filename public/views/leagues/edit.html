@@ -24,13 +24,16 @@
             <div class='panel-heading'>Competition Phases</div>
             <div class='panel-body'>
 
-                <league-time ng-model='league.trialStart'>
+                <league-time ng-model='league.trialStart'
+                    required='true'>
                     Trial Period Start (GMT)
                 </league-time>
-                <league-time ng-model='league.competitionStart'>
+                <league-time ng-model='league.competitionStart'
+                    required='true'>
                     Competetion Period Start (GMT)
                 </league-time>
-                <league-time ng-model='league.competitionEnd'>
+                <league-time ng-model='league.competitionEnd'
+                    required='true'>
                     Competition Period End (GMT)
                 </league-time>
 
@@ -140,6 +143,43 @@
                     </div>
                 </div>
 
+            </div>
+        </div>
+
+        <div class='panel panel-info'>
+            <div class='panel-heading'>Redistribution Dynamics</div>
+            <div class='panel-body'>
+                <div class='form-group'>
+                    <label class='control-label col-lg-3' for='redistribute'>
+                        Redistribute Portfolios?
+                    </label>
+                    <div class='col-lg-2'>
+                        <select class='form-control' id='redistribute'
+                            ng-model='league.redistributePortfolios'
+                            ng-options='o.value as o.label
+                                for o in options.redistribute' />
+                    </div>
+                </div>
+
+                <div ng-show='league.redistributePortfolios'>
+                    <league-time ng-model='league.firstRedistribution'
+                        required='league.redistributePortfolios'>
+                        First Redistribution (GMT)
+                    </league-time>
+
+                    <div class='form-group'>
+                        <label class='control-label col-lg-3'>
+                            Time between redistributions
+                        </label>
+                        <div class='col-lg-3'>
+                            <div class='input-group'>
+                                <input type='number' class='form-control'
+                                    ng-model='league.redistributionPeriod' />
+                                <span class='input-group-addon'>Hours</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 

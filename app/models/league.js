@@ -98,6 +98,24 @@ var LeagueSchema = new Schema({
     leverageLimit: {
         type: Number,
         default: 0
+    },
+
+    redistributePortfolios: {
+        type: Boolean,
+        default: false
+    },
+
+    firstRedistribution: {
+        type: Date
+    },
+
+    redistributionPeriod: {
+        type: Number,
+        default: 0
+    },
+
+    nextRedistribution: {
+        type: Date
     }
 });
 
@@ -197,8 +215,65 @@ var promoteToTrial = function(league, cb) {
     }
 };
 
+var executeRedistribution = function(agents, cb) {
+    if (!agents.length) {
+        cb();
+    }
+    else {
+        var agent = _.first(agents);
+        var restagents = _.rest(agents);
+
+        var next_composition = _.clone(_.last(agent.portfolio).composition);
+        next_composition.cash00 -= 100;
+        agent.portfolio.push({composition: next_composition});
+        agent.save(function() {
+            executeRedistribution(restagents, cb);
+        });
+    }
+};
+
+var redistributePortfolios = function(league, cb) {
+    var next_dist = league.nextRedistribution;
+    if (next_dist === undefined) {
+        next_dist = league.firstRedistribution;
+    }
+    next_dist = next_dist.getTime();
+
+    if (Date.now() >= next_dist) {
+        console.log('Redistributing agents in league');
+        var new_next_dist = next_dist;
+        while (league.redistributionPeriod > 0 &&
+               new_next_dist <= Date.now()) {
+            // Redistributes on every tick if redistributionPeriod = 0
+            new_next_dist += league.redistributionPeriod * 1000;
+            // TODO change seconds to hours
+        }
+        console.log('Next redistribution: ' + new_next_dist);
+        league.nextRedistribution = new Date(new_next_dist);
+        console.log('Time: ' + league.nextRedistribution);
+        league.save(function() {
+            Agent.find({league: league})
+            .populate('league', 'startCash')
+            .exec(function(err, agents) {
+                executeRedistribution(agents, cb);
+            });
+        });
+    }
+    else {
+        cb();
+    }
+};
+
 LeagueSchema.methods.promote = function(cb) {
-    promoteToTrial(this, cb);
+    var league = this;
+    promoteToTrial(league, function() {
+        if (league.redistributePortfolios) {
+            redistributePortfolios(league, cb);
+        }
+        else {
+            cb();
+        }
+    });
 };
 
 //=============================================================================

@@ -201,8 +201,8 @@ var __get_security_value = function(quotes, symbol, scheme) {
     if ((error && error !== 'false') ||
         (scheme === 'last' && (isNaN(value) || value === 0))) {
         throw {
-            'msg': 'Trade on unknown security ' + symbol,
-            'code': 2
+            'msg': 'Trade on unknown or invalid security ' + symbol,
+            'code': 2,
         };
     }
     else if (scheme !== 'last' && isNaN(value)) {
