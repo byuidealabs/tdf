@@ -100,22 +100,17 @@ var LeagueSchema = new Schema({
         default: 0
     },
 
-    redistributePortfolios: {
-        type: Boolean,
-        default: false
-    },
-
-    firstRedistribution: {
-        type: Date
-    },
-
-    redistributionPeriod: {
-        type: Number,
-        default: 0
-    },
-
-    nextRedistribution: {
-        type: Date
+    redistribute: {
+        on: {
+            type: Boolean,
+            default: false
+        },
+        first: Date,
+        next: Date,
+        period: {
+            type: Number,
+            default: 0
+        }
     }
 });
 
@@ -233,24 +228,22 @@ var executeRedistribution = function(agents, cb) {
 };
 
 var redistributePortfolios = function(league, cb) {
-    var next_dist = league.nextRedistribution;
+    var next_dist = league.redistribute.next;
     if (next_dist === undefined) {
-        next_dist = league.firstRedistribution;
+        next_dist = league.redistribute.first;
     }
     next_dist = next_dist.getTime();
 
     if (Date.now() >= next_dist) {
         console.log('Redistributing agents in league');
         var new_next_dist = next_dist;
-        while (league.redistributionPeriod > 0 &&
+        while (league.redistribute.period > 0 &&
                new_next_dist <= Date.now()) {
-            // Redistributes on every tick if redistributionPeriod = 0
-            new_next_dist += league.redistributionPeriod * 1000;
+            // Redistributes on every tick if redistribution period = 0
+            new_next_dist += league.redistribute.period * 1000;
             // TODO change seconds to hours
         }
-        console.log('Next redistribution: ' + new_next_dist);
-        league.nextRedistribution = new Date(new_next_dist);
-        console.log('Time: ' + league.nextRedistribution);
+        league.redistribute.next = new Date(new_next_dist);
         league.save(function() {
             Agent.find({league: league})
             .populate('league', 'startCash')
@@ -267,7 +260,7 @@ var redistributePortfolios = function(league, cb) {
 LeagueSchema.methods.promote = function(cb) {
     var league = this;
     promoteToTrial(league, function() {
-        if (league.redistributePortfolios) {
+        if (league.redistribute.on) {
             redistributePortfolios(league, cb);
         }
         else {

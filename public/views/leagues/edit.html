@@ -1,5 +1,6 @@
 <section ng-controller='LeaguesController' ng-init='findOne()'>
     <h1>Edit League</h1>
+
     <form class='form-horizontal' ng-submit='update()'>
 
         <div class='panel panel-info'>
@@ -155,15 +156,15 @@
                     </label>
                     <div class='col-lg-2'>
                         <select class='form-control' id='redistribute'
-                            ng-model='league.redistributePortfolios'
+                            ng-model='league.redistribute.on'
                             ng-options='o.value as o.label
                                 for o in options.redistribute' />
                     </div>
                 </div>
 
-                <div ng-show='league.redistributePortfolios'>
-                    <league-time ng-model='league.firstRedistribution'
-                        required='league.redistributePortfolios'>
+                <div ng-show='league.redistribute.on'>
+                    <league-time ng-model='league.redistribute.first'
+                        required='league.redistribute.on'>
                         First Redistribution (GMT)
                     </league-time>
 
@@ -174,7 +175,7 @@
                         <div class='col-lg-3'>
                             <div class='input-group'>
                                 <input type='number' class='form-control'
-                                    ng-model='league.redistributionPeriod' />
+                                    ng-model='league.redistribute.period' />
                                 <span class='input-group-addon'>Hours</span>
                             </div>
                         </div>
