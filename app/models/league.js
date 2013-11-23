@@ -5,6 +5,9 @@
 var mongoose = require('mongoose'),
     Schema = mongoose.Schema,
     _ = require('underscore'),
+    //sylvester = require('sylvester'),
+    //Matrix = sylvester.Matrix,
+    //Vector = sylvester.Vector,
     Agent = mongoose.model('Agent');
 
 var winnerMetricsEnum = ['Greatest Value',
@@ -210,6 +213,78 @@ var promote_to_trial = function(league, cb) {
     }
 };
 
+var compute_redistribution = function(agents, cb) {
+    // TODO: Build an numpy-like library
+    var k = 10; // TODO
+    var n = 5;  // TODO
+    var delta = {};
+    var deltabar = {};
+    var x = {};
+
+    // Compute x, delta, deltabar
+    _.each(agents, function(agent) {
+        // Gather last k + 1 values
+        var values = _.last(agent.portfoliovalue, k + 1);
+        values = _.map(values, function(value) {
+            return value.totalvalue;
+        });
+        x[agent._id] = _.last(values, k);
+
+        // Compute delta (return) for last k times
+        delta[agent._id] = [];
+        for (var i = 1; i < values.length; i++) {
+            // TODO make efficient
+            var r = values[i] / values[i - 1];
+            delta[agent._id].push(r);
+        }
+
+        // Compute deltabar (average return over last k times)
+        // Assumes arithmetic mean (TODO possibly allow geometric)
+        var deltabar_agent = 0;
+        _.each(delta[agent._id], function(d) {
+            deltabar_agent += d;
+        });
+        deltabar[agent._id] = deltabar_agent / k;
+    });
+
+    console.log(JSON.stringify(delta));
+    console.log(JSON.stringify(deltabar));
+    console.log(JSON.stringify(x));
+
+    // Compute competitionvalues
+    var competitionvalues = Array.apply(null, new Array(k)).map(
+        Number.prototype.valueOf, 0);
+    _.each(x, function(agent_x) {
+        for (var i = 0; i < k; i++) {
+            competitionvalues[i] += agent_x[i];
+        }
+    });
+    console.log(JSON.stringify(competitionvalues));
+
+    // Compute z
+    var z = {};
+    _.each(x, function(agent_x, agent_id) {
+        z[agent_id] = [];
+        for (var i = 0; i < k; i++) {
+            z[agent_id].push(agent_x[i] / competitionvalues[i]);
+        }
+    });
+    console.log(JSON.stringify(z));
+
+    // Compute uk
+    var uk = {};
+    var den = 0;
+    _.each(agents, function(agent) {
+        den += _.last(z[agent._id]) * _.last(delta[agent._id]);
+    });
+    _.each(agents, function(agent) {
+        uk[agent._id] = _.last(z[agent._id]) * _.last(delta[agent._id]) / den;
+    });
+    console.log(JSON.stringify(uk));
+
+    cb();
+};
+
 var execute_redistribution = function(agents, cb) {
     if (!agents.length) {
         cb();
@@ -223,7 +298,7 @@ var execute_redistribution = function(agents, cb) {
             last_portfolio = {composition: {cash00: agent.league.startCash}};
         }
         var next_composition = _.clone(last_portfolio.composition);
-        next_composition.cash00 -= 100;
+        //next_composition.cash00 -= 100;
         agent.portfolio.push({composition: next_composition});
         agent.save(function() {
             execute_redistribution(restagents, cb);
@@ -252,7 +327,9 @@ var redistribute_portfolios = function(league, cb) {
             Agent.find({league: league})
             .populate('league', 'startCash')
             .exec(function(err, agents) {
-                execute_redistribution(agents, cb);
+                compute_redistribution(agents, function() {
+                    execute_redistribution(agents, cb);
+                });
             });
         });
     }

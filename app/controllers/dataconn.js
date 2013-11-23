@@ -122,25 +122,23 @@ var query_yahoo = function(symbols_list, quotes, cb) {
             else {
                 csv().from.string(body.replace(/<(?:.|\n)*?>/gm, ''))
                     .to.array(function(quotesarray) {
-
                     _.each(quotesarray, function(quote) {
                         var error = (quote[4] !== 'N/A');
 
-                        var ask = quote[1];
-                        if (isNaN(ask)) {
-                            ask = -1;
+                        var last = quote[3];
+                        if (isNaN(last) || parseFloat(last) === 0) {
+                            last = 0;
                             error = true;
+                        }
+                        var ask = quote[1];
+                        if (isNaN(ask) || parseFloat(ask) === 0) {
+                            ask = last;
                         }
                         var bid = quote[2];
-                        if (isNaN(bid)) {
-                            bid = -1;
-                            error = true;
+                        if (isNaN(bid) || parseFloat(bid) === 0) {
+                            bid = last;
                         }
-                        var last = quote[3];
-                        if (isNaN(last)) {
-                            quote = -1;
-                            error = true;
-                        }
+
                         quotes[quote[0].toUpperCase()] = {
                             'ask': ask,
                             'bid': bid,

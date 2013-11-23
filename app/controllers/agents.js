@@ -182,81 +182,90 @@ exports.resetapikey = function(req, res) {
  */
 var __execute_trade = function(agent, trade, quotes, res) {
 
-    var last_portfolio = _.last(agent.portfolio);
-    var curr_composition;
+    try {
+        var last_portfolio = _.last(agent.portfolio);
+        var curr_composition;
 
-    if (last_portfolio === undefined) {
-        curr_composition = {
-            'cash00': agent.league.startCash
-        };
-    }
-    else {
-        curr_composition = _.clone(last_portfolio.composition);
-    }
-
-    var pre_composition = _.clone(curr_composition);
-
-    // Change portfolio composition based on trade
-    _.each(trade, function(quantity, symbol) {
-        symbol = symbol.toUpperCase();
-        var curr_quantity = curr_composition[symbol] || 0;
-        agent.league.tradeMethods = {
-            // TODO move to league persistancy and let admin modify
-            buy: 'ask',
-            sell: 'bid'
-        };
-        var tradeMethod;
-        if (quantity < 0) {
-            tradeMethod = agent.league.tradeMethods.buy;
-        }
-        else if (quantity > 0) {
-            tradeMethod = agent.league.tradeMethods.sell;
+        if (last_portfolio === undefined) {
+            curr_composition = {
+                'cash00': agent.league.startCash
+            };
         }
         else {
-            // Don't trade if q is zero
-            return;
+            curr_composition = _.clone(last_portfolio.composition);
         }
-        var price = dataconn.get_security_value(quotes, symbol,
-                                                tradeMethod);
-        var trade_rate = price * quantity;
 
-        curr_composition.cash00 -= trade_rate;
-        curr_composition[symbol] = curr_quantity + quantity;
+        var pre_composition = _.clone(curr_composition);
 
-        if (curr_composition[symbol] === 0) {
-            // Filter out all symbols with zero quantity
-            delete curr_composition[symbol];
-        }
-    });
+        // Change portfolio composition based on trade
+        _.each(trade, function(quantity, symbol) {
+            symbol = symbol.toUpperCase();
+            var curr_quantity = curr_composition[symbol] || 0;
+            agent.league.tradeMethods = {
+                // TODO move to league persistancy and let admin modify
+                buy: 'ask',
+                sell: 'bid'
+            };
+            var tradeMethod;
+            if (quantity < 0) {
+                tradeMethod = agent.league.tradeMethods.buy;
+            }
+            else if (quantity > 0) {
+                tradeMethod = agent.league.tradeMethods.sell;
+            }
+            else {
+                // Don't trade if q is zero
+                return;
+            }
+            var price = dataconn.get_security_value(quotes, symbol,
+                                                    tradeMethod);
+            var trade_rate = price * quantity;
 
-    // Check if any leverage limits are reached
-    var value = dataconn.portfolioValue(curr_composition, quotes, false);
-    var neg_value = -1 * dataconn.portfolioValue(curr_composition, quotes,
-                                                    true);
-    var max_neg_value = agent.league.leverageLimit * value;
+            curr_composition.cash00 -= trade_rate;
+            curr_composition[symbol] = curr_quantity + quantity;
 
-    if (neg_value > max_neg_value) {
-        var curr_neg_value = -1 * dataconn.portfolioValue(pre_composition,
-                                                            quotes,
-                                                            true);
-        throw {
-            'msg': 'Leverage limit exceeded.',
-            'code': 5,
-            'negative_value': neg_value,
-            'current_value': value,
-            'current_negative_value': curr_neg_value,
-            'leverage_limit': agent.league.leverageLimit,
-            'max_negative_value': max_neg_value
-        };
-    }
-
-    // Save changes to agent
-    agent.portfolio.push({composition: curr_composition});
-    agent.save(function () {
-        agent.setStatus(false, Tick, function(agent) {
-            res.jsonp(agent);
+            if (curr_composition[symbol] === 0) {
+                // Filter out all symbols with zero quantity
+                delete curr_composition[symbol];
+            }
         });
-    });
+
+        // Check if any leverage limits are reached
+        console.log(JSON.stringify(curr_composition));
+        var value = dataconn.portfolioValue(curr_composition, quotes, false);
+        var neg_value = -1 * dataconn.portfolioValue(curr_composition, quotes,
+                                                        true);
+        var max_neg_value = agent.league.leverageLimit * value;
+
+        if (neg_value > max_neg_value) {
+            var curr_neg_value = -1 * dataconn.portfolioValue(pre_composition,
+                                                                quotes,
+                                                                true);
+            throw {
+                'msg': 'Leverage limit exceeded.',
+                'code': 5,
+                'negative_value': neg_value,
+                'current_value': value,
+                'current_negative_value': curr_neg_value,
+                'leverage_limit': agent.league.leverageLimit,
+                'max_negative_value': max_neg_value
+            };
+        }
+
+        // Save changes to agent
+        agent.portfolio.push({composition: curr_composition});
+        agent.save(function () {
+            agent.setStatus(false, Tick, function(agent) {
+                res.jsonp(agent);
+            });
+        });
+    }
+    catch (err) {
+        // An error was encountered
+        res.jsonp({
+            error: err
+        });
+    }
 
 };
 
