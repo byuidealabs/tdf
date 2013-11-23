@@ -137,7 +137,7 @@ LeagueSchema.statics = {
 };
 
 //=============================================================================
-//  Methods
+//  Methods Helpers
 //=============================================================================
 
 var reset_agents = function(agents, cb) {
@@ -154,7 +154,7 @@ var reset_agents = function(agents, cb) {
     }
 };
 
-var promoteToPostCompetition = function(league, cb) {
+var promote_to_postcompetition = function(league, cb) {
     var competitionEndTime = new Date(league.competitionEnd).getTime();
     if (league.leaguePhase === 2 && Date.now() > competitionEndTime) {
 
@@ -171,7 +171,7 @@ var promoteToPostCompetition = function(league, cb) {
     }
 };
 
-var promoteToCompetition = function(league, cb) {
+var promote_to_competition = function(league, cb) {
     var competitionStartTime = new Date(league.competitionStart).getTime();
     if (league.leaguePhase === 1 && Date.now() > competitionStartTime) {
 
@@ -184,17 +184,17 @@ var promoteToCompetition = function(league, cb) {
                 .populate('league', 'startCash')
                 .exec(function(err, agents) {
                     reset_agents(agents, function() {
-                        promoteToPostCompetition(league, cb);
+                        promote_to_postcompetition(league, cb);
                     });
                 });
         });
     }
     else {
-        promoteToPostCompetition(league, cb);
+        promote_to_postcompetition(league, cb);
     }
 };
 
-var promoteToTrial = function(league, cb) {
+var promote_to_trial = function(league, cb) {
     var trialStartTime = new Date(league.trialStart).getTime();
     if (league.leaguePhase === 0 && Date.now() > trialStartTime) {
 
@@ -202,15 +202,15 @@ var promoteToTrial = function(league, cb) {
 
         league.leaguePhase = 1;
         league.save(function() {
-            promoteToCompetition(league, cb);
+            promote_to_competition(league, cb);
         });
     }
     else {
-        promoteToCompetition(league, cb);
+        promote_to_competition(league, cb);
     }
 };
 
-var executeRedistribution = function(agents, cb) {
+var execute_redistribution = function(agents, cb) {
     if (!agents.length) {
         cb();
     }
@@ -226,12 +226,12 @@ var executeRedistribution = function(agents, cb) {
         next_composition.cash00 -= 100;
         agent.portfolio.push({composition: next_composition});
         agent.save(function() {
-            executeRedistribution(restagents, cb);
+            execute_redistribution(restagents, cb);
         });
     }
 };
 
-var redistributePortfolios = function(league, cb) {
+var redistribute_portfolios = function(league, cb) {
     var next_dist = league.redistribute.next;
     if (next_dist === undefined) {
         next_dist = league.redistribute.first;
@@ -252,7 +252,7 @@ var redistributePortfolios = function(league, cb) {
             Agent.find({league: league})
             .populate('league', 'startCash')
             .exec(function(err, agents) {
-                executeRedistribution(agents, cb);
+                execute_redistribution(agents, cb);
             });
         });
     }
@@ -261,11 +261,28 @@ var redistributePortfolios = function(league, cb) {
     }
 };
 
+//=============================================================================
+//  Methods
+//=============================================================================
+
+/**
+ * On every 'tick' made by the grunt task manager, this is called to do two
+ * things:
+ *
+ * (1) Check the League's phase. If the phase needs to change, promote the
+ *     league to the next phase(s).
+ *     * If promoting to the competition period, resets the portfolio of every
+ *       agent in the league.
+ * (2) If the redistribution rule is turned on in the league, automatically
+ *     redistributes the values of the portfolio according to the
+ *     redistribution rules.
+ *
+ */
 LeagueSchema.methods.promote = function(cb) {
     var league = this;
-    promoteToTrial(league, function() {
+    promote_to_trial(league, function() {
         if (league.redistribute.on) {
-            redistributePortfolios(league, cb);
+            redistribute_portfolios(league, cb);
         }
         else {
             cb();

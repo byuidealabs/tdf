@@ -78,6 +78,10 @@ var update_portfolio_values = function(agents, quotes, cb) {
             // TODO
         }
         else if (neg_value > max_neg) {
+            // Leverage limit exceeded, sell off random securities until either
+            // the leverage limit is within acceptable bounds or the value
+            // of the portfolio reaches zero.
+
             console.log('Leverage limit exceeded on agent ' + agent.name +
                         '. Selling off securities.');
             var sell_method = 'bid'; //TODO
@@ -93,7 +97,6 @@ var update_portfolio_values = function(agents, quotes, cb) {
                 if (_.size(symbols) === 0) {
                     break;
                 }
-                console.log(symbols);
                 var rdm = Math.floor(Math.random()*symbols.length);
                 var symbol = symbols[rdm];
 

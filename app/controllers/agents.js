@@ -174,95 +174,90 @@ exports.resetapikey = function(req, res) {
 
 /**
  * Real codes:
+ *  1. Empty trade
  *  2. Unknown symbol
  *  3. Could not look up symbol
  *  4. Could not look up scheme (bid/ask/last) of symbol (should never see)
  *  5. Leverage limit exceeded
  */
 var __execute_trade = function(agent, trade, quotes, res) {
-    try {
-        var last_portfolio = _.last(agent.portfolio);
-        var curr_composition;
 
-        if (last_portfolio === undefined) {
-            curr_composition = {
-                'cash00': agent.league.startCash
-            };
+    var last_portfolio = _.last(agent.portfolio);
+    var curr_composition;
+
+    if (last_portfolio === undefined) {
+        curr_composition = {
+            'cash00': agent.league.startCash
+        };
+    }
+    else {
+        curr_composition = _.clone(last_portfolio.composition);
+    }
+
+    var pre_composition = _.clone(curr_composition);
+
+    // Change portfolio composition based on trade
+    _.each(trade, function(quantity, symbol) {
+        symbol = symbol.toUpperCase();
+        var curr_quantity = curr_composition[symbol] || 0;
+        agent.league.tradeMethods = {
+            // TODO move to league persistancy and let admin modify
+            buy: 'ask',
+            sell: 'bid'
+        };
+        var tradeMethod;
+        if (quantity < 0) {
+            tradeMethod = agent.league.tradeMethods.buy;
+        }
+        else if (quantity > 0) {
+            tradeMethod = agent.league.tradeMethods.sell;
         }
         else {
-            curr_composition = _.clone(last_portfolio.composition);
+            // Don't trade if q is zero
+            return;
         }
+        var price = dataconn.get_security_value(quotes, symbol,
+                                                tradeMethod);
+        var trade_rate = price * quantity;
 
-        var pre_composition = _.clone(curr_composition);
+        curr_composition.cash00 -= trade_rate;
+        curr_composition[symbol] = curr_quantity + quantity;
 
-        // Change portfolio composition based on trade
-        _.each(trade, function(quantity, symbol) {
-            symbol = symbol.toUpperCase();
-            var curr_quantity = curr_composition[symbol] || 0;
-            agent.league.tradeMethods = {
-                // TODO move to league persistancy and let admin modify
-                buy: 'ask',
-                sell: 'bid'
-            };
-            var tradeMethod;
-            if (quantity < 0) {
-                tradeMethod = agent.league.tradeMethods.buy;
-            }
-            else if (quantity > 0) {
-                tradeMethod = agent.league.tradeMethods.sell;
-            }
-            else {
-                // Don't trade if q is zero
-                return;
-            }
-            var price = dataconn.get_security_value(quotes, symbol,
-                                                    tradeMethod);
-            var trade_rate = price * quantity;
-
-            curr_composition.cash00 -= trade_rate;
-            curr_composition[symbol] = curr_quantity + quantity;
-
-            if (curr_composition[symbol] === 0) {
-                // Filter out all symbols with zero quantity
-                delete curr_composition[symbol];
-            }
-        });
-
-        // Check if any leverage limits are reached
-        var value = dataconn.portfolioValue(curr_composition, quotes, false);
-        var neg_value = -1 * dataconn.portfolioValue(curr_composition, quotes,
-                                                     true);
-        var max_neg_value = agent.league.leverageLimit * value;
-
-        if (neg_value > max_neg_value) {
-            var curr_neg_value = -1 * dataconn.portfolioValue(pre_composition,
-                                                              quotes,
-                                                              true);
-            throw {
-                'msg': 'Leverage limit exceeded.',
-                'code': 5,
-                'negative_value': neg_value,
-                'current_value': value,
-                'current_negative_value': curr_neg_value,
-                'leverage_limit': agent.league.leverageLimit,
-                'max_negative_value': max_neg_value
-            };
+        if (curr_composition[symbol] === 0) {
+            // Filter out all symbols with zero quantity
+            delete curr_composition[symbol];
         }
+    });
 
-        // Save changes to agent
-        agent.portfolio.push({composition: curr_composition});
-        agent.save(function () {
-            agent.setStatus(false, Tick, function(agent) {
-                res.jsonp(agent);
-            });
-        });
+    // Check if any leverage limits are reached
+    var value = dataconn.portfolioValue(curr_composition, quotes, false);
+    var neg_value = -1 * dataconn.portfolioValue(curr_composition, quotes,
+                                                    true);
+    var max_neg_value = agent.league.leverageLimit * value;
+
+    if (neg_value > max_neg_value) {
+        var curr_neg_value = -1 * dataconn.portfolioValue(pre_composition,
+                                                            quotes,
+                                                            true);
+        throw {
+            'msg': 'Leverage limit exceeded.',
+            'code': 5,
+            'negative_value': neg_value,
+            'current_value': value,
+            'current_negative_value': curr_neg_value,
+            'leverage_limit': agent.league.leverageLimit,
+            'max_negative_value': max_neg_value
+        };
     }
-    catch (err) {
-        // An error was encountered
-        res.jsonp({
-            error: err
+
+    // Save changes to agent
+    agent.portfolio.push({composition: curr_composition});
+    agent.save(function () {
+        agent.setStatus(false, Tick, function(agent) {
+            res.jsonp(agent);
         });
-    }
+    });
+
 };
 
 var __setup_trade = function(agent, trade, cb) {
@@ -306,9 +301,25 @@ exports.trade = function(req, res) {
     var trade = req.body.trade || req.body;  // Depending on source of data
     // TODO: error check to see if trade is {string->number, ...}
 
-    __setup_trade(agent, trade, function(quotes) {
-        __execute_trade(agent, trade, quotes, res);
-    });
+    try {
+        if (_.size(trade) === 0) {
+            throw {
+                'msg': 'Empty Trade',
+                'code': 6
+            };
+        }
+        else {
+            __setup_trade(agent, trade, function(quotes) {
+                __execute_trade(agent, trade, quotes, res);
+            });
+        }
+    }
+    catch (err) {
+        // An error was encountered
+        res.jsonp({
+            error: err
+        });
+    }
 };
 
 /**
