@@ -2,4 +2,29 @@ chart{
     display:none;
     width: 600px;
     height:400px;
+}
+
+.circle{
+height:20px;
+background-color: 000;
+}
+
+.animate-enter,.animate-leave {
+-webkit-transition:1000ms cubic-bezier(.165,.84,.44,1) all;
+-moz-transition:1000ms cubic-bezier(.165,.84,.44,1) all;
+-ms-transition:1000ms cubic-bezier(.165,.84,.44,1) all;
+-o-transition:1000ms cubic-bezier(.165,.84,.44,1) all;
+transition:1000ms cubic-bezier(.165,.84,.44,1) all;
+}
+
+.animate-enter {
+left:100%;
+}
+
+.animate-leave.animate-leave-active {
+left:-100%;
+}
+
+.animate-enter.animate-enter-active,.animate-leave {
+left:0;
 }​
