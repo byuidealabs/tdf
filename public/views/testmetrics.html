@@ -1,39 +1,4 @@
-<!--<section ng-controller='testLinesController'>
-    <h1>Testing Line Graph</h1>
-    <line-graph data='d3data'></line-graph>
-
-    <div class='panel panel-info'>
-        <div class='panel-heading'>
-            Change the values to see the chart change
-        </div>
-        <div class='panel-body'>
-            <form class='form-horizontal'>
-                <div class='form-group' ng-repeat='data in d3data'>
-                    <label class='control-label col-lg-1' for='name{{$index}}'>
-                        Name
-                    </label>
-                    <div class='col-lg-2'>
-                        <input type='text' class='form-control'
-                            id='name{{$index}}' ng-model='data.name' />
-                    </div>
-                    <label class='control-label col-lg-1'
-                        for='score{{$index}}'>
-                        Score
-                    </label>
-                    <div class='col-lg-2'>
-                        <input type='text' class='form-control'
-                            id='score{{$index}}' ng-model='data.score' disabled/>
-                    </div>
-                </div>
-            </form>
-        </div>
-    </div>
-</section>-->
-<h1>New Line Graph Test</h1>
-<section ng-controller='TestFlotController'>
-            <div class="chartContainer" style="width:600px; height:400px; margin-left:auto; margin-right:auto"><chart data='data' options='options'> </chart> </div>
-</section>
-<!--<section ng-controller='TestMetricsController'>
+<section ng-controller='TestMetricsController'>
 
     <div ng-repeat='test in tests'>
         <h2>Test {{$index + 1}}</h2>
@@ -58,5 +23,4 @@
     <br />
     <p>Moving Score = {{testMovingScore(test1.values, test1.metric)}}</p>
     <p>Expected Moving Score = {{test1.expected_moving}}</p>
-
-</section>-->
+</section>
