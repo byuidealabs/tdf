@@ -23,8 +23,8 @@ angular.module('tdf.agents').controller('AgentsController',
         $scope.create = function() {
             var agent = new Agents($scope.agent);
             agent.$save(function(/*response*/) {
-                //$location.path('agents/' + agent._id);
-                $location.path('users/profile');
+                $location.path('agents/' + agent._id);
+                //$location.path('users/profile');
             });
         };
 
@@ -53,7 +53,7 @@ angular.module('tdf.agents').controller('AgentsController',
             modalInstance.result.then(function() {
                 agent.$remove();
                 Utilities.spliceByObject($scope.agents, agent);
-                $location.path('users/profile');
+                $location.path('users/' + $scope.global.user._id);
             });
 
         };

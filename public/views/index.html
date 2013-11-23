@@ -1,17 +1,85 @@
-<section data-ng-controller="IndexController">
+<section data-ng-controller='IndexController'>
     <h1>Welcome to the Tour de Finance</h1>
-    <img src='img/TDFPage.jpg' />
 
-    <a class='btn btn-success' href='/#!/leagues'>
-        Current Standings
-    </a>
+    <div style='margin-top: 40px'>
+    <div class='row'>
+        <div class='col-md-6'>
 
-    <div class='btn-group' ng-hide='global.user'>
-        <a class='btn btn-primary' href='signin'>
-            Log In
-        </a>
-        <a class='btn btn-primary' href='signup'>
-            Sign Up
-        </a>
+            <div ng-app>
+                <div ng-controller="SlideshowController" class="slideshow" ng-switch='slideshow' ng-animate="'animate'">
+                <p class="cover"></p>
+                    <div class="slider-content" ng-switch-when='1'>
+                        <img src='/img/tour_de_finance.png' style='display: block; margin-left:auto; margin-right:auto; width:85%;' />
+                    </div>
+                    <div class="slider-content" ng-switch-when='2'>
+                       <img src='/img/chart.jpg' style='display: block; margin-left:auto; margin-right:auto; width:85%;' />
+                    </div>
+                    <div class="slider-buttons">
+                        <a ng-click='slideshow = 1'>
+                        <div class="circle"></div>
+                        </a>
+                        <a ng-click='slideshow = 2'>
+                        <div class="circle"></div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div class='col-md-6'>
+            <section class='content' style='margin-top: 0px; padding-top: 10px; padding-bottom: 0px'>
+                <section class='container'>
+                    <div class='panel panel-primary'>
+                        <div class='col-md-13' style='padding-left:20px'>
+                            <form action='/users/session' method='post' role='form' class='signin form-horizontal'>
+                            <p class='error'></p>
+                            <div class='form-group'>
+                                <div class='col-lg-11'>
+                                    <input id='email' type='text' name='email' placeholder='Email' class='form-control'>
+                                </div>
+                            </div>
+                            <div class='form-group'>
+                                <div class='col-lg-9'>
+                                    <input id='password' type='password' name='password' placeholder='Password' class='form-control'>
+                                </div>
+                                <button type='submit' class='btn btn-primary'>Sign in</button>
+                            </div>
+                            </form>
+                        </div>
+                    </div>
+ 
+                    <div class='panel panel-primary'>
+                    <div class='col-md-13' style='padding-left:20px'>
+                        <h3>New to Tour de Finance? Create an account.</h3>
+                        <form action='/users' method='post' class='signup form-horizontal'>
+                        <div class='form-group'>
+                            <div class='col-lg-11'>
+                                <input id='name' type='text' name='name' placeholder='Full name' class='form-control'>
+                            </div>
+                        </div>
+                        <div class='form-group'>
+                            <div class='col-lg-11'>
+                                <input id='email' type='text' name='email' placeholder='Email' class='form-control'>
+                            </div>
+                        </div>
+                        <div class='form-group'>
+                            <div class='col-lg-11'>
+                                <input id='username' type='text' name='username' placeholder='Username' class='form-control'>
+                            </div>
+                        </div>
+                        <div class='form-group'>
+                            <div class='col-lg-9'>
+                                <input id='password' type='password' name='password' placeholder='Password' class='form-control'>
+                            </div>
+                            <button type='submit' class='btn btn-primary'>Sign up</button>
+                        </div>
+                    </form>
+                    </div>
+                    </div>
+
+                </section>
+            </section>
+        </div>
+        </div>
     </div>
 </section>

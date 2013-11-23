@@ -86,6 +86,23 @@ window.app.config(['$routeProvider',
     }
 ]);
 
+
+window.app.run(['Global', '$location', '$rootScope', 
+    function(Global, $location, $rootScope){
+        $rootScope.$on('$routeChangeStart', function(event, next, current){
+            var isLoggedin = !!Global.user;
+            if (isLoggedin)
+            {
+                if (next.templateUrl == 'views/index.html') 
+                {  
+                    $location.path('/leagues')
+                }
+            }
+            console.log(next.templateUrl);
+        })
+    }
+]);
+
 //Setting HTML5 Location Mode
 window.app.config(['$locationProvider',
     function($locationProvider) {
