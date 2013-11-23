@@ -95,11 +95,11 @@ window.app.run(['Global', '$location', '$rootScope',
             {
                 if (next.templateUrl == 'views/index.html') 
                 {  
-                    $location.path('/leagues')
+                    $location.path('/leagues');
                 }
             }
             console.log(next.templateUrl);
-        })
+        });
     }
 ]);
 

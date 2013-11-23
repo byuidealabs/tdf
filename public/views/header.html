@@ -6,7 +6,7 @@
         <li data-ng-repeat='item in menu' data-ng-show='true'
                 ui-route='/{{item.link}}' ng-class='{active: $uiRoute}'>
             <a href='#!/{{item.link}}'>{{item.title}}</a>
-        </li>
+        </li> 
     </ul>
     <ul class='nav navbar-nav pull-right' data-ng-show='global.authenticated'>
         <li class='dropdown'>

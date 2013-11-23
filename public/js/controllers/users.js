@@ -50,14 +50,17 @@ angular.module('tdf.users').controller('UsersController',
             });
         };
 
-        $scope.removeAgent = function(agent) {
+        $scope.remove = function(agent) {
+            /*agent.$remove();
+            Utilities.spliceByObject($scope.agents, agent);
+            $location.path('agents/');*/
             var modalInstance = $modal.open({
                 templateUrl: 'views/confirmModal.html',
                 controller: function($scope, $modalInstance) {
                     $scope.heading = 'Confirm Agent Deletion';
-                    $scope.message = 'Are you sure you wish to delete this ' +
-                                     'agent and all of its data? (this ' +
-                                     'action cannot be undone)';
+                    $scope.message = 'Are you sure that you want to delete ' +
+                                     'this agent? ' +
+                                     '(this action cannot be undone)';
 
                     $scope.confirm = function() {
                         $modalInstance.close('confirmed');
@@ -69,13 +72,10 @@ angular.module('tdf.users').controller('UsersController',
                 }
             });
 
-            modalInstance.result.then(function () {
-                Agents.remove({
-                    agentId: agent._id
-                }, function() {
-                    Utilities.spliceByProperty($scope.user.agents, '_id',
-                                               agent._id);
-                });
+            modalInstance.result.then(function() {
+                agent.$remove();
+                Utilities.spliceByObject($scope.agents, agent);
+                $location.path('users/' + $scope.global.user._id);
             });
         };
     }]);
