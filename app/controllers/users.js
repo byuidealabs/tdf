@@ -50,6 +50,7 @@ exports.session = function(req, res) {
 /**
  * Create user
  */
+
 exports.create = function(req, res, next) {
     var user = new User(req.body);
 
