@@ -95,11 +95,26 @@ window.app.run(['Global', '$location', '$rootScope',
             {
                 if (next.templateUrl == 'views/index.html') 
                 {  
-                    $location.path('/leagues')
+                    $location.path('/leagues');
+                }
+                if (!Global.user.isAdmin)
+                {
+                    if (next.templateUrl == 'views/users/list.html') 
+                    {  
+                        $location.path('/');
+                    }
                 }
             }
-            console.log(next.templateUrl);
-        })
+
+            if (!isLoggedin)
+            {
+                if (next.templateUrl == 'views/users/list.html') 
+                {  
+                    $location.path('/');
+                }
+            }
+
+        });
     }
 ]);
 
