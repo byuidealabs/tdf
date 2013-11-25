@@ -97,8 +97,23 @@ window.app.run(['Global', '$location', '$rootScope',
                 {  
                     $location.path('/leagues');
                 }
+                if (!Global.user.isAdmin)
+                {
+                    if (next.templateUrl == 'views/users/list.html') 
+                    {  
+                        $location.path('/');
+                    }
+                }
             }
-            console.log(next.templateUrl);
+
+            if (!isLoggedin)
+            {
+                if (next.templateUrl == 'views/users/list.html') 
+                {  
+                    $location.path('/');
+                }
+            }
+
         });
     }
 ]);

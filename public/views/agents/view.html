@@ -112,7 +112,7 @@
         </div>
     </div>
 
-    <div ng-class='{"btn-group": (global.user._id == agent.user._id)}'>
+    <!--<div ng-class='{"btn-group": (global.user._id == agent.user._id)}'>
         <a class='btn btn-primary' href='/#!/users/profile/'
             ng-show='global.user._id == agent.user._id'>
             Profile
@@ -120,7 +120,7 @@
         <a class='btn btn-primary' href='/#!/agents/'>
             Agent List
         </a>
-    </div>
+    </div>-->
     <div class='btn-group' ng-show='global.user._id == agent.user._id'>
         <a class='btn btn-warning' href='/#!/agents/{{agent._id}}/trade'>
             Trade
