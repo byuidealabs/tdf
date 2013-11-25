@@ -5,8 +5,10 @@
 var mongoose = require('mongoose'),
     Schema = mongoose.Schema,
     _ = require('underscore'),
-    //sylvester = require('sylvester'),
-    //Matrix = sylvester.Matrix,
+    numjs = require('numjs'),
+    narray = numjs.narray,
+    sylvester = require('sylvester'),
+    Matrix = sylvester.Matrix,
     //Vector = sylvester.Vector,
     Agent = mongoose.model('Agent');
 
@@ -215,94 +217,177 @@ var promote_to_trial = function(league, cb) {
 
 var compute_redistribution = function(agents, cb) {
     // TODO: Build an numpy-like library
+
     var k = 10; // TODO
-    var n = 5;  // TODO
+    var alpha = 1 / (k + 1);
+    var beta = 1 / (k + 1);
     var delta = {};
     var deltabar = {};
     var x = {};
 
+    var i;
+    var j;
+
     // Compute x, delta, deltabar
+    console.log('\nPer-agent computations');
     _.each(agents, function(agent) {
+        var id = agent._id;
+        console.log('Agent: ' + id);
         // Gather last k + 1 values
         var values = _.last(agent.portfoliovalue, k + 1);
         values = _.map(values, function(value) {
             return value.totalvalue;
         });
-        x[agent._id] = _.last(values, k);
+        x[id] = _.last(values, k);
+
+        console.log('values: ' + narray.Stringify(values));
 
         // Compute delta (return) for last k times
-        delta[agent._id] = [];
-        for (var i = 1; i < values.length; i++) {
-            // TODO make efficient
-            var r = values[i] / values[i - 1];
-            delta[agent._id].push(r);
-        }
+        // TODO zero-handling in values
+        delta[id] = narray.PDiv(narray.Shift(values, 1), values);
+        console.log('delta: ' + narray.Stringify(delta[id]));
 
         // Compute deltabar (average return over last k times)
         // Assumes arithmetic mean (TODO possibly allow geometric)
-        var deltabar_agent = 0;
-        _.each(delta[agent._id], function(d) {
-            deltabar_agent += d;
-        });
-        deltabar[agent._id] = deltabar_agent / k;
+        deltabar[id] = narray.Mean(delta[id]);
+        console.log('deltabar: ' + deltabar[id]);
     });
 
-    console.log(JSON.stringify(delta));
-    console.log(JSON.stringify(deltabar));
-    console.log(JSON.stringify(x));
+    console.log('\n');
 
     // Compute competitionvalues
-    var competitionvalues = Array.apply(null, new Array(k)).map(
-        Number.prototype.valueOf, 0);
+    var competitionvalues = narray.Zeros(k);
     _.each(x, function(agent_x) {
-        for (var i = 0; i < k; i++) {
-            competitionvalues[i] += agent_x[i];
-        }
+        competitionvalues = narray.PAdd(competitionvalues, agent_x);
     });
-    console.log(JSON.stringify(competitionvalues));
+    console.log('competition values: ' + narray.Stringify(competitionvalues));
 
-    // Compute z
-    var z = {};
-    _.each(x, function(agent_x, agent_id) {
-        z[agent_id] = [];
-        for (var i = 0; i < k; i++) {
-            z[agent_id].push(agent_x[i] / competitionvalues[i]);
-        }
+    // Compute z and Z
+    var z = [];
+    _.each(x, function(agent_x) {
+        z.push(narray.PDiv(agent_x, competitionvalues));
     });
-    console.log(JSON.stringify(z));
+    var Z = [];
+    for (i = 0; i < k; i++) {
+        for (j = 0; j < z.length; j++) {
+            Z.push(z[j][i]);
+        }
+    }
+    console.log('z: ' + JSON.stringify(z));
+    console.log('Z: ' + JSON.stringify(Z));
 
     // Compute uk
-    var uk = {};
+    var u = [];
     var den = 0;
+    var index = 0;
     _.each(agents, function(agent) {
-        den += _.last(z[agent._id]) * _.last(delta[agent._id]);
+        den += _.last(z[index]) * _.last(delta[agent._id]);
+        index++;
     });
+    index = 0;
     _.each(agents, function(agent) {
-        uk[agent._id] = _.last(z[agent._id]) * _.last(delta[agent._id]) / den;
+        u.push(_.last(z[index]) * _.last(delta[agent._id]) / den);
     });
-    console.log(JSON.stringify(uk));
+    console.log('u(k): ' + JSON.stringify(u));
 
-    cb();
+    // Build A
+    var numagents = _.size(agents);
+    var dim = k * numagents;
+    var A = new Array(dim);
+    var B = new Array(dim);
+    for (i = 0; i < dim; i++) {
+        A[i] = narray.Zeros(dim);
+        B[i] = narray.Zeros(numagents);
+        for (j = 0; j < dim; j++) {
+            if (i < dim - numagents) {
+                if (j === i + numagents) {
+                    A[i][j] = 1;
+                }
+            }
+            else {
+                if (j % numagents === i % numagents) {
+                    A[i][j] = alpha;
+                }
+            }
+        }
+        for (j = 0; j < numagents; j++) {
+            if (i >= dim - numagents && j === i % numagents) {
+                B[i][j] = beta;
+            }
+        }
+    }
+
+    // Gather A, Z, B, and U into their respective matrices
+    A = Matrix.create(A);
+    B = Matrix.create(B);
+    Z = Matrix.create([Z]).transpose();
+    var U = Matrix.create([u]).transpose();
+
+    // Compute AZ + BU
+    var AZ = A.x(Z);
+    var BU = B.x(U);
+    var AZpBU = AZ.add(BU);
+    console.log(AZ);
+    console.log('\n');
+    console.log(BU);
+    console.log('\n');
+    console.log(AZpBU);
+    console.log('\n');
+
+    // Extract Z[k + 1]
+    var start = (k - 1) * numagents;
+    var zkp1 = {};
+    index = 1;
+    _.each(agents, function(agent) {
+        zkp1[agent._id] = AZpBU.e(index + start, 1);
+        index++;
+    });
+    console.log(zkp1);
+    console.log('\n');
+
+    // Compute change in values
+    var deltavalue = {};
+    _.each(agents, function(agent) {
+        var id = agent._id;
+        var desiredvalue = zkp1[id] * _.last(competitionvalues);
+        console.log(id);
+        console.log(zkp1[id]);
+        console.log('total: ' + _.last(competitionvalues));
+        console.log('desired: ' + desiredvalue);
+        deltavalue[id] = desiredvalue - _.last(x[id]);
+        console.log('current: ' + _.last(x[id]));
+        console.log('delta: ' + deltavalue[id]);
+    });
+
+    console.log(deltavalue);
+
+    cb(deltavalue);
 };
 
-var execute_redistribution = function(agents, cb) {
+var execute_redistribution = function(agents, deltavalues, cb) {
     if (!agents.length) {
         cb();
     }
     else {
         var agent = _.first(agents);
+        var id = agent._id;
         var restagents = _.rest(agents);
 
-        var last_portfolio = _.last(agent.portfolio);
-        if (last_portfolio === undefined) {
-            last_portfolio = {composition: {cash00: agent.league.startCash}};
+        if (deltavalues[id] === 0) {
+            execute_redistribution(restagents, deltavalues, cb);
         }
-        var next_composition = _.clone(last_portfolio.composition);
-        //next_composition.cash00 -= 100;
-        agent.portfolio.push({composition: next_composition});
-        agent.save(function() {
-            execute_redistribution(restagents, cb);
-        });
+        else {
+            var last_portfolio = _.last(agent.portfolio);
+            if (last_portfolio === undefined) {
+                last_portfolio = {composition: {cash00: agent.league.startCash}};
+            }
+            var next_composition = _.clone(last_portfolio.composition);
+            next_composition.cash00 += deltavalues[id];
+            agent.portfolio.push({composition: next_composition});
+            agent.save(function() {
+                execute_redistribution(restagents, deltavalues, cb);
+            });
+        }
     }
 };
 
@@ -327,9 +412,14 @@ var redistribute_portfolios = function(league, cb) {
             Agent.find({league: league})
             .populate('league', 'startCash')
             .exec(function(err, agents) {
-                compute_redistribution(agents, function() {
-                    execute_redistribution(agents, cb);
-                });
+                if (_.size(agents) === 0) {
+                    cb();
+                }
+                else {
+                    compute_redistribution(agents, function(deltavalues) {
+                        execute_redistribution(agents, deltavalues, cb);
+                    });
+                }
             });
         });
     }
