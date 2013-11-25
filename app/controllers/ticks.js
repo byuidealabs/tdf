@@ -7,7 +7,9 @@ var mongoose = require('mongoose'),
     dataconn = require('./dataconn'),
     Agent = mongoose.model('Agent'),
     League = mongoose.model('League'),
-    _ = require('underscore');
+    _ = require('underscore'),
+    numjs = require('numjs'),
+    nnum = numjs.nnum;
 
 //=============================================================================
 //  Helper functions
@@ -128,7 +130,7 @@ var update_portfolio_values = function(agents, quotes, cb) {
             else {
                 var pricetype = 'bid';  //TODO get from league
                 var sellprice = quotes[symbol][pricetype];
-                var securityprice = sellprice * quantity;
+                var securityprice = nnum.Round(sellprice, 2) * quantity;
                 totalvalue += securityprice;
                 composition[symbol] = securityprice;
             }

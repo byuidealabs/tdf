@@ -7,6 +7,7 @@ var mongoose = require('mongoose'),
     _ = require('underscore'),
     numjs = require('numjs'),
     narray = numjs.narray,
+    nnum = numjs.nnum,
     sylvester = require('sylvester'),
     Matrix = sylvester.Matrix,
     //Vector = sylvester.Vector,
@@ -229,38 +230,32 @@ var compute_redistribution = function(agents, cb) {
     var j;
 
     // Compute x, delta, deltabar
-    console.log('\nPer-agent computations');
     _.each(agents, function(agent) {
         var id = agent._id;
-        console.log('Agent: ' + id);
         // Gather last k + 1 values
         var values = _.last(agent.portfoliovalue, k + 1);
         values = _.map(values, function(value) {
-            return value.totalvalue;
+            return nnum.Round(value.totalvalue, 2);
         });
         x[id] = _.last(values, k);
-
-        console.log('values: ' + narray.Stringify(values));
 
         // Compute delta (return) for last k times
         // TODO zero-handling in values
         delta[id] = narray.PDiv(narray.Shift(values, 1), values);
-        console.log('delta: ' + narray.Stringify(delta[id]));
+        delta[id] = _.map(delta[id], function(d) {
+            return nnum.Round(d, 4);
+        });
 
         // Compute deltabar (average return over last k times)
         // Assumes arithmetic mean (TODO possibly allow geometric)
         deltabar[id] = narray.Mean(delta[id]);
-        console.log('deltabar: ' + deltabar[id]);
     });
-
-    console.log('\n');
 
     // Compute competitionvalues
     var competitionvalues = narray.Zeros(k);
     _.each(x, function(agent_x) {
         competitionvalues = narray.PAdd(competitionvalues, agent_x);
     });
-    console.log('competition values: ' + narray.Stringify(competitionvalues));
 
     // Compute z and Z
     var z = [];
@@ -270,11 +265,9 @@ var compute_redistribution = function(agents, cb) {
     var Z = [];
     for (i = 0; i < k; i++) {
         for (j = 0; j < z.length; j++) {
-            Z.push(z[j][i]);
+            Z.push(nnum.Round(z[j][i], 4));
         }
     }
-    console.log('z: ' + JSON.stringify(z));
-    console.log('Z: ' + JSON.stringify(Z));
 
     // Compute uk
     var u = [];
@@ -286,9 +279,9 @@ var compute_redistribution = function(agents, cb) {
     });
     index = 0;
     _.each(agents, function(agent) {
-        u.push(_.last(z[index]) * _.last(delta[agent._id]) / den);
+        var curr_u = _.last(z[index]) * _.last(delta[agent._id]) / den;
+        u.push(nnum.Round(curr_u, 2));
     });
-    console.log('u(k): ' + JSON.stringify(u));
 
     // Build A
     var numagents = _.size(agents);
@@ -327,12 +320,6 @@ var compute_redistribution = function(agents, cb) {
     var AZ = A.x(Z);
     var BU = B.x(U);
     var AZpBU = AZ.add(BU);
-    console.log(AZ);
-    console.log('\n');
-    console.log(BU);
-    console.log('\n');
-    console.log(AZpBU);
-    console.log('\n');
 
     // Extract Z[k + 1]
     var start = (k - 1) * numagents;
@@ -342,21 +329,13 @@ var compute_redistribution = function(agents, cb) {
         zkp1[agent._id] = AZpBU.e(index + start, 1);
         index++;
     });
-    console.log(zkp1);
-    console.log('\n');
 
     // Compute change in values
     var deltavalue = {};
     _.each(agents, function(agent) {
         var id = agent._id;
         var desiredvalue = zkp1[id] * _.last(competitionvalues);
-        console.log(id);
-        console.log(zkp1[id]);
-        console.log('total: ' + _.last(competitionvalues));
-        console.log('desired: ' + desiredvalue);
-        deltavalue[id] = desiredvalue - _.last(x[id]);
-        console.log('current: ' + _.last(x[id]));
-        console.log('delta: ' + deltavalue[id]);
+        deltavalue[id] = nnum.Round(desiredvalue - _.last(x[id]), 2);
     });
 
     console.log(deltavalue);
