@@ -193,6 +193,7 @@ exports.portfolioValue = function(composition, quotes, negative_only) {
             //      bid
             if (quotes[symbol] === undefined) {
                 console.log('Undefined symbol ' + symbol);
+                return 0;
             }
             curr_value = (quotes[symbol].bid * quantity);
         }

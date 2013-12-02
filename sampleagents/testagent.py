@@ -3,12 +3,12 @@ import json
 
 HEADERS = {'Content-Type': 'application/json'}
 SITE = 'http://localhost:3000/agents/trade/'
-AGENT_ID = '528279784ee30efd11000004'             # Lab Agent
+AGENT_ID = '529cc987f2e748b10c0044b9'             # Lab Agent
 # AGENT_ID = '527e640b6f8aaab26a000002'               # Personal Agent
 OTHER_ID = '5277c1ccb33812240e000003'
 BOGUS_ID = '012345678900000000000000'
 
-API_KEY = 'ihnepugwnpybinlsmbosbdjhdpfhohiv'      # Lab Agent
+API_KEY = 'dqgtewlkyigqeecnuqefkajycqkgwnqn'      # Lab Agent
 # API_KEY = 'mosxwaqxrutualrdaoyrdgwrtdyksuhv'        # Personal Agent
 ALT_KEY = 'mnvanhaajotdowwcdrqfcwujolajchct'
 
@@ -33,8 +33,7 @@ if __name__ == '__main__':
 
     # Create trade 1: buy 100 shares GOOG
     buy = {
-        'buy': [{'s': 'GOOG', 'q': 10}],
-        'sell': [],
+        'GOOG': 10,
         'apikey': API_KEY
     }
 
@@ -46,8 +45,7 @@ if __name__ == '__main__':
     #-------------------------------
 
     sell = {
-        'buy': [],
-        'sell': [{'s': 'GOOG', 'q': 5}],
+        'GOOG': -5,
         'apikey': API_KEY
     }
 
@@ -59,8 +57,9 @@ if __name__ == '__main__':
     #-------------------------------
 
     comp = {
-        'buy': [{'s': 'NFLX', 'q': 13}, {'s': 'AAPL', 'q': 7}],
-        'sell': [{'s': 'GOOG', 'q': 5}],
+        'NFLX': 13,
+        'AAPL': 7,
+        'GOOG': -5,
         'apikey': API_KEY
     }
 
@@ -112,8 +111,7 @@ if __name__ == '__main__':
     #-------------------------------
 
     nexs = {
-        'buy': [{'s': 'notasymbol', 'q': 100}],
-        'sell': [],
+        'notasymbol': 100,
         'apikey': API_KEY
     }
     r = requests.put(SITE + AGENT_ID, data=json.dumps(nexs), headers=HEADERS)
@@ -125,8 +123,7 @@ if __name__ == '__main__':
     #-------------------------------
 
     buyc = {
-        'buy': [{'s': 'cash', 'q': 100}],
-        'sell': [],
+        'cash': 100,
         'apikey': API_KEY
     }
     r = requests.put(SITE + AGENT_ID, data=json.dumps(buyc), headers=HEADERS)
@@ -137,8 +134,7 @@ if __name__ == '__main__':
     #-------------------------------
 
     badkey = {
-        'buy': [{'s': 'GOOG', 'q': 100}],
-        'sell':  [],
+        'GOOG': 100,
         'apikey': 'thisisabogusapikeythatwontwork00'
     }
     r = requests.put(SITE + AGENT_ID, data=json.dumps(badkey), headers=HEADERS)
@@ -152,8 +148,7 @@ if __name__ == '__main__':
     # test.
 
     alt = {
-        'buy': [{'s': 'GOOG', 'q': 100}],
-        'sell': [],
+        'GOOG': 100,
         'apikey': ALT_KEY
     }
     r = requests.put(SITE + AGENT_ID, data=json.dumps(alt), headers=HEADERS)
@@ -164,9 +159,9 @@ if __name__ == '__main__':
     #-------------------------------
 
     sall = {
-        'buy': [],
-        'sell': [{'s': 'AAPL', 'q': 7}, {'s': 'NFLX', 'q': 13},
-                 {'s': 'CASH', 'q': 100}],
+        'AAPL': 7,
+        'NFLX': 13,
+        'CASH': 100,
         'apikey': API_KEY
     }
     r = requests.put(SITE + AGENT_ID, data=json.dumps(sall), headers=HEADERS)

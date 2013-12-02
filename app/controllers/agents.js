@@ -310,6 +310,8 @@ exports.trade = function(req, res) {
     var trade = req.body.trade || req.body;  // Depending on source of data
     // TODO: error check to see if trade is {string->number, ...}
 
+    trade = _.omit(trade, 'apikey');
+
     try {
         if (_.size(trade) === 0) {
             throw {
