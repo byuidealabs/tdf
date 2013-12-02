@@ -192,7 +192,8 @@ exports.portfolioValue = function(composition, quotes, negative_only) {
             // TODO tie in value computation with admin (don't necessarily be
             //      bid
             if (quotes[symbol] === undefined) {
-                console.log('Undefined symbol ' + symbol);
+                console.log('Dataconn: Undefined symbol ' + symbol);
+                console.log(JSON.stringify(composition));
                 return 0;
             }
             curr_value = (quotes[symbol].bid * quantity);

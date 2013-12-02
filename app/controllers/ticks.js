@@ -129,10 +129,17 @@ var update_portfolio_values = function(agents, quotes, cb) {
             }
             else {
                 var pricetype = 'bid';  //TODO get from league
-                var sellprice = quotes[symbol][pricetype];
-                var securityprice = nnum.Round(sellprice, 2) * quantity;
-                totalvalue += securityprice;
-                composition[symbol] = securityprice;
+
+                if (quotes[symbol] === undefined) {
+                    console.log('Ticks: Undefined symbol ' + symbol);
+                    console.log(JSON.stringify(new_composition));
+                }
+                else {
+                    var sellprice = quotes[symbol][pricetype];
+                    var securityprice = nnum.Round(sellprice, 2) * quantity;
+                    totalvalue += securityprice;
+                    composition[symbol] = securityprice;
+                }
             }
         });
 

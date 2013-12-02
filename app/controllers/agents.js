@@ -9,6 +9,8 @@ var mongoose = require('mongoose'),
     Crypto = require('crypto'),
     _ = require('underscore');
 
+var SANDP500 = require('../data/sandp500.js').sandp500_list;
+
 //=============================================================================
 //  Helper Functions
 //=============================================================================
@@ -176,7 +178,7 @@ exports.resetapikey = function(req, res) {
  * Real codes:
  *  1. Empty trade
  *  2. Unknown symbol
- *  3. Could not look up symbol
+ *  3. Could not look up symbol, not allowed by league
  *  4. Could not look up scheme (bid/ask/last) of symbol (should never see)
  *  5. Leverage limit exceeded
  */
@@ -269,6 +271,25 @@ var __execute_trade = function(agent, trade, quotes, res) {
 
 };
 
+/**
+ * Throws an error if any symbol in symbols is not in the list of allowed
+ * symbols in the agent's league.
+ */
+var __check_all_symbols_allowed = function(league, symbols) {
+    var league_symbols = SANDP500;
+    for (var i = 0; i < symbols.length; i++) {
+        // not using underscore to loop in order to break early for efficiency
+        var symbol = symbols[i];
+
+        if (!_.contains(league_symbols, symbol)) {
+            throw {
+                'msg': 'Symbol ' + symbol + ' not allowed by league.',
+                'code': 3
+            };
+        }
+    }
+};
+
 var __setup_trade = function(agent, trade, cb) {
 
     var symbols = [];
@@ -278,12 +299,16 @@ var __setup_trade = function(agent, trade, cb) {
     if (last_portfolio !== undefined) {
         var composition = last_portfolio.composition;
         symbols = _.union(symbols,
-                          dataconn.compositionSymbols(composition));
+                        dataconn.compositionSymbols(composition));
     }
 
     // Get symbols from trade
     symbols = _.union(symbols, _.keys(trade));
+    symbols = _.map(symbols, function(symbol) {
+        return symbol.toUpperCase();
+    });
 
+    __check_all_symbols_allowed(agent.league, symbols);
     dataconn.yahooQuotes(symbols, function(err, quotes) {
         cb(quotes);
     });
