@@ -47,14 +47,13 @@ var randomAscii = function(len){
  */
 exports.agent = function(req, res, next, id) {
     Agent.load(id, function(err, agent) {
-        if (err) {
-            return next(err);
+        if (err || !agent) {
+            next(new Error('Failed to load agent ' + id));
         }
-        if (!agent) {
-            return next(new Agent('Failed to load agent ' + id));
+        else {
+            req.agent = agent;
+            next();
         }
-        req.agent = agent;
-        next();
     });
 };
 

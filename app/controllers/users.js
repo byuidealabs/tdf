@@ -100,10 +100,13 @@ exports.user = function(req, res, next, id) {
             _id: id
         })
         .exec(function(err, user) {
-            if (err) return next(err);
-            if (!user) return next(new Error('Failed to load User ' + id));
-            req.profile = user;
-            next();
+            if (err || !user) {
+                next(new Error('Failed to load User ' + id));
+            }
+            else {
+                req.profile = user;
+                next();
+            }
         });
 };
 
