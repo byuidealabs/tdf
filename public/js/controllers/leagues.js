@@ -81,6 +81,21 @@ angular.module('tdf.leagues').controller('LeaguesController',
 
                 $scope.setLeagueChartOptions(league);
 
+                $scope.$watch('league.redistribute.n', function(n) {
+                    var alpha;
+                    if ($scope.league.redistribute.alpha === undefined) {
+                        alpha = [];
+                    }
+                    else {
+                        alpha = $scope.league.redistribute.alpha;
+                    }
+                    while (alpha.length < n) {
+                        alpha.push(0);
+                    }
+                    alpha = alpha.splice(0, n);
+                    $scope.league.redistribute.alpha = alpha;
+                });
+
                 Agents.query({
                     league: league._id
                 }, function(agents) {
@@ -185,5 +200,6 @@ angular.module('tdf.leagues').controller('LeaguesController',
             });
             $scope.chartData = chartData;
         });
+
 
     }]);

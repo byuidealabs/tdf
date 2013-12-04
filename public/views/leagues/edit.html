@@ -180,7 +180,42 @@
                             </div>
                         </div>
                     </div>
+
+                    <div class='form-group'>
+                        <label class='control-label col-lg-3'>
+                            n
+                        </label>
+                        <div class='col-lg-3'>
+                            <input type='number' class='form-control'
+                                ng-model='league.redistribute.n'
+                                required>
+                        </div>
+                    </div>
+
+                    <div class='form-group'>
+                        <label class='control-label col-lg-3'>
+                            &beta;
+                        </label>
+                        <div class='col-lg-3'>
+                            <input type='number' class='form-control'
+                                ng-model='league.redistribute.beta'/>
+                        </div>
+                    </div>
+
+                    <div ng-repeat='i in league.redistribute.n | Range'>
+                        <div class='form-group'>
+                            <label class='control-label col-lg-3'>
+                                &alpha;<sub>{{i + 1}}</sub>
+                            </label>
+                            <div class='col-lg-3'>
+                                <input type='number' class='form-control'
+                                    ng-model='league.redistribute.alpha[i]'>
+                            </div>
+                        </div>
+                    </div>
                 </div>
+
+                {{league.redistribute.alpha}}
             </div>
         </div>
 
