@@ -181,6 +181,8 @@ exports.resetapikey = function(req, res) {
  *  3. Could not look up symbol, not allowed by league
  *  4. Could not look up scheme (bid/ask/last) of symbol (should never see)
  *  5. Leverage limit exceeded
+ *  6. Empty trade
+ *  7. Tried to trade with a non-integer quantity.
  */
 var __execute_trade = function(agent, trade, quotes, res) {
 
@@ -319,25 +321,34 @@ var __setup_trade = function(agent, trade, cb) {
  *
  * If trade is successful, responds with the new agent
  * Otherwise, responds with {error: {'msg': <message>, 'code': <code>}}
- *
- * Error codes are as follows:
- *  1. Attempted to sell a security that does not own
- *  2. Attempted to sell more of a security than already owns
- *  3. Attempted to buy more than has cash to purchase
- *  4. Attempted to buy or sell on a nonexistant security (symbol doesn't
- *     match any known security)
- *  5. Attempted to trade cash
  */
 exports.trade = function(req, res) {
 
     // 1. Determine current symbol set
     var agent = req.agent;
     var trade = req.body.trade || req.body;  // Depending on source of data
+
+    console.log('Trading');
+    console.log(trade);
+    console.log(JSON.stringify(trade));
+
     // TODO: error check to see if trade is {string->number, ...}
 
-    trade = _.omit(trade, 'apikey');
-
     try {
+        // Remove API key
+        trade = _.omit(trade, 'apikey');
+
+        // Convert quantities to numbers if strings
+        _.each(trade, function(q, s) {
+            if (isNaN(q)) {
+                throw {
+                    'msg': 'Trade quantity must be an integer.',
+                    'code': 7
+                };
+            }
+            trade[s] = Number(q);
+        });
+
         if (_.size(trade) === 0) {
             throw {
                 'msg': 'Empty Trade',
