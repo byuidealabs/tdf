@@ -116,7 +116,10 @@ var LeagueSchema = new Schema({
         period: {
             type: Number,
             default: 0
-        }
+        },
+        n: Number,
+        alpha: [Number],
+        beta: Number
     }
 });
 

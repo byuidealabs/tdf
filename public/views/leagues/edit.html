@@ -162,7 +162,7 @@
                     </div>
                 </div>
 
-                <div ng-show='league.redistribute.on'>
+                <div ng-if='league.redistribute.on'>
                     <league-time ng-model='league.redistribute.first'
                         required='league.redistribute.on'>
                         First Redistribution (GMT)
@@ -188,7 +188,7 @@
                         <div class='col-lg-3'>
                             <input type='number' class='form-control'
                                 ng-model='league.redistribute.n'
-                                required>
+                                min='1' />
                         </div>
                     </div>
 
@@ -198,7 +198,8 @@
                         </label>
                         <div class='col-lg-3'>
                             <input type='number' class='form-control'
-                                ng-model='league.redistribute.beta'/>
+                                ng-model='league.redistribute.beta'
+                                min='0.01' step='0.01' />
                         </div>
                     </div>
 
@@ -209,13 +210,13 @@
                             </label>
                             <div class='col-lg-3'>
                                 <input type='number' class='form-control'
-                                    ng-model='league.redistribute.alpha[i]'>
+                                    ng-model='league.redistribute.alpha[i]'
+                                    min='0.01' step='0.01' />
                             </div>
                         </div>
                     </div>
-                </div>
 
-                {{league.redistribute.alpha}}
+                </div>
             </div>
         </div>
 
