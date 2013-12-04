@@ -2,7 +2,6 @@
  * Module dependencies.
  */
 var mongoose = require('mongoose'),
-    async = require('async'),
     League = mongoose.model('League'),
     _ = require('underscore');
 
@@ -11,10 +10,13 @@ var mongoose = require('mongoose'),
  */
 exports.league = function(req, res, next, id) {
     League.load(id, function(err, league) {
-        if (err) return next(err);
-        if (!league) return next(new Error('Failed to load league ' + id));
-        req.league = league;
-        next();
+        if (err || !league) {
+            next(new Error('Failed to load league ' + id));
+        }
+        else {
+            req.league = league;
+            next();
+        }
     });
 };
 
@@ -46,7 +48,7 @@ exports.update = function(req, res) {
 
     league = _.extend(league, req.body);
 
-    league.save(function(err) {
+    league.save(function(/*err*/) {
         res.jsonp(league);
     });
 };
