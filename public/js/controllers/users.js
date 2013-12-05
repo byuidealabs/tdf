@@ -4,6 +4,7 @@ angular.module('tdf.users').controller('UsersController',
     function ($scope, $routeParams, $location, $modal, Global, Utilities,
               Users, Agents, Leagues, _) {
         $scope.global = Global;
+        $scope.saveerror = '';
 
         $scope.find = function(query) {
             Users.query(query, function(users) {
@@ -45,8 +46,15 @@ angular.module('tdf.users').controller('UsersController',
 
         $scope.updateProfile = function() {
             var user = $scope.user;
+            $scope.saveerror = '';
             user.$update(function() {
+                // Success
+                Global.set_user(user);
                 $location.path('users/' + user._id);
+            },
+            function(msg) {
+                // Failure
+                $scope.saveerror = msg.data.flash;
             });
         };
 

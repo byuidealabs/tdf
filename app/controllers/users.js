@@ -53,14 +53,16 @@ exports.session = function(req, res, next) {
 var detect_duplicate_user_prop = function(user, property, cb) {
     var query = {};
     query[property] = user[property];
-    User.findOne(query, function(err, dup_user) {
-        if (dup_user) {
-            cb(true);
-        }
-        else {
-            cb(false);
-        }
-    });
+    User.findOne(query)
+        .where('_id').ne(user.id)
+        .exec(function(err, dup_user) {
+            if (dup_user) {
+                cb(true);
+            }
+            else {
+                cb(false);
+            }
+        });
 };
 
 /**
@@ -69,13 +71,13 @@ var detect_duplicate_user_prop = function(user, property, cb) {
 var detect_duplicate_user = function(user, cb) {
     detect_duplicate_user_prop(user, 'username', function(dup_username) {
         if (dup_username) {
-            cb(true, 'A user with this user name already exists. ' +
+            cb(true, 'Another user with this user name already exists. ' +
                'Please choose another user name.');
         }
         else {
             detect_duplicate_user_prop(user, 'email', function(dup_email) {
                 if (dup_email) {
-                    cb(true, 'A user with this email already exists. ' +
+                    cb(true, 'Another user with this email already exists. ' +
                        'Please choose another email.');
                 }
                 else {
@@ -109,23 +111,6 @@ exports.create = function(req, res, next) {
         });
 
     });
-
-    /*user.provider = 'local';
-    user.save(function(err) {
-        if (err) {
-            return res.render('users/signup', {
-                errors: err.errors,
-                user: user
-            });
-        }
-        req.logIn(user, function(err) {
-            if (err) {
-                return next(err);
-            }
-            return res.redirect('/');
-        });
-    });*/
-    //next(new Error('Reached Error'));
 };
 
 /**
@@ -188,10 +173,17 @@ exports.all = function(req, res) {
  */
 exports.update = function(req, res) {
     var user = req.user;
-
     user = _.extend(user, req.body);
 
-    user.save(function(/*err*/) {
-        res.jsonp(user);
+    detect_duplicate_user(user, function(has_duplicate, message) {
+        if (has_duplicate) {
+            return res.send(500, {
+                flash: message
+            });
+        }
+
+        user.save(function(/*err*/) {
+            res.jsonp(user);
+        });
     });
 };
