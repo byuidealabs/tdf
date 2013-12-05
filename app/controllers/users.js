@@ -48,13 +48,69 @@ exports.session = function(req, res, next) {
 };
 
 /**
+ * Detects whether the user has a duplicate of the given property.
+ */
+var detect_duplicate_user_prop = function(user, property, cb) {
+    var query = {};
+    query[property] = user[property];
+    User.findOne(query, function(err, dup_user) {
+        if (dup_user) {
+            cb(true);
+        }
+        else {
+            cb(false);
+        }
+    });
+};
+
+/**
+ * Detects whether a user with duplicate information exists.
+ */
+var detect_duplicate_user = function(user, cb) {
+    detect_duplicate_user_prop(user, 'username', function(dup_username) {
+        if (dup_username) {
+            cb(true, 'A user with this user name already exists. ' +
+               'Please choose another user name.');
+        }
+        else {
+            detect_duplicate_user_prop(user, 'email', function(dup_email) {
+                if (dup_email) {
+                    cb(true, 'A user with this email already exists. ' +
+                       'Please choose another email.');
+                }
+                else {
+                    cb(false, '');
+                }
+            });
+        }
+    });
+};
+
+/**
  * Create user
  */
-
 exports.create = function(req, res, next) {
     var user = new User(req.body);
 
-    user.provider = 'local';
+    detect_duplicate_user(user, function(has_duplicate, message) {
+        if (has_duplicate) {
+            return res.send(500, {
+                flash: message
+            });
+        }
+        user.save(function(err) {
+            if (err) {
+                return res.send(500, {
+                    flash: 'An unkonwn error has occured.'
+                });
+            }
+            req.user = user;
+            next();
+        });
+
+    });
+
+    /*user.provider = 'local';
     user.save(function(err) {
         if (err) {
             return res.render('users/signup', {
@@ -68,9 +124,6 @@ exports.create = function(req, res, next) {
             }
             return res.redirect('/');
         });
-    });
-    /*res.render('error', {
-        message: 'Reached error'
     });*/
     //next(new Error('Reached Error'));
 };

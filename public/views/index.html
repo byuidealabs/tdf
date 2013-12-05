@@ -34,11 +34,10 @@
 
         <div class='col-md-6'>
 
-            <p>Email valid: {{login.email.$valid}}</p>
-
             <div class='panel panel-primary'><div class='panel-body'>
-                <ng-form name='login' ng-submit='login()'
+                <form ng-submit='login()'
                     class='form-horizontal'>
+
                     <div class='alert alert-danger col-lg-11'
                         ng-if='loginerror.length'>
                         {{loginerror}}
@@ -66,62 +65,69 @@
                             Sign in
                         </button>
                     </div>
-                </ng-form>
+                </form>
             </div></div>
 
-            <section class='content'
-                style='margin-top: 0px; padding-top: 10px;
-                       padding-bottom: 0px'>
+            <div class='panel panel-primary'><div class='panel-body'>
+                <h3>
+                    New to Tour de Finance? Create an account.
+                </h3>
 
-                    <div class='panel panel-primary'>
-                        <div class='col-md-13' style='padding-left:20px'>
-                            <h3>
-                                New to Tour de Finance? Create an account.
-                            </h3>
-                            <form ng-submit='create_user()'
-                                class='signup form-horizontal'>
-                                <div class='form-group'>
-                                    <div class='col-lg-11'>
-                                        <input id='name' type='text'
-                                            ng-model='newuser.name'
-                                            placeholder='Full name'
-                                            class='form-control'>
-                                    </div>
-                                </div>
-                                <div class='form-group'>
-                                    <div class='col-lg-11'>
-                                        <input id='email' type='text'
-                                            ng-model='newuser.email'
-                                            placeholder='Email'
-                                            class='form-control'>
-                                    </div>
-                                </div>
-                                <div class='form-group'>
-                                    <div class='col-lg-11'>
-                                        <input id='username' type='text'
-                                            ng-model='newuser.username'
-                                            placeholder='Username'
-                                            class='form-control'>
-                                    </div>
-                                </div>
-                                <div class='form-group'>
-                                    <div class='col-lg-9'>
-                                        <input id='password' type='password'
-                                            ng-model='newuser.password'
-                                            placeholder='Password'
-                                            class='form-control'>
-                                    </div>
-                                    <button type='submit'
-                                        class='btn btn-primary'>
-                                        Sign up
-                                    </button>
-                                </div>
-                            </form>
+                <form name='signup' ng-submit='register()'
+                    class='form-horizontal'>
+
+                    <div class='alert alert-danger col-lg-11'
+                        ng-if='registererror.length'>
+                        {{registererror}}
+                    </div>
+
+                    <div class='form-group'>
+                        <div class='col-lg-11'>
+                            <input id='name' type='text'
+                                ng-model='newuser.name'
+                                placeholder='Full Name'
+                                class='form-control'
+                                required />
                         </div>
                     </div>
 
-                </section>
-            </section>
+                    <div class='form-group'>
+                        <div class='col-lg-11'>
+                            <input id='email' type='text'
+                                ng-model='newuser.email'
+                                placeholder='Email'
+                                class='form-control'
+                                required />
+                        </div>
+                    </div>
+
+                    <div class='form-group'>
+                        <div class='col-lg-11'>
+                            <input id='username' type='text'
+                                ng-model='newuser.username'
+                                placeholder='Username'
+                                class='form-control'
+                                required />
+                        </div>
+                    </div>
+
+                    <div class='form-group'>
+                        <div class='col-lg-9'>
+                            <input id='password' type='password'
+                                ng-model='newuser.password'
+                                placeholder='Password'
+                                class='form-control'
+                                required />
+                        </div>
+                        <button type='submit'
+                            class='btn btn-primary'>
+                            Sign Up
+                        </button>
+                    </div>
+
+                </form>
+            </div></div>
+
         </div>
         </div>
     </div>
