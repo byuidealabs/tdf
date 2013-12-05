@@ -1,6 +1,26 @@
 <section ng-controller='AgentsController' ng-init='findOne()'>
     <h1>{{agent.name}}</h1>
 
+    <div class='btn-group' ng-show='global.user._id == agent.user._id'>
+        <a class='btn btn-warning' href='/#!/agents/{{agent._id}}/trade'>
+            Trade
+        </a>
+        <a class='btn btn-default' href='/#!/agents/{{agent._id}}/edit'>
+            Edit Agent
+        </a>
+        <a class='btn btn-default' href='/#!/leagues/{{agent.league._id}}'>
+            View League
+        </a>
+        <a class='btn btn-danger' ng-click='resetTrades()'>
+            Reset Trades
+        </a>
+        <a class='btn btn-danger' ng-click='remove(agent)'>
+            Delete Agent
+        </a>
+    </div>
+
+    <br class='clear-fix'/><br />
+
     <div class='panel panel-info'>
         <div class='panel-heading'>Details</div>
         <div class='panel-body'>
@@ -128,6 +148,9 @@
         <a class='btn btn-default' href='/#!/agents/{{agent._id}}/edit'>
             Edit Agent
         </a>
+        <a class='btn btn-default' href='/#!/leagues/{{agent.league._id}}'>
+            View League
+        </a>
         <a class='btn btn-danger' ng-click='resetTrades()'>
             Reset Trades
         </a>
@@ -135,4 +158,7 @@
             Delete Agent
         </a>
     </div>
+
+    <br class='clear-fix'/><br />
+
 </section>
