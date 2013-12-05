@@ -112,10 +112,20 @@
                     </div>
 
                     <div class='form-group'>
-                        <div class='col-lg-9'>
+                        <div class='col-lg-11'>
                             <input id='password' type='password'
                                 ng-model='newuser.password'
                                 placeholder='Password'
+                                class='form-control'
+                                required />
+                        </div>
+                    </div>
+
+                    <div class='form-group'>
+                        <div class='col-lg-9'>
+                            <input id='checkpassword' type='password'
+                                ng-model='newuser.checkpassword'
+                                placeholder='Verify Password'
                                 class='form-control'
                                 required />
                         </div>
