@@ -10,12 +10,9 @@ angular.module('tdf.system').controller('IndexController',
             var user = new Users($scope.newuser);
             user.$save(function(/*response*/) {
                 // Successful Registration
-                console.log('success');
                 window.location.reload();
             }, function(msg) {
                 // Failed Registration
-                console.log('Failure');
-                console.log(msg);
                 $scope.registererror = msg.data.flash;
             });
         };
