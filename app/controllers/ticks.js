@@ -137,6 +137,7 @@ var update_portfolio_values = function(agents, quotes, cb) {
                 else {
                     var sellprice = quotes[symbol][pricetype];
                     var securityprice = nnum.Round(sellprice, 2) * quantity;
+
                     totalvalue += securityprice;
                     composition[symbol] = securityprice;
                 }
@@ -167,6 +168,8 @@ exports.tick = function(req, res) {
 
     // 1. Promote leagues and get their symbols
     tick_leagues(function(allsymbols) {
+
+        console.log('Reached for a league');
 
         // 2. Fetch yahoo data
         dataconn.yahooQuotes(allsymbols, function(err, quotes) {
