@@ -4,16 +4,20 @@ angular.module('tdf.system').controller('IndexController',
         $scope.global = Global;
 
         $scope.loginerror = '';
+        $scope.registererror = '';
 
-        $scope.create_user = function() {
-            console.log('reached');
-            console.log($scope.newuser);
+        $scope.register = function() {
             var user = new Users($scope.newuser);
             user.$save(function(/*response*/) {
-                console.log('saved');
+                // Successful Registration
+                console.log('success');
+                window.location.reload();
+            }, function(msg) {
+                // Failed Registration
+                console.log('Failure');
+                console.log(msg);
+                $scope.registererror = msg.data.flash;
             });
-
-            console.log(user);
         };
 
         $scope.login = function() {

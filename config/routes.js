@@ -10,14 +10,7 @@ module.exports = function(app, passport, auth) {
     app.get('/signup', users.signup);
     app.get('/signout', users.signout);
 
-    //Setting up the users api
-    app.post('/users', users.create);
-
-    /*app.post('/users/session', passport.authenticate('local', {
-        failureRedirect: '/',
-        failureFlash: 'Invalid email or password.'
-    }), users.session);*/
-    app.post('/users/session', function(req, res, next) {
+    var authenticate = function(req, res, next) {
         passport.authenticate('local', function(err, user, info) {
             if (err) {
                 return next(err);
@@ -36,7 +29,11 @@ module.exports = function(app, passport, auth) {
                 });
             });
         })(req, res, next);
-    });
+    };
+
+    //Setting up the users api
+    app.post('/users', users.create, authenticate);
+    app.post('/users/session', authenticate);
 
     // Public User Routes
     app.get('/users', users.all);
