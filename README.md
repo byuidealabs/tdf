@@ -2,6 +2,8 @@
 
 A paper-trading system for use in studying controls applied to finance.
 
+Note that installation has only been tested using Ubuntu 13.10 and that the web client has only been tested in Chromium.
+
 ## Installation
 
 ### Step 1: Install node.js
@@ -42,11 +44,16 @@ You can also restart MongoDB by:
 	sudo service mongodb restart
 	
 ### Step 4: Install Project Dependencies
+
+Follow the directions [here](https://github.com/ekalinin/nodeenv/issues/24) to enable npm to install packages locally. In brief:
+
+	sudo chown -fR myusername:myusername ~/.npm ~/tmp
 	
 Navigate to the tdf directory and execute the following commands:
 
-	sudo npm install
 	npm install
+	
+Note, you should never need to do a `sudo npm install`.
 	
 If you get a git error 128, you may need to switch the url protocol to https:// (instead of git://). To do this:
 
@@ -60,124 +67,28 @@ In the tdf directory, start the grunt server by:
 	
 If everything is installed properly, you will get a message stating that the server is running on port 3000. Navigate to [localhost:3000](http://localhost:3000) to access TDF.
 
-# MEAN Stack
+## Back-end Trading
 
-MEAN is a boilerplate that provides a nice starting point for [MongoDB](http://www.mongodb.org/), [Node.js](http://www.nodejs.org/), [Express](http://expressjs.com/), and [AngularJS](http://angularjs.org/) based applications. It is designed to give you quick and organized way to start developing of MEAN based web apps with useful modules like mongoose and passport pre-bundled and configured. We mainly try to take care of the connection points between existing popular frameworks and solve common integration problems.  
+To make a trade on the backend, you must first create an agent through the web client. To do this:
 
-## Prerequisites
-* Node.js - Download and Install [Node.js](http://www.nodejs.org/download/). You can also follow [this gist](https://gist.github.com/isaacs/579814) for a quick and easy way to install Node.js and npm
-* MongoDB - Download and Install [MongoDB](http://www.mongodb.org/downloads) - Make sure it's running on the default port (27017).
+1.  Login or register with the site
+2.  Click on the 'My Agents' link in the top navigation bar
+3.  Above the desired league, click on the 'Create an Agent' button
 
-### Optional
-* Grunt - Download and Install [Grunt](http://gruntjs.com).
+Once you have created the agent, navigate to the agent's view if you are not there already (after creating an agent, the site automatically redirects to the agent view). To do this:
 
-## Additional Packages
-* Express - Defined as npm module in the [package.json](package.json) file.
-* Mongoose - Defined as npm module in the [package.json](package.json) file.
-* Passport - Defined as npm module in the [package.json](package.json) file.
-* AngularJS - Defined as bower module in the [bower.json](bower.json) file.
-* Twitter Bootstrap - Defined as bower module in the [bower.json](bower.json) file.
-* UI Bootstrap - Defined as bower module in the [bower.json](bower.json) file.
+1.  Click on the 'My Agents' link in the top navigation bar
+2.  Locate the agent in your list of agents, and click on the view button to the right of the agent's name
 
-## Quick Install
+In the agent view, note the following:
 
- The quickest way to get started with MEAN is to clone the project and utilize it like this:
+*  The agent's id
+*  The agent's api key (you will need to click on the show button to the right of the key to display it)
 
-  Install dependencies:
+To trade in any language, create an HTTP post. The url will be `<host>/agents/trade/<agent-id>`, where `host` is the url pointing to the TDF server and `<agent-id>` is the id noted from the agent view.
 
-    $ npm install
+The data for the post will consist of key-value pairs where each key represents a ticker symbol in the list of ticker symbols allowed by the league (currently only and all symbols in the S&P500), and the value is the number of trades of that security to sell, where negative quantities signify a sell and positive signify a buy.
 
-  Export the node Path to load your lib into project (default in HEROKU)
-    $ export NODE_PATH=lib
+Further, the data must also pass the key `apikey` with the value of the api key noted from the agent's view.
 
-  We recommend using [Grunt](https://github.com/gruntjs/grunt-cli) to start the server:
-    $ grunt
-
-  When not using grunt you can use:
-
-    $ node server
-    
-  Then open a browser and go to:
-
-    http://localhost:3000
-
-## Quick Deployment
-4 commands to deploy your mean app to heroku,
-Before you start make sure you have <a href="https://toolbelt.heroku.com/">heroku toolbelt</a> installed and an accessible mongo db instance - you can try <a href="http://www.mongohq.com/">mongohq</a> which have an easy setup )
-
-```bash
-git init
-git add .
-git commit -m "initial version"
-heroku apps:create
-git push heroku master
-```
-
-## Configuration
-All configuration is specified in the [config](config/) folder, particularly the [config.js](config/config.js) file. Here you will need to specify your application name, database name, as well as hook up any social app keys if you want integration with Twitter, Facebook, GitHub or Google.
-
-### Environmental Settings
-
-There are three environments provided by default, __development__, __test__, and __production__. Each of these environments has the following configuration options:
-* db - This is the name of the MongoDB database to use, and is set by default to __mean-dev__ for the development environment.
-* root - This is determined automatically at the start of this file, but can be overridden here.
-* app.name - This is the name of your app or website, and can be different for each environment. You can tell which environment you are running by looking at the TITLE attribute that your app generates.
-* Social Registration - Facebook, GitHub, Google, Twitter. You can specify your own social accounts here for each social platform, with the following for each provider:
-	* clientID
-	* clientSecret
-	* callbackURL
-
-To run with a different environment, just specify NODE_ENV as you call grunt:
-
-	$ NODE_ENV=test grunt
-
-If you are using node instead of grunt, it is very similar:
-
-	$ NODE_ENV=test node server
-
-> NOTE: Running Node.js applications in the __production__ environment enables caching, which is disabled by default in all other environments.
-
-## Getting Started
-  We pre-included an article example, check it out:
-  * [The Model](https://github.com/linnovate/mean/blob/master/app/models/article.js) - Where we define our object schema.
-  * [The Controller](https://github.com/linnovate/mean/blob/master/app/controllers/articles.js) - Where we take care of our backend logic.
-  * [NodeJS Routes](https://github.com/linnovate/mean/blob/master/config/routes.js) - Where we define our REST service routes.
-  * [AngularJs Routes](https://github.com/linnovate/mean/blob/master/public/js/config.js) - Where we define our CRUD routes.
-  * [The AngularJs Service](https://github.com/linnovate/mean/blob/master/public/js/services/articles.js) - Where we connect to our REST service.
-  * [The AngularJs Controller](https://github.com/linnovate/mean/blob/master/public/js/controllers/articles.js) - Where we take care of  our frontend logic.
-  * [The AngularJs Views Folder](https://github.com/linnovate/mean/blob/master/public/views/articles) - Where we keep our CRUD views.
-
-## MEAN Modules
-   Mean presents a growing eco-system of MEAN based modules in the npm repository, To write (and contribute) your own MEAN based module checkout [mean-logger](https://npmjs.org/package/mean-logger) for examples.
-  
-## More Information
-
-  * Contact Amos Haviv on any issue via [E-Mail](mailto:mail@amoshaviv.com), [Facebook](http://www.facebook.com/amoshaviv), or [Twitter](http://www.twitter.com/amoshaviv).
-  * Visit us at [Linnovate.net](http://www.linnovate.net/).
-  * Visit our [Ninja's Zone](http://www.meanleanstartupmachine.com/) for extended support.
-
-## Credits
-Inspired by the great work of [Madhusudhan Srinivasa](https://github.com/madhums/)
-
-## License
-
-(The MIT License)
-
-Permission is hereby granted, free of charge, to any person obtaining
-a copy of this software and associated documentation files (the
-'Software'), to deal in the Software without restriction, including
-without limitation the rights to use, copy, modify, merge, publish,
-distribute, sublicense, and/or sell copies of the Software, and to
-permit persons to whom the Software is furnished to do so, subject to
-the following conditions:
-
-The above copyright notice and this permission notice shall be
-included in all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND,
-EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
-IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
-CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
-TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
-SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+If the trade is successfull, the server will respond with a JSON object representing the agent's info and current status. Otherwise, it will return a JSON object describing the error encountered.
