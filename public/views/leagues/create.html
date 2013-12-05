@@ -1,6 +1,7 @@
 <section ng-controller='LeaguesController' ng-init='getDefault()'>
     <h2>Create a League</h2>
     <form class='form-horizontal' ng-submit='create()'>
+
         <div class='panel panel-info'>
             <div class='panel-heading'>General Settings</div>
             <div class='panel-body'>
@@ -23,13 +24,16 @@
             <div class='panel-heading'>Competition Phases</div>
             <div class='panel-body'>
 
-                <league-time ng-model='league.trialStart'>
+                <league-time ng-model='league.trialStart'
+                    required='true'>
                     Trial Period Start (GMT)
                 </league-time>
-                <league-time ng-model='league.competitionStart'>
-                    Competetion Period Start (GMT)
+                <league-time ng-model='league.competitionStart'
+                    required='true'>
+                    Competition Period Start (GMT)
                 </league-time>
-                <league-time ng-model='league.competitionEnd'>
+                <league-time ng-model='league.competitionEnd'
+                    required='true'>
                     Competition Period End (GMT)
                 </league-time>
 
@@ -116,18 +120,6 @@
                 </div>
 
                 <div class='form-group'>
-                    <label class='control-label col-lg-3' for='shortSellLimit'>
-                        Short Sell Limit
-                    </label>
-                    <div class='col-lg-2'>
-                        <input type='number' class='form-control'
-                            ng-model='league.shortSellLimit' id='shortSellLimit'
-                            required>
-                        <!--(0 means short selling is not allowed)-->
-                    </div>
-                </div>
-
-                <div class='form-group'>
                     <label class='control-label col-lg-3' for='leverageLimit'>
                         Leverage Limit
                     </label>
@@ -139,6 +131,79 @@
                     </div>
                 </div>
 
+            </div>
+        </div>
+
+        <div class='panel panel-info'>
+            <div class='panel-heading'>Redistribution Dynamics</div>
+            <div class='panel-body'>
+                <div class='form-group'>
+                    <label class='control-label col-lg-3' for='redistribute'>
+                        Redistribute Portfolios?
+                    </label>
+                    <div class='col-lg-2'>
+                        <select class='form-control' id='redistribute'
+                            ng-model='league.redistribute.on'
+                            ng-options='o.value as o.label
+                                for o in options.redistribute' />
+                    </div>
+                </div>
+
+                <div ng-if='league.redistribute.on'>
+                    <league-time ng-model='league.redistribute.first'
+                        required='league.redistribute.on'>
+                        First Redistribution (GMT)
+                    </league-time>
+
+                    <div class='form-group'>
+                        <label class='control-label col-lg-3'>
+                            Time between redistributions
+                        </label>
+                        <div class='col-lg-3'>
+                            <div class='input-group'>
+                                <input type='number' class='form-control'
+                                    ng-model='league.redistribute.period' />
+                                <span class='input-group-addon'>Hours</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class='form-group'>
+                        <label class='control-label col-lg-3'>
+                            n
+                        </label>
+                        <div class='col-lg-3'>
+                            <input type='number' class='form-control'
+                                ng-model='league.redistribute.n'
+                                min='1' />
+                        </div>
+                    </div>
+
+                    <div class='form-group'>
+                        <label class='control-label col-lg-3'>
+                            &beta;
+                        </label>
+                        <div class='col-lg-3'>
+                            <input type='number' class='form-control'
+                                ng-model='league.redistribute.beta'
+                                min='0.01' step='0.01' />
+                        </div>
+                    </div>
+
+                    <div ng-repeat='i in league.redistribute.n | Range'>
+                        <div class='form-group'>
+                            <label class='control-label col-lg-3'>
+                                &alpha;<sub>{{i + 1}}</sub>
+                            </label>
+                            <div class='col-lg-3'>
+                                <input type='number' class='form-control'
+                                    ng-model='league.redistribute.alpha[i]'
+                                    min='0.01' step='0.01' />
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
             </div>
         </div>
 

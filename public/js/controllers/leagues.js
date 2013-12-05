@@ -25,14 +25,42 @@ angular.module('tdf.leagues').controller('LeaguesController',
         $scope.getDefault = function() {
             // TODO: Look to see if it is better to get defaults from
             // Schema defaults
+
+            var ms_in_week = 1000*60*60*24*7;
+
+            var today = new Date();
+            today.setHours(0);
+            today.setMinutes(0);
+            today.setSeconds(0);
+
+            var oneweek = new Date();
+            oneweek.setTime(today.getTime() + ms_in_week);
+
+            var twoweeks = new Date();
+            twoweeks.setTime(today.getTime() + 2 * ms_in_week);
+
             $scope.league = {
                 name: '',
+
+                trialStart: today,
+                competitionStart: oneweek,
+                competitionEnd: twoweeks,
+
                 isOpenLeague: true,
                 maxAgents: 100,
                 maxrUserAgents: 100,
                 principalAgentRequired: false,
                 startCash: 100000,
-                leverageLimit: 0
+                leverageLimit: 0,
+
+                redistribute: {
+                    on: false,
+                    first: today,
+                    period: 24,
+                    n: 2,
+                    beta: 1,
+                    alpha: [1, 1]
+                }
             };
         };
 
