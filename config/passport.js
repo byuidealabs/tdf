@@ -39,22 +39,29 @@ module.exports = function(passport) {
             passwordField: 'password'
         },
         function(email, password, done) {
+            console.log('reached');
+            console.log('email ' + email);
+            console.log('password ' + password);
             User.findOne({
                 email: email
             }, function(err, user) {
                 if (err) {
+                    console.log('error');
                     return done(err);
                 }
                 if (!user) {
+                    console.log('unknown user');
                     return done(null, false, {
                         message: 'Unknown user'
                     });
                 }
                 if (!user.authenticate(password)) {
+                    console.log('invalid password');
                     return done(null, false, {
                         message: 'Invalid password'
                     });
                 }
+                console.log('success');
                 return done(null, user);
             });
         }

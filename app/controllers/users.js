@@ -43,8 +43,8 @@ exports.signout = function(req, res) {
 /**
  * Session
  */
-exports.session = function(req, res) {
-    res.redirect('/');
+exports.session = function(req, res, next) {
+    next();
 };
 
 /**
@@ -69,6 +69,10 @@ exports.create = function(req, res, next) {
             return res.redirect('/');
         });
     });
+    /*res.render('error', {
+        message: 'Reached error'
+    });*/
+    //next(new Error('Reached Error'));
 };
 
 /**

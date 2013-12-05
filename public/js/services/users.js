@@ -1,6 +1,6 @@
 // Users service used for users REST endpoint
-angular.module('tdf.users').factory("Users", 
-    ['$resource', 
+angular.module('tdf.users').factory('Users',
+    ['$resource',
     function($resource) {
         return $resource('users/:userId', {
             userId: '@_id'
@@ -12,6 +12,12 @@ angular.module('tdf.users').factory("Users",
                 method: 'GET',
                 params: {
                     'userId': 'profile'
+                }
+            },
+            login: {
+                method: 'POST',
+                params: {
+                    'userId': 'session'
                 }
             }
         });

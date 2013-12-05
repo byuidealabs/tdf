@@ -13,10 +13,30 @@ module.exports = function(app, passport, auth) {
     //Setting up the users api
     app.post('/users', users.create);
 
-    app.post('/users/session', passport.authenticate('local', {
+    /*app.post('/users/session', passport.authenticate('local', {
         failureRedirect: '/',
         failureFlash: 'Invalid email or password.'
-    }), users.session);
+    }), users.session);*/
+    app.post('/users/session', function(req, res, next) {
+        passport.authenticate('local', function(err, user, info) {
+            if (err) {
+                return next(err);
+            }
+            if (!user) {
+                return res.send(500, {
+                    flash: info.message
+                });
+            }
+            req.logIn(user, function(err) {
+                if (err) {
+                    return next(err);
+                }
+                return res.send(200, {
+                    flash: 'Successful login'
+                });
+            });
+        })(req, res, next);
+    });
 
     // Public User Routes
     app.get('/users', users.all);
