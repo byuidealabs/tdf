@@ -146,6 +146,28 @@ LeagueSchema.statics = {
 };
 
 //=============================================================================
+//  Pre-save hook
+//=============================================================================
+
+LeagueSchema.pre('save', function(next) {
+    if (this.redistribute.on) {
+        var redistribute = this.redistribute;
+
+        var normalizer = redistribute.beta;
+        normalizer += narray.Sum(redistribute.alpha);
+
+        redistribute.alpha = _.map(redistribute.alpha, function(alphai) {
+            return nnum.Round(alphai / normalizer, 2);
+        });
+        redistribute.beta = nnum.Round(1 - narray.Sum(redistribute.alpha), 2);
+
+        this.redistribute = redistribute;
+    }
+
+    next();
+});
+
+//=============================================================================
 //  Methods Helpers
 //=============================================================================
 
@@ -219,12 +241,11 @@ var promote_to_trial = function(league, cb) {
     }
 };
 
-var compute_redistribution = function(agents, cb) {
+var compute_redistribution = function(league, agents, cb) {
     // TODO: Build an numpy-like library
 
-    var k = 10; // TODO
-    var alpha = 1 / (k + 1);
-    var beta = 1 / (k + 1);
+
+    var n = league.redistribute.n;
     var delta = {};
     var deltabar = {};
     var x = {};
@@ -235,12 +256,13 @@ var compute_redistribution = function(agents, cb) {
     // Compute x, delta, deltabar
     _.each(agents, function(agent) {
         var id = agent._id;
-        // Gather last k + 1 values
-        var values = _.last(agent.portfoliovalue, k + 1);
+        // Gather last n + 1 values
+        var values = _.last(agent.portfoliovalue, n + 1);
         values = _.map(values, function(value) {
             return nnum.Round(value.totalvalue, 2);
         });
-        x[id] = _.last(values, k);
+        values = narray.PrePad(values, n + 1, league.startCash);
+        x[id] = _.last(values, n);
 
         // Compute delta (return) for last k times
         // TODO zero-handling in values
@@ -255,7 +277,7 @@ var compute_redistribution = function(agents, cb) {
     });
 
     // Compute competitionvalues
-    var competitionvalues = narray.Zeros(k);
+    var competitionvalues = narray.Zeros(n);
     _.each(x, function(agent_x) {
         competitionvalues = narray.PAdd(competitionvalues, agent_x);
     });
@@ -266,7 +288,7 @@ var compute_redistribution = function(agents, cb) {
         z.push(narray.PDiv(agent_x, competitionvalues));
     });
     var Z = [];
-    for (i = 0; i < k; i++) {
+    for (i = 0; i < n; i++) {
         for (j = 0; j < z.length; j++) {
             Z.push(nnum.Round(z[j][i], 4));
         }
@@ -288,13 +310,14 @@ var compute_redistribution = function(agents, cb) {
 
     // Build A
     var numagents = _.size(agents);
-    var dim = k * numagents;
+    var dim = n * numagents;
     var A = new Array(dim);
     var B = new Array(dim);
     for (i = 0; i < dim; i++) {
         A[i] = narray.Zeros(dim);
         B[i] = narray.Zeros(numagents);
         for (j = 0; j < dim; j++) {
+            var curr_n = Math.floor(j / numagents);
             if (i < dim - numagents) {
                 if (j === i + numagents) {
                     A[i][j] = 1;
@@ -302,13 +325,13 @@ var compute_redistribution = function(agents, cb) {
             }
             else {
                 if (j % numagents === i % numagents) {
-                    A[i][j] = alpha;
+                    A[i][j] = league.redistribute.alpha[curr_n];
                 }
             }
         }
         for (j = 0; j < numagents; j++) {
             if (i >= dim - numagents && j === i % numagents) {
-                B[i][j] = beta;
+                B[i][j] = league.redistribute.beta;
             }
         }
     }
@@ -325,13 +348,14 @@ var compute_redistribution = function(agents, cb) {
     var AZpBU = AZ.add(BU);
 
     // Extract Z[k + 1]
-    var start = (k - 1) * numagents;
+    var start = (n - 1) * numagents;
     var zkp1 = {};
     index = 1;
     _.each(agents, function(agent) {
         zkp1[agent._id] = AZpBU.e(index + start, 1);
         index++;
     });
+
 
     // Compute change in values
     var deltavalue = {};
@@ -398,7 +422,8 @@ var redistribute_portfolios = function(league, cb) {
                     cb();
                 }
                 else {
-                    compute_redistribution(agents, function(deltavalues) {
+                    compute_redistribution(league, agents,
+                                           function(deltavalues) {
                         execute_redistribution(agents, deltavalues, cb);
                     });
                 }
