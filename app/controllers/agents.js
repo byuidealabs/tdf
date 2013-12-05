@@ -211,10 +211,10 @@ var __execute_trade = function(agent, trade, quotes, res) {
             };
             var tradeMethod;
             if (quantity < 0) {
-                tradeMethod = agent.league.tradeMethods.buy;
+                tradeMethod = agent.league.tradeMethods.sell;
             }
             else if (quantity > 0) {
-                tradeMethod = agent.league.tradeMethods.sell;
+                tradeMethod = agent.league.tradeMethods.buy;
             }
             else {
                 // Don't trade if q is zero
