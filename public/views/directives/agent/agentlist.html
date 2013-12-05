@@ -4,7 +4,8 @@
 
         <div class='pull-right btn-group' ng-show='global.user'>
             <a class='btn btn-default'
-                href='/#!/leagues/{{league.name}}'>
+                href='/#!/leagues/{{league._id}}'
+                ng-if='leagues.length > 1'>
                 View League
             </a>
             <a class='btn btn-success'
