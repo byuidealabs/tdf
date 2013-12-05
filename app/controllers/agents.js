@@ -65,13 +65,14 @@ exports.create = function(req, res) {
     agent.apikey = randomAscii(32);
     agent.user = req.user;
 
-    agent.save(function(err) {
-        if (err) {
+    agent.save(function(/*err*/) {
+        // TODO error handling
+        /*if (err) {
             return res.send('users/signup', {
                 errors: err.errors,
                 agent: agent
             });
-        }
+        }*/
         res.jsonp(agent);
     });
 };

@@ -6,13 +6,18 @@
         <div class='col-md-6'>
 
             <div ng-app>
-                <div ng-controller="SlideshowController" class="slideshow" ng-switch='slideshow' ng-animate="'animate'">
-                <p class="cover"></p>
+                <div ng-controller="SlideshowController" class="slideshow"
+                    ng-switch='slideshow' ng-animate="'animate'">
+                    <p class="cover"></p>
                     <div class="slider-content" ng-switch-when='1'>
-                        <img src='/img/tour_de_finance.png' style='display: block; margin-left:auto; margin-right:auto; width:85%;' />
+                        <img src='/img/tour_de_finance.png'
+                            style='display: block; margin-left:auto;
+                                   margin-right:auto; width:85%;' />
                     </div>
                     <div class="slider-content" ng-switch-when='2'>
-                       <img src='/img/chart.jpg' style='display: block; margin-left:auto; margin-right:auto; width:85%;' />
+                        <img src='/img/chart.jpg'
+                            style='display: block; margin-left:auto;
+                                   margin-right:auto; width:85%;' />
                     </div>
                     <div class="slider-buttons">
                         <a ng-click='slideshow = 1'>
@@ -26,55 +31,93 @@
             </div>
 
         </div>
+
         <div class='col-md-6'>
-            <section class='content' style='margin-top: 0px; padding-top: 10px; padding-bottom: 0px'>
-                <section class='container' style='width:100%'>
+
+            <p>Email valid: {{login.email.$valid}}</p>
+
+            <div class='panel panel-primary'><div class='panel-body'>
+                <ng-form name='login' ng-submit='login()'
+                    class='form-horizontal'>
+                    <div class='alert alert-danger col-lg-11'
+                        ng-if='loginerror.length'>
+                        {{loginerror}}
+                    </div>
+
+                    <div class='form-group'>
+                        <div class='col-lg-11'>
+                            <input id='email' type='text'
+                                ng-model='loginuser.email'
+                                placeholder='Email'
+                                class='form-control'
+                                required />
+                        </div>
+                    </div>
+
+                    <div class='form-group'>
+                        <div class='col-lg-9'>
+                            <input id='password' type='password'
+                                ng-model='loginuser.password'
+                                placeholder='Password'
+                                class='form-control'
+                                required />
+                        </div>
+                        <button type='submit' class='btn btn-primary'>
+                            Sign in
+                        </button>
+                    </div>
+                </ng-form>
+            </div></div>
+
+            <section class='content'
+                style='margin-top: 0px; padding-top: 10px;
+                       padding-bottom: 0px'>
+
                     <div class='panel panel-primary'>
                         <div class='col-md-13' style='padding-left:20px'>
-                            <form action='/users/session' method='post' role='form' class='signin form-horizontal'>
-                            <p class='error'></p>
-                            <div class='form-group'>
-                                <div class='col-lg-11'>
-                                    <input id='email' type='text' name='email' placeholder='Email' class='form-control'>
+                            <h3>
+                                New to Tour de Finance? Create an account.
+                            </h3>
+                            <form ng-submit='create_user()'
+                                class='signup form-horizontal'>
+                                <div class='form-group'>
+                                    <div class='col-lg-11'>
+                                        <input id='name' type='text'
+                                            ng-model='newuser.name'
+                                            placeholder='Full name'
+                                            class='form-control'>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class='form-group'>
-                                <div class='col-lg-9'>
-                                    <input id='password' type='password' name='password' placeholder='Password' class='form-control'>
+                                <div class='form-group'>
+                                    <div class='col-lg-11'>
+                                        <input id='email' type='text'
+                                            ng-model='newuser.email'
+                                            placeholder='Email'
+                                            class='form-control'>
+                                    </div>
                                 </div>
-                                <button type='submit' class='btn btn-primary'>Sign in</button>
-                            </div>
+                                <div class='form-group'>
+                                    <div class='col-lg-11'>
+                                        <input id='username' type='text'
+                                            ng-model='newuser.username'
+                                            placeholder='Username'
+                                            class='form-control'>
+                                    </div>
+                                </div>
+                                <div class='form-group'>
+                                    <div class='col-lg-9'>
+                                        <input id='password' type='password'
+                                            ng-model='newuser.password'
+                                            placeholder='Password'
+                                            class='form-control'>
+                                    </div>
+                                    <button type='submit'
+                                        class='btn btn-primary'>
+                                        Sign up
+                                    </button>
+                                </div>
                             </form>
                         </div>
-                    </div>
- 
-                    <div class='panel panel-primary'>
-                    <div class='col-md-13' style='padding-left:20px'>
-                        <h3>New to Tour de Finance? Create an account.</h3>
-                        <form action='/users' method='post' class='signup form-horizontal'>
-                        <div class='form-group'>
-                            <div class='col-lg-11'>
-                                <input id='name' type='text' name='name' placeholder='Full name' class='form-control'>
-                            </div>
-                        </div>
-                        <div class='form-group'>
-                            <div class='col-lg-11'>
-                                <input id='email' type='text' name='email' placeholder='Email' class='form-control'>
-                            </div>
-                        </div>
-                        <div class='form-group'>
-                            <div class='col-lg-11'>
-                                <input id='username' type='text' name='username' placeholder='Username' class='form-control'>
-                            </div>
-                        </div>
-                        <div class='form-group'>
-                            <div class='col-lg-9'>
-                                <input id='password' type='password' name='password' placeholder='Password' class='form-control'>
-                            </div>
-                            <button type='submit' class='btn btn-primary'>Sign up</button>
-                        </div>
-                    </form>
-                    </div>
                     </div>
 
                 </section>
