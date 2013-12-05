@@ -46,11 +46,12 @@ angular.module('tdf.users').controller('UsersController',
 
         $scope.updateProfile = function() {
             var user = $scope.user;
+            $scope.savesuccess = '';
             $scope.saveerror = '';
             user.$update(function() {
                 // Success
                 Global.set_user(user);
-                $location.path('users/' + user._id);
+                $scope.savesuccess = 'Save Successful';
             },
             function(msg) {
                 // Failure
