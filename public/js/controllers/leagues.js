@@ -64,6 +64,21 @@ angular.module('tdf.leagues').controller('LeaguesController',
             };
         };
 
+        $scope.loadEdit = function() {
+            if ($routeParams.leagueId === undefined) {
+                // Create
+                $scope.contentTitle = 'Create a League';
+                $scope.submit = $scope.create;
+                $scope.getDefault();
+            }
+            else {
+                // Update
+                $scope.contentTitle = 'Edit League';
+                $scope.submit = $scope.update;
+                $scope.findOne();
+            }
+        };
+
         $scope.create = function() {
             var league = new Leagues($scope.league);
 

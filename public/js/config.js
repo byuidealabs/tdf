@@ -36,7 +36,7 @@ window.app.config(['$routeProvider',
             templateUrl: 'views/leagues/list.html'
         }).
         when('/leagues/create', {
-            templateUrl: 'views/leagues/create.html'
+            templateUrl: 'views/leagues/edit.html'
         }).
         when('/leagues/:leagueId/edit', {
             templateUrl: 'views/leagues/edit.html'

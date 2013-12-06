@@ -1,7 +1,7 @@
-<section ng-controller='LeaguesController' ng-init='findOne()'>
-    <h1>Edit League</h1>
+<section ng-controller='LeaguesController' ng-init='loadEdit()'>
+    <h1>{{contentTitle}}</h1>
 
-    <form class='form-horizontal' ng-submit='update()'>
+    <form class='form-horizontal' ng-submit='submit()'>
 
         <div class='panel panel-info'>
             <div class='panel-heading'>General Settings</div>
