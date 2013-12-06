@@ -66,6 +66,23 @@ window.app.config(['$routeProvider',
             templateUrl: 'views/agents/view.html'
         }).
 
+        // Histories
+
+        when('/histories', {
+            // Histories for all stocks tracked by all leagues in the system
+            templateUrl: 'views/histories/list.html'
+        }).
+        when('/leagues/:leagueId/histories/', {
+            // Histories for only the stocks tracked by the given league
+            templateUrl: 'views/histories/list.html'
+        }).
+        when('/histories/:ticker', {
+            templateUrl: 'views/histories/view.html'
+        }).
+        when('leagues/:leagueId/histories/:ticker', {
+            templateUrl: 'views/histories/view.html'
+        }).
+
         // Testing
 
         when('/testmetrics', {
@@ -87,20 +104,21 @@ window.app.config(['$routeProvider',
 ]);
 
 
-window.app.run(['Global', '$location', '$rootScope', 
+window.app.run(['Global', '$location', '$rootScope',
     function(Global, $location, $rootScope){
-        $rootScope.$on('$routeChangeStart', function(event, next, current){
+        $rootScope.$on('$routeChangeStart', function(event,
+                                                     next /*, current*/){
             var isLoggedin = !!Global.user;
             if (isLoggedin)
             {
-                if (next.templateUrl == 'views/index.html') 
-                {  
+                if (next.templateUrl === 'views/index.html')
+                {
                     $location.path('/leagues');
                 }
                 if (!Global.user.isAdmin)
                 {
-                    if (next.templateUrl == 'views/users/list.html') 
-                    {  
+                    if (next.templateUrl === 'views/users/list.html')
+                    {
                         $location.path('/');
                     }
                 }
@@ -108,8 +126,8 @@ window.app.run(['Global', '$location', '$rootScope',
 
             if (!isLoggedin)
             {
-                if (next.templateUrl == 'views/users/list.html') 
-                {  
+                if (next.templateUrl === 'views/users/list.html')
+                {
                     $location.path('/');
                 }
             }

@@ -190,9 +190,10 @@ exports.tick = function(req, res) {
 };
 
 /**
- * Gets the historical prices for the last n ticks.
+ * Gets the historical prices
  */
 exports.historical = function(req, res) {
+    // TODO filter time span depending on league
 
     var allsymbols = SYMBOLS; //TODO
     if (_.contains(allsymbols, req.symbol)) {
@@ -214,4 +215,9 @@ exports.historical = function(req, res) {
     /*Tick.historical(function(values) {
         res.jsonp(values);
     });*/
+};
+
+exports.symbols = function(req, res) {
+    // TODO see if league is passed, filter based on league
+    res.jsonp(SYMBOLS);
 };
