@@ -169,8 +169,6 @@ exports.tick = function(req, res) {
     // 1. Promote leagues and get their symbols
     tick_leagues(function(allsymbols) {
 
-        console.log('Reached for a league');
-
         // 2. Fetch yahoo data
         dataconn.yahooQuotes(allsymbols, function(err, quotes) {
             var securities = securities_list(quotes);

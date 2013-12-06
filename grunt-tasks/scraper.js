@@ -33,7 +33,6 @@ module.exports = function(grunt) {
     grunt.registerTask('scraper',
                             'Scrapes data from yahoo finance, storing it' +
                             ' in MongoDB', function() {
-        console.log('entered scraper!!!!!!');
         var done = this.async();
         var options = this.options();
         var timeout_ms;
