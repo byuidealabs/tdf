@@ -2,8 +2,8 @@ import requests
 #import json
 
 SITE = 'http://localhost:3000/agents/trade/'
-AGENT_ID = '529f909fe5a69fcd4c0001fd'
-API_KEY = 'ykuffmwbfmefulrbfycnaigyyhqxjlue'
+AGENT_ID = '52a120b03106ecc03800313f'
+API_KEY = 'uhcjxwqcnncpttpvhixuycvhjwackitc'
 
 
 if __name__ == '__main__':

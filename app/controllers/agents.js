@@ -259,7 +259,8 @@ var __execute_trade = function(agent, trade, quotes, res) {
 
         // Save changes to agent
         agent.portfolio.push({composition: curr_composition});
-        agent.save(function () {
+        agent.save(function (err) {
+            console.log(err);
             agent.setStatus(false, Tick, function(agent) {
                 res.jsonp(agent);
             });
@@ -336,10 +337,6 @@ exports.trade = function(req, res) {
         // Front-end or backend Post or Put
         trade  = req.body.trade || req.body;  // Depending on source of data
     }
-
-    console.log('Trading');
-    console.log(trade);
-    console.log(JSON.stringify(trade));
 
     // TODO: error check to see if trade is {string->number, ...}
 
