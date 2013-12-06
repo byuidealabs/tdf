@@ -49,3 +49,13 @@ footer img {
     margin: 4px 0;
     border-color:#333;
 }
+
+/*-----------------------------------------------------------------------------
+ * Agent Lists
+ *---------------------------------------------------------------------------*/
+
+.agent-description-box {
+    max-height: 50px;
+    overflow-y: scroll;
+    overflow-x: hidden;
+}

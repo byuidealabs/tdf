@@ -2,7 +2,12 @@
     <div class='panel-heading'>
         Agents in League "{{league.name}}"
 
-        <div class='pull-right' ng-show='global.user'>
+        <div class='pull-right btn-group' ng-show='global.user'>
+            <a class='btn btn-default'
+                href='/#!/leagues/{{league._id}}'
+                ng-if='leagues.length > 1'>
+                View League
+            </a>
             <a class='btn btn-success'
                 href='/#!/agents/create/{{league._id}}'>
                 Create an Agent

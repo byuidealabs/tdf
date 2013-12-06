@@ -195,9 +195,25 @@ exports.tick = function(req, res) {
  * Gets the historical prices for the last n ticks.
  */
 exports.historical = function(req, res) {
-    var n = req.n;
 
-    Tick.historical(n, function(values) {
+    var allsymbols = SYMBOLS; //TODO
+    if (_.contains(allsymbols, req.symbol)) {
+        Tick.securityHistory(req.symbol, function(values) {
+            res.jsonp(values);
+        });
+    }
+    else {
+        res.jsonp({
+            error: {
+                code: 101,
+                message: 'Unknown security with symbol ' + req.symbol + '.'
+            }
+        });
+    }
+
+
+
+    /*Tick.historical(function(values) {
         res.jsonp(values);
-    });
+    });*/
 };

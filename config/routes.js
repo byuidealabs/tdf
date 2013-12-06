@@ -143,6 +143,8 @@ module.exports = function(app, passport, auth) {
             agents.trade);
     app.post('/agents/trade/:agentId', auth.agent.hasAuthorization,
              agents.trade);
+    app.get('/agents/trade/:agentId', auth.agent.hasAuthorization,
+            agents.trade);
     app.del('/agents/trade/:agentId', auth.agent.hasAuthorization,
             agents.reset);
     app.del('/agents/apikey/:agentId', auth.requiresLogin,
@@ -161,6 +163,17 @@ module.exports = function(app, passport, auth) {
 
     app.param('n', function(req, res, next, value) {
         req.n = parseInt(value);
+        next();
+    });
+
+    //=========================================================================
+    //  Historical Values
+    //=========================================================================
+
+    app.get('/history/:securityId', ticks.historical);
+
+    app.param('securityId', function(req, res, next, id) {
+        req.symbol = id;
         next();
     });
 

@@ -1,5 +1,17 @@
+<div ng-if='agent.description.length'>
+    <div class='row'>
+        <div class='col-lg-2'><b>Agent Description</b></div>
+        <div class='col-lg-9 agent-description-box'>
+            {{agent.description}}
+        </div>
+    </div>
+
+    <br />
+</div>
+
 <div class='row'>
     <div class='col-lg-4'>
+        <div class='row'></div>
         <div ng-show='agent.status.cash'>
             <div class='row'>
                 <div class='col-lg-6'><b>Current Cash</b></div>
