@@ -15,7 +15,7 @@ Follow the instructions [here](https://github.com/joyent/node/wiki/Installing-No
 	sudo add-apt-repository ppa:chris-lea/node.js
 	sudo apt-get update
 	sudo apt-get install nodejs
-	
+
 ### Step 2: Install Grunt and Bower
 
 Install both grunt, the grunt client, and bower globally by:
@@ -30,41 +30,41 @@ Follow the instructions [here](http://docs.mongodb.org/manual/tutorial/install-m
 	echo 'deb http://downloads-distro.mongodb.org/repo/ubuntu-upstart dist 10gen' | sudo tee /etc/apt/sources.list.d/mongodb.list
 	sudo apt-get update
 	sudo apt-get install mongodb-10gen
-	
+
 Once MongoDB is installed, start it by:
 
 	sudo service mongodb start
-	
+
 You can stop MongoDB by:
 
 	sudo service mongodb stop
-	
+
 You can also restart MongoDB by:
 
 	sudo service mongodb restart
-	
+
 ### Step 4: Install Project Dependencies
 
 Follow the directions [here](https://github.com/ekalinin/nodeenv/issues/24) to enable npm to install packages locally. In brief:
 
 	sudo chown -fR myusername:myusername ~/.npm ~/tmp
-	
+
 Navigate to the tdf directory and execute the following commands:
 
 	npm install
-	
+
 Note, you should never need to do a `sudo npm install`.
-	
+
 If you get a git error 128, you may need to switch the url protocol to https:// (instead of git://). To do this:
 
 	git config --global url."https://".insteadOf git://
-	
+
 ### Step 5: Run the Grunt Server
 
 In the tdf directory, start the grunt server by:
 
 	grunt
-	
+
 If everything is installed properly, you will get a message stating that the server is running on port 3000. Navigate to [localhost:3000](http://localhost:3000) to access TDF.
 
 ## Back-end Trading
@@ -92,3 +92,36 @@ The data for the post will consist of key-value pairs where each key represents 
 Further, the data must also pass the key `apikey` with the value of the api key noted from the agent's view.
 
 If the trade is successfull, the server will respond with a JSON object representing the agent's info and current status. Otherwise, it will return a JSON object describing the error encountered.
+
+## Querying Historical Data
+
+The historical data for any symbol tracked by the system can be queried through the following url:
+
+    <host>/history/<symbol>
+
+where `<host>` is the location of TDF and `<symbol>` is the ticker symbol for the desired security.
+
+This returns a JSON object of the following form:
+
+    {
+        "current": {
+            "ask": <real-time ask price>,
+            "bid": <real-time bid price>,
+            "last": <real-time last price>
+        },
+        "ask": {
+            <JavaScript date of most recently scraped data>: <ask at date>,
+            ...
+            <JavaScript date of first scraped data>: <ask at date>
+        },
+        "bid": {
+            <JavaScript date of most recently scraped data>: <bid at date>,
+            ...
+            <JavaScript date of first scraped data>: <bid at date>
+        },
+        "last": {
+            <JavaScript date of most recently scraped data>: <last at date>,
+            ...
+            <JavaScript date of first scraped data>: <last at date>
+        }
+    }
