@@ -327,7 +327,15 @@ exports.trade = function(req, res) {
 
     // 1. Determine current symbol set
     var agent = req.agent;
-    var trade = req.body.trade || req.body;  // Depending on source of data
+    var trade;
+    if (req.method === 'GET') {
+        // Back-end Get
+        trade = req.query;
+    }
+    else {
+        // Front-end or backend Post or Put
+        trade  = req.body.trade || req.body;  // Depending on source of data
+    }
 
     console.log('Trading');
     console.log(trade);

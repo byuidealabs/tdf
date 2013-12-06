@@ -69,7 +69,7 @@ If everything is installed properly, you will get a message stating that the ser
 
 ## Back-end Trading
 
-To make a trade on the backend, you must first create an agent through the web client. To do this:
+You can make a trade using any language. To make a trade on the backend, you must first create an agent through the web client. To do this:
 
 1.  Login or register with the site
 2.  Click on the 'My Agents' link in the top navigation bar
@@ -82,16 +82,35 @@ Once you have created the agent, navigate to the agent's view if you are not the
 
 In the agent view, note the following:
 
-*  The agent's id
+*  The agent's public id
 *  The agent's api key (you will need to click on the show button to the right of the key to display it)
 
-To trade in any language, create an HTTP post. The url will be `<host>/agents/trade/<agent-id>`, where `host` is the url pointing to the TDF server and `<agent-id>` is the id noted from the agent view.
+### Trading with HTTP POST (recommended)
+
+To trade with an HTTP POST, the url will be
+
+    <host>/agents/trade/<agent-id>
+
+where `<host>` is the url pointing to the TDF server and `<agent-id>` is the public id noted from the agent view.
 
 The data for the post will consist of key-value pairs where each key represents a ticker symbol in the list of ticker symbols allowed by the league (currently only and all symbols in the S&P500), and the value is the number of trades of that security to sell, where negative quantities signify a sell and positive signify a buy.
 
 Further, the data must also pass the key `apikey` with the value of the api key noted from the agent's view.
 
+### Trading with HTTP GET
+
+Trades may also be made with a HTTP GET in much the same way as a post; however, all trade data will be passed through the URL. To build this URL,
+
+    <host>/agents/trade/<agent-id>?apikey=<apikey>&<symbol 1>=<quantity 1>&<symbol 2>=<quantity 2>&...
+
+Where `<host>` is the location of TDF, `<agent-id>` is the public id noted from the agent view, `<apikey>` is the api key noted from the agent view.
+
+Each `<symbol i>=<quantity i>` refers to a trade for the security represented by the Yahoo Finance ticker simbol `<symbol i>`. Positive quantities `<quantity i>` refer to a buy, where negative quantities refer to a sell.
+
+### Responses and Errors from Trading
+
 If the trade is successfull, the server will respond with a JSON object representing the agent's info and current status. Otherwise, it will return a JSON object describing the error encountered.
+
 
 ## Querying Historical Data
 

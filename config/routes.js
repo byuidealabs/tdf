@@ -143,6 +143,8 @@ module.exports = function(app, passport, auth) {
             agents.trade);
     app.post('/agents/trade/:agentId', auth.agent.hasAuthorization,
              agents.trade);
+    app.get('/agents/trade/:agentId', auth.agent.hasAuthorization,
+            agents.trade);
     app.del('/agents/trade/:agentId', auth.agent.hasAuthorization,
             agents.reset);
     app.del('/agents/apikey/:agentId', auth.requiresLogin,
