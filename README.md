@@ -67,6 +67,14 @@ In the tdf directory, start the grunt server by:
 
 If everything is installed properly, you will get a message stating that the server is running on port 3000. Navigate to [localhost:3000](http://localhost:3000) to access TDF.
 
+## Getting Started
+
+Once you have installed TDF, you will need to begin by creating a league. To do this, you will need an admin account. For now, an admin account is created by registering an account with the username `admin` (this will be changed in the future for greater security and flexibility of admins).
+
+After loging in with the admin account, click on `Leagues` in the top navigation bar, and then click the button to add a league. Enter a name of the league and then, if you wish, modify the rest of the league parameters. 
+
+Now that you have a league, you and other users can register agents to trade and compete within this league.
+
 ## Back-end Trading
 
 To make a trade on the backend, you must first create an agent through the web client. To do this:
