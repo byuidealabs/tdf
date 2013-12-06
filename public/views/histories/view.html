@@ -1,0 +1,41 @@
+<section ng-controller='HistoriesController' ng-init='findOne()'>
+    <h1>History and Status of {{symbol}}</h1>
+
+    <div class='panel panel-info'>
+        <div class='panel-heading'>Real-time Status</div>
+        <div class='panel-body'>
+            <div ng-if='chartLoading'>Loading...</div>
+            <div ng-if='!chartLoading'>
+                <div class='row'>
+                    <div class='col-lg-1'><b>Ask</b></div>
+                    <div class='col-lg-2'>
+                        {{security.current.ask | currency}}
+                    </div>
+                </div>
+                <div class='row'>
+                    <div class='col-lg-1'><b>Bid</b></div>
+                    <div class='col-lg-2'>
+                        {{security.current.bid | currency}}
+                    </div>
+                </div>
+                <div class='row'>
+                    <div class='col-lg-1'><b>Last</b></div>
+                    <div class='col-lg-2'>
+                        {{security.current.last | currency}}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class='panel panel-info'>
+        <div class='panel-heading'>Historical Values</div>
+        <div class='panel-body'>
+            <div ng-if='chartLoading'>Loading...</div>
+            <div ng-if='!chartLoading'
+                chart data='chartData' options='chartOptions'
+                style='width: 100%; height:300px'></div>
+        </div>
+    </div>
+</section>
+

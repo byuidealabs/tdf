@@ -59,7 +59,7 @@ TickSchema.statics.mostRecent = function(cb) {
 
 TickSchema.statics.securityHistory = function(symbol, cb) {
     // TODO More efficient?
-    this.find().sort({time: -1}).exec(function(err, docs) {
+    this.find().sort({time: -1}).limit(200).exec(function(err, docs) {
         var ask = {};
         var bid = {};
         var last = {};

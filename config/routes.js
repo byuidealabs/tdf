@@ -171,7 +171,7 @@ module.exports = function(app, passport, auth) {
     //=========================================================================
 
     app.get('/history/:securityId', ticks.historical);
-    app.get('/history/', ticks.symbols);
+    app.get('/history', ticks.symbols);
 
     app.param('securityId', function(req, res, next, id) {
         req.symbol = id;

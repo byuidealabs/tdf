@@ -1,0 +1,9 @@
+<section ng-controller='HistoriesController' ng-init='find()'>
+    <h1>Tracked Securities</h1>
+
+    <a class='btn btn-info btn-security-list'
+        ng-repeat='security in securities'
+        href='/#!/histories/{{security.symbol}}'>
+        {{security.symbol}}
+    </a>
+</section>
