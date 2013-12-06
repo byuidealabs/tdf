@@ -84,9 +84,6 @@ exports.update = function(req, res) {
     var agent = req.agent;
     agent = _.extend(agent, _.omit(req.body, 'apikey'));
 
-    console.log(agent.description);
-    console.log(JSON.stringify(agent));
-
     agent.save(function(err) {
         console.log(err);
         res.jsonp(agent);

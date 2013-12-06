@@ -4,6 +4,7 @@
 
 var mongoose = require('mongoose'),
     Schema = mongoose.Schema,
+    dataconn = require('../controllers/dataconn'),
     _ = require('underscore');
 
 //=============================================================================
@@ -26,9 +27,10 @@ var TickSchema = new Schema({
 //=============================================================================
 
 /**
- * Finds the historical prices for the stock of the given symbol.
+ * Finds the historical prices for last n timesteps
  */
 TickSchema.statics.historical = function(n, cb) {
+    // TODO More efficient?
     this.find({}).sort({time: -1}).limit(n).exec(function(err, docs) {
         var result = {};
 
@@ -52,6 +54,43 @@ TickSchema.statics.historical = function(n, cb) {
 TickSchema.statics.mostRecent = function(cb) {
     this.historical(1, function(results) {
         cb(_.last(_.values(results)));
+    });
+};
+
+TickSchema.statics.securityHistory = function(symbol, cb) {
+    // TODO More efficient?
+    this.find().sort({time: -1}).exec(function(err, docs) {
+        var ask = {};
+        var bid = {};
+        var last = {};
+
+        _.each(docs, function(doc) {
+            for(var i = 0; i < doc.securities.length; i++) {
+                // for loop to exit early
+                var security = doc.securities[i];
+                if (security.symbol === symbol) {
+                    ask[doc.time] = security.ask;
+                    bid[doc.time] = security.bid;
+                    last[doc.time] = security.last;
+                    break;
+                }
+            }
+        });
+
+        dataconn.yahooQuotes([symbol], function(err, quotes) {
+            var result = {
+                current: {
+                    ask: Number(quotes[symbol].ask),
+                    bid: Number(quotes[symbol].bid),
+                    last: Number(quotes[symbol].last)
+                },
+                ask: ask,
+                bid: bid,
+                last: last
+            };
+            cb(result);
+        });
+
     });
 };
 
