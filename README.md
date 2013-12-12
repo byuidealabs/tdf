@@ -114,7 +114,7 @@ The historical data for any symbol tracked by the system can be queried through 
 
 where `<host>` is the location of TDF and `<symbol>` is the ticker symbol for the desired security.
 
-This returns a JSON object of the following form:
+The response is a JSON object of the following form:
 
     {
         "current": {
@@ -137,4 +137,30 @@ This returns a JSON object of the following form:
             ...
             <JavaScript date of first scraped data>: <last at date>
         }
+    }
+    
+## Querying the Agent's Portfolio Composition
+
+A user can query to receive the current composition of an agent's portfolio and the values of all securities in the portfolio through the following URL:
+
+    <host>/agents/<agent-id>/composition?apikey=<apikey>
+	
+where `<host>` is the location of TDF, `<agent-id>` is the agent's public id, and `<apikey>` is the agent's private api key.
+
+The response is a JSON object of the following form:
+
+    {
+        "uninvested_cash": <Total Uninvested Cash>,
+        "<Symbol 1>": {
+            "quantity": <Number of shares invested in <Symbol 1>>,
+            "price": <Price of one share of <Symbol 1>>,
+            "value": <Value of investment in <Symbol 1>, quantity * price>
+        },
+        ...
+        "<Symbol n>": {
+            "quantity": <Number of shares invested in <Symbol n>>,
+            "price": <Price of one share of <Symbol n>>,
+            "value": <Value of investment in <Symbol n>, quantity * price>
+        },
+        "total_value": <Total value of portfolio = uninvested_cash + sum_{i = 1 to n} value(<symbol i>)>
     }
