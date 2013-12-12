@@ -7,6 +7,7 @@ var mongoose = require('mongoose'),
     Tick = mongoose.model('Tick'),
     dataconn = require('./dataconn'),
     Crypto = require('crypto'),
+    nnum = require('numjs').nnum,
     _ = require('underscore');
 
 var SANDP500 = require('../data/sandp500.js').sandp500_list;
@@ -19,7 +20,7 @@ var SANDP500 = require('../data/sandp500.js').sandp500_list;
  * Creates a random ascii key of the specified length
  */
 var randomAscii = function(len){
-    // Derived from
+    // Derived frm
     // http://kun.io/blog/42051818404/Node.js:-Creating-a-Random-String
     var bytes = Crypto.randomBytes(len);
     var i;
@@ -384,5 +385,55 @@ exports.trade = function(req, res) {
 exports.reset = function(req, res) {
     req.agent.resetPortfolio(function(agent) {
         res.jsonp(agent);
+    });
+};
+
+/**
+ * Query to get the current composition of securities within the portfolio
+ * and their values.
+ */
+exports.current_composition = function(req, res) {
+    var agent = req.agent;
+
+    var last_portfolio = _.last(agent.portfolio);
+    var curr_composition;
+
+    if (last_portfolio === undefined) {
+        curr_composition = {
+            'cash00': agent.league.startCash
+        };
+    }
+    else {
+        curr_composition = last_portfolio.composition;
+    }
+
+    var symbols = dataconn.compositionSymbols(curr_composition);
+
+    dataconn.yahooQuotes(symbols, function(err, quotes) {
+
+        var composition = {
+            'uninvested_cash': curr_composition.cash00
+        };
+        var total_value = curr_composition.cash00;
+
+        var value_method = 'bid';  // TODO get from league
+
+        _.each(symbols, function(symbol) {
+            var quantity = curr_composition[symbol];
+            var price = dataconn.get_security_value(quotes, symbol,
+                                                    value_method);
+            var value = quantity * price;
+            total_value += value;
+            composition[symbol] = {
+                'quantity': curr_composition[symbol],
+                'price': nnum.Round(price, 2),
+                'value': nnum.Round(value, 2)
+            };
+        });
+
+        composition.total_value = total_value;
+
+        res.jsonp(composition);
+
     });
 };

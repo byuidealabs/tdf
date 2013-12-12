@@ -150,6 +150,9 @@ module.exports = function(app, passport, auth) {
     app.del('/agents/apikey/:agentId', auth.requiresLogin,
             auth.agent.hasAuthorization, agents.resetapikey);
 
+    app.get('/agents/:agentId/composition', auth.agent.hasAuthorization,
+            agents.current_composition);
+
     // Finish with setting up the leagueId param
     app.param('agentId', agents.agent);
 
