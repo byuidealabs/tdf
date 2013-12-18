@@ -47,6 +47,7 @@
     "devDependencies": {
         "supertest": "latest",
         "should": "latest",
+        "chai": "latest",
         "grunt-contrib-watch": "latest",
         "grunt-contrib-jshint": "latest",
         "grunt-nodemon": "latest",

@@ -33,6 +33,9 @@
         "afterEach",
         "it"
     ],
+    "exported": [
+        "app"
+    ],
     "indent": 4, // Specify indentation spacing
     "maxlen": 120, // Max line lenght
     "devel": false, // Allow development statements e.g. `console.log();`.

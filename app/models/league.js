@@ -241,6 +241,50 @@ var promote_to_trial = function(league, cb) {
     }
 };
 
+//=============================================================================
+//  Redistribution
+//=============================================================================
+
+/**
+ * Returns an array of the last n + 1 historical portfolio values of the
+ * given agent.
+ *
+ * If the recorded historical values of the agent is less than n + 1, the
+ * values will be pre-padded with the league's default starting cash.
+ *
+ * @param {Agent} agent the agent for which to retrive the historical
+ * portfolio values.
+ * @param {League} the league in which the agent is participating.
+ * @param {int} n the timesteps being computed by the redistribution.
+ *
+ * @return {array} The last n + 1 historical portfolio values of the given
+ * agent.
+ */
+LeagueSchema.statics.__agent_values = function(agent, league, n) {
+    var values = _.last(agent.portfoliovalue, n + 1);
+    values = _.map(values, function(value) {
+        return nnum.Round(value.totalvalue, 2);
+    });
+    values = narray.PrePad(values, n + 1, league.startCash);
+    return values;
+};
+
+/**
+ * Returns the x vector for a portfolio with the given array of historical
+ * values.
+ *
+ * The x vector is essentially the last n values.
+ *
+ * @param {array} values the n + 1 historical values as returned by
+ * __compute_agent_values.
+ * @param {int} n the number of timesteps being computed.
+ *
+ * @return {array} the last n values.
+ */
+exports.__agent_x = function(values, n) {
+    return _.last(values, n);
+};
+
 var compute_redistribution = function(league, agents, cb) {
     // TODO: Build an numpy-like library
 
