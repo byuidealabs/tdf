@@ -260,29 +260,14 @@ var promote_to_trial = function(league, cb) {
  * @return {array} The last n + 1 historical portfolio values of the given
  * agent.
  */
-LeagueSchema.methods.__agent_values = function(agent, n) {
+LeagueSchema.methods.__agent_values = function(agent) {
+    var n = this.redistribute.n;
     var values = _.last(agent.portfoliovalue, n + 1);
     values = _.map(values, function(value) {
         return nnum.Round(value.totalvalue, 2);
     });
     values = narray.PrePad(values, n + 1, this.startCash);
     return values;
-};
-
-/**
- * Returns the x vector for a portfolio with the given array of historical
- * values.
- *
- * The x vector is essentially the last n values.
- *
- * @param {array} values the n + 1 historical values as returned by
- * __compute_agent_values.
- * @param {int} n the number of timesteps being computed.
- *
- * @return {array} the last n values.
- */
-LeagueSchema.statics.__agent_x = function(values, n) {
-    return _.last(values, n);
 };
 
 /**
@@ -308,20 +293,22 @@ LeagueSchema.statics.__agent_x = function(values, n) {
  * @return {Object} an object describing the agents returns as described
  * above.
  */
-var __agents_returns = function(agents, league, n) {
+LeagueSchema.methods.__agents_returns = function(agents) {
+    var league = this;
+    var n = this.redistribute.n;
+
     var returns = {};
     _.each(agents, function(agent) {
         var id = agent._id;
         returns[id] = {};
 
-        var values = league.__agent_values(agent, n);
+        var values = league.__agent_values(agent);
         returns[id].x = _.last(values, n);
 
     });
 
     return returns;
 };
-LeagueSchema.statics.__agents_returns = __agents_returns;
 
 var compute_redistribution = function(league, agents, cb) {
     // TODO: Build an numpy-like library

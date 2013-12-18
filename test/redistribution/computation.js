@@ -77,13 +77,19 @@ describe('<Unit Test>:', function() {
                 }
             ];
             league = new League({
-                'startCash': 100000
+                'startCash': 100000,
+                'redistribute': {
+                    'n': 5
+                }
             });
             altleague = new League({
-                'startCash': 50000
+                'startCash': 50000,
+                'redistribute': {
+                    'n': 6
+                }
             });
 
-            returns = League.__agents_returns(agents, league, 5);
+            returns = league.__agents_returns(agents, 5);
 
             done();
         });
@@ -96,27 +102,27 @@ describe('<Unit Test>:', function() {
 
             it('should return an array of 6 $100,000\'s for shortflat',
                function() {
-                var values = league.__agent_values(agents[0], 5);
+                var values = league.__agent_values(agents[0]);
                 expect(values).to.deep.equal([100000, 100000, 100000,
                                               100000, 100000, 100000]);
             });
 
             it('should pre-pad shortflat with altleague\'s start cash',
                function() {
-                var values = altleague.__agent_values(agents[0], 6);
+                var values = altleague.__agent_values(agents[0]);
                 expect(values).to.deep.equal([50000, 50000, 50000,
                                               50000, 50000, 100000,
                                               100000]);
             });
 
             it('should get all of decreasing\'s values', function() {
-                var values = league.__agent_values(agents[1], 5);
+                var values = league.__agent_values(agents[1]);
                 expect(values).to.deep.equal([100000, 999000, 997000,
                                               996500, 996300, 995000]);
             });
 
             it('should get the last n+1 of increasing\'s values', function() {
-                var values = league.__agent_values(agents[2], 5);
+                var values = league.__agent_values(agents[2]);
                 expect(values).to.deep.equal([100800, 101500, 103000,
                                               104000, 106000, 106500]);
             });
