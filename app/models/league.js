@@ -260,12 +260,12 @@ var promote_to_trial = function(league, cb) {
  * @return {array} The last n + 1 historical portfolio values of the given
  * agent.
  */
-LeagueSchema.statics.__agent_values = function(agent, league, n) {
+LeagueSchema.methods.__agent_values = function(agent, n) {
     var values = _.last(agent.portfoliovalue, n + 1);
     values = _.map(values, function(value) {
         return nnum.Round(value.totalvalue, 2);
     });
-    values = narray.PrePad(values, n + 1, league.startCash);
+    values = narray.PrePad(values, n + 1, this.startCash);
     return values;
 };
 
@@ -281,9 +281,47 @@ LeagueSchema.statics.__agent_values = function(agent, league, n) {
  *
  * @return {array} the last n values.
  */
-exports.__agent_x = function(values, n) {
+LeagueSchema.statics.__agent_x = function(values, n) {
     return _.last(values, n);
 };
+
+/**
+ * For every agent, builds information about the returns of that agent's
+ * performance.
+ *
+ * The returned object will be in the following format:
+ *
+ *      {
+ *          '<agent id 1>': {
+ *              'x': [<last n portfolio values>],
+ *              'delta': [<last n portfolio returns>],
+ *              'deltabar': <arithmetic mean of delta>
+ *          },
+ *          ...
+ *      }
+ *
+ * @param {list of Agent} agents the agents whose portfolios will be
+ * redistributed.
+ * @param {League} league the league in which the agents compete.
+ * @param {int} n the time horizon computed by the redistribution.
+ *
+ * @return {Object} an object describing the agents returns as described
+ * above.
+ */
+var __agents_returns = function(agents, league, n) {
+    var returns = {};
+    _.each(agents, function(agent) {
+        var id = agent._id;
+        returns[id] = {};
+
+        var values = league.__agent_values(agent, n);
+        returns[id].x = _.last(values, n);
+
+    });
+
+    return returns;
+};
+LeagueSchema.statics.__agents_returns = __agents_returns;
 
 var compute_redistribution = function(league, agents, cb) {
     // TODO: Build an numpy-like library

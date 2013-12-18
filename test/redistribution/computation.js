@@ -13,7 +13,8 @@ var expect = require('chai').expect,
 
 var agents,
     league,
-    altleague;
+    altleague,
+    returns;
 
 //=============================================================================
 //  The Tests
@@ -21,6 +22,10 @@ var agents,
 
 describe('<Unit Test>:', function() {
     describe('Model League Statics, Redistribution Computations:', function() {
+
+        //---------------------------------------------------------------------
+        //  Static data to be used in all tests
+        //---------------------------------------------------------------------
 
         before(function(done) {
             agents = [
@@ -71,41 +76,47 @@ describe('<Unit Test>:', function() {
                     ]
                 }
             ];
-            league = {
+            league = new League({
                 'startCash': 100000
-            };
-            altleague = {
+            });
+            altleague = new League({
                 'startCash': 50000
-            };
+            });
+
+            returns = League.__agents_returns(agents, league, 5);
 
             done();
         });
 
-        describe('Method __agent_values', function() {
+        //---------------------------------------------------------------------
+        //  Static Method __agent_values
+        //---------------------------------------------------------------------
+
+        describe('Static Method __agent_values', function() {
 
             it('should return an array of 6 $100,000\'s for shortflat',
                function() {
-                var values = League.__agent_values(agents[0], league, 5);
+                var values = league.__agent_values(agents[0], 5);
                 expect(values).to.deep.equal([100000, 100000, 100000,
                                               100000, 100000, 100000]);
             });
 
             it('should pre-pad shortflat with altleague\'s start cash',
                function() {
-                var values = League.__agent_values(agents[0], altleague, 6);
+                var values = altleague.__agent_values(agents[0], 6);
                 expect(values).to.deep.equal([50000, 50000, 50000,
                                               50000, 50000, 100000,
                                               100000]);
             });
 
             it('should get all of decreasing\'s values', function() {
-                var values = League.__agent_values(agents[1], league, 5);
+                var values = league.__agent_values(agents[1], 5);
                 expect(values).to.deep.equal([100000, 999000, 997000,
                                               996500, 996300, 995000]);
             });
 
             it('should get the last n+1 of increasing\'s values', function() {
-                var values = League.__agent_values(agents[2], league, 5);
+                var values = league.__agent_values(agents[2], 5);
                 expect(values).to.deep.equal([100800, 101500, 103000,
                                               104000, 106000, 106500]);
             });
