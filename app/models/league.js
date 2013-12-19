@@ -302,12 +302,25 @@ LeagueSchema.methods.__agents_returns = function(agents) {
         var id = agent._id;
         returns[id] = {};
 
+        // Get the last n + 1 values, where x is the last n of these.
         var values = league.__agent_values(agent);
         returns[id].x = _.last(values, n);
 
+        // Compute delta (current / previous) for the last n timesteps
+        returns[id].delta = narray.PDiv(narray.Shift(values, 1), values);
+        returns[id].delta = _.map(returns[id].delta, function(d) {
+            return nnum.Round(d, 4);
+        });
+
+        // Compute delta bar with arithmetic mean of delta
+        returns[id].deltabar = nnum.Round(narray.Mean(returns[id].delta), 4);
     });
 
     return returns;
+};
+
+LeagueSchema.methods.__competition_values = function(agents, returns) {
+    return returns; // TODO
 };
 
 var compute_redistribution = function(league, agents, cb) {
