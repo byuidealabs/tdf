@@ -2,9 +2,28 @@
 
 A paper-trading system for use in studying controls applied to finance.
 
-Note that installation has only been tested using Ubuntu 13.10 and that the web client has only been tested in Chromium.
+## Installation of a Virtualbox Image
 
-## Installation
+A recent build of TDF can be downloaded, imported into, and run from virtual box without requiring the installation of the TDF source or dependencies. To do this:
+
+1. Download and install Virtualbox from [https://www.virtualbox.org/wiki/Downloads](virtualbox.org/wiki/Downloads)
+2. Download the TDF Virtual Appliance from [http://ideaquant.cs.byu.edu/tour-de-finance.ova](ideaquant.cs.byu.edu/tour-de-finance.ova)
+3. Start Virtualbox
+4. Within Virtualbox, navigate to `file > Import Appliance`
+5. Click `Open appliance`
+6. Navigate to the location where you downloaded the TDF Virtual Appliance and open the file `tour-de-finance.ova`
+7. Click `Next`
+8. Click `Import`. Virtualbox will begin importing TDF. This may take a while.
+9. Now you will have a Virtualbox instance with the name in the form of `deploy_...`. Highlight this instance and click the green `start` button
+10. Click `Next` on any dialogue box that pops up
+11. Your machine will boot up
+12. Eventually your machine will be booted. You can now minimize the virtual machine as you won't need to login here
+13. Now, you should be able to get to the TDF webapp by going to [http://localhost:3000/](localhost:3000) in any web browser
+14. If you ever need to close the virtual machine, just try to close it like any other program. (Red box in upper right hand corner). Then select `Power off the Machine` when the following dialogue box opens. TDF will then be exited safely
+
+## Installation from Source
+
+Note that this installation has only been tested using Ubuntu 13.10.
 
 ### Step 1: Install node.js
 
