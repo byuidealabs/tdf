@@ -6,8 +6,8 @@ A paper-trading system for use in studying controls applied to finance.
 
 A recent build of TDF can be downloaded, imported into, and run from virtual box without requiring the installation of the TDF source or dependencies. To do this:
 
-1. Download and install Virtualbox from [https://www.virtualbox.org/wiki/Downloads](virtualbox.org/wiki/Downloads)
-2. Download the TDF Virtual Appliance from [http://ideaquant.cs.byu.edu/tour-de-finance.ova](ideaquant.cs.byu.edu/tour-de-finance.ova)
+1. Download and install Virtualbox from [virtualbox.org/wiki/Downloads](https://www.virtualbox.org/wiki/Downloads)
+2. Download the TDF Virtual Appliance from [ideaquant.cs.byu.edu/tour-de-finance.ova](http://ideaquant.cs.byu.edu/tour-de-finance.ova)
 3. Start Virtualbox
 4. Within Virtualbox, navigate to `file > Import Appliance`
 5. Click `Open appliance`
@@ -18,7 +18,7 @@ A recent build of TDF can be downloaded, imported into, and run from virtual box
 10. Click `Next` on any dialogue box that pops up
 11. Your machine will boot up
 12. Eventually your machine will be booted. You can now minimize the virtual machine as you won't need to login here
-13. Now, you should be able to get to the TDF webapp by going to [http://localhost:3000/](localhost:3000) in any web browser
+13. Now, you should be able to get to the TDF webapp by going to [localhost:3000](http://localhost:3000/) in any web browser
 14. If you ever need to close the virtual machine, just try to close it like any other program. (Red box in upper right hand corner). Then select `Power off the Machine` when the following dialogue box opens. TDF will then be exited safely
 
 ## Installation from Source
