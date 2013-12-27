@@ -11,16 +11,29 @@ A recent build of TDF can be downloaded, imported into, and run from virtual box
 3. Start Virtualbox
 	![View of Virtualbox Once Started](docs/vb-install-images/3-start-vb.png)
 4. Within Virtualbox, navigate to `file > Import Appliance`
+	![File > Import Appliance](docs/vb-install-images/4-import-tdf.png)
 5. Click `Open appliance`
+	![Import Virtual Appliance Dialogue](docs/vb-install-images/5-open-tdf.png)
 6. Navigate to the location where you downloaded the TDF Virtual Appliance and open the file `tour-de-finance.ova`
+	![Example Location of the tour-de-finance.ova File](docs/vb-install-images/6-navigate-file.png)
 7. Click `Next`
+	![Virtual Appliance Ready to be Imported](docs/vb-install-images/7-import-tdf.png)
 8. Click `Import`. Virtualbox will begin importing TDF. This may take a while.
+	![Import Details](docs/vb-install-images/8a-import-details.png)
+	![Import: Time Remaining](docs/vb-install-images/8b-import-time.png)
 9. Now you will have a Virtualbox instance with the name in the form of `deploy_...`. Highlight this instance and click the green `start` button
+	![TDF Imported](docs/vb-install-images/9-imported.png)
 10. Click `Next` on any dialogue box that pops up
+	![Information Running TDF](docs/vb-install-images/10a-dialogue1.png)
+	![Information Running TDF](docs/vb-install-images/10b-dialogue2.png)
 11. Your machine will boot up
+	![TDF Booting](docs/vb-install-images/11-booting.png)
 12. Eventually your machine will be booted. You can now minimize the virtual machine as you won't need to login here
+	![TDF Booted](docs/vb-install-images/12-booted.png)
 13. Now, you should be able to get to the TDF webapp by going to [localhost:3000](http://localhost:3000/) in any web browser
+	![TDF Web App](docs/vb-install-images/13-app.png)
 14. If you ever need to close the virtual machine, just try to close it like any other program. (Red box in upper right hand corner). Then select `Power off the Machine` when the following dialogue box opens. TDF will then be exited safely
+	![Exit Dialogue](docs/vb-install-images/14-exit.png)
 
 ## Installation from Source
 
