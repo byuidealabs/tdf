@@ -9,6 +9,7 @@ A recent build of TDF can be downloaded, imported into, and run from virtual box
 1. Download and install Virtualbox from [virtualbox.org/wiki/Downloads](https://www.virtualbox.org/wiki/Downloads)
 2. Download the TDF Virtual Appliance from [ideaquant.cs.byu.edu/tour-de-finance.ova](http://ideaquant.cs.byu.edu/tour-de-finance.ova)
 3. Start Virtualbox
+	![View of Virtualbox Once Started][docs/vb-install-images/3-start-vb.png]
 4. Within Virtualbox, navigate to `file > Import Appliance`
 5. Click `Open appliance`
 6. Navigate to the location where you downloaded the TDF Virtual Appliance and open the file `tour-de-finance.ova`
