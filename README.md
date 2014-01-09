@@ -75,6 +75,11 @@ You can stop MongoDB by:
 You can also restart MongoDB by:
 
 	sudo service mongodb restart
+	
+Note that occasionally a lock on MongoDB will prevent TDF from accessing its data. This will manifest as an error when running grunt indicating that a port (the number may vary depending on the installation and configuration of MongoDB) is unavailable. To fix this error:
+
+	sudo rm /var/lib/mongodb/mongod.lock
+	sudo service mongodb restart
 
 ### Step 4: Install Project Dependencies
 
