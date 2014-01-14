@@ -50,13 +50,8 @@ module.exports = function(grunt) {
                 }
             }
         },
-        scraper: {
-            options: {
-                tickrate: 15
-            }
-        },
         concurrent: {
-            tasks: ['scraper', 'nodemon', 'watch'],
+            tasks: ['nodemon', 'watch'],
             options: {
                 logConcurrentOutput: true
             }
@@ -79,8 +74,6 @@ module.exports = function(grunt) {
             }
         }
     });
-
-    grunt.loadTasks('./grunt-tasks');
 
     //Load NPM tasks
     grunt.loadNpmTasks('grunt-contrib-watch');

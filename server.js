@@ -4,7 +4,8 @@
 var express = require('express'),
     fs = require('fs'),
     passport = require('passport'),
-    logger = require('mean-logger');
+    logger = require('mean-logger'),
+    moment = require('moment');
 
 /**
  * Main application entry file.
@@ -59,3 +60,18 @@ logger.init(app, passport, mongoose);
 
 //expose app
 exports = module.exports = app;
+
+// Scraper Functionality:
+var ticks = require('./app/controllers/ticks');
+var tickrate = 1;
+var scraper = function() {
+    var timestr = moment().format('MM/DD/YYYY HH:mm:ss');
+    console.log('(' + timestr + ') Scraping new Data.');
+    ticks.tick(function() {
+        console.log('\tData scraped. Next scrape in ' + tickrate +
+                    ' second(s).\n');
+    });
+};
+
+// Run the scraper as defined as admin
+setInterval(scraper, tickrate * 1000);

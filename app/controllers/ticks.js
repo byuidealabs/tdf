@@ -164,7 +164,7 @@ var update_portfolio_values = function(agents, quotes, cb) {
 /**
  * Execute a tick
  */
-exports.tick = function(req, res) {
+exports.tick = function(cb) {
 
     // 1. Promote leagues and get their symbols
     tick_leagues(function(allsymbols) {
@@ -179,7 +179,8 @@ exports.tick = function(req, res) {
                     .populate('league', 'startCash leverageLimit')
                     .exec(function(err, agents) {
                         update_portfolio_values(agents, quotes, function() {
-                            res.jsonp(tick);
+                            //res.jsonp(tick);
+                            cb();
                         });
                     });
             });
