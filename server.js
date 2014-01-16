@@ -63,7 +63,7 @@ exports = module.exports = app;
 
 // Scraper Functionality:
 var ticks = require('./app/controllers/ticks');
-var tickrate = 1;
+var tickrate = 60*60; //TODO move to front-end
 var scraper = function() {
     var timestr = moment().format('MM/DD/YYYY HH:mm:ss');
     console.log('(' + timestr + ') Scraping new Data.');
