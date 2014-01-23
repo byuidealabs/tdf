@@ -191,6 +191,10 @@ exports.portfolioValue = function(composition, quotes, negative_only) {
             // TODO error check symbol has a quantity
             // TODO tie in value computation with admin (don't necessarily be
             //      bid
+            if (quotes === undefined) {
+                console.log('Dataconn: quotes not found');
+                return 0;
+            }
             if (quotes[symbol] === undefined) {
                 console.log('Dataconn: Undefined symbol ' + symbol);
                 console.log(JSON.stringify(composition));

@@ -73,5 +73,7 @@ var scraper = function() {
     });
 };
 
+// Run the scraper on startup
+scraper();
 // Run the scraper as defined as admin
 setInterval(scraper, tickrate * 1000);
