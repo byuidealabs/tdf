@@ -147,6 +147,8 @@ module.exports = function(app, passport, auth) {
             agents.trade);
     app.del('/agents/trade/:agentId', auth.agent.hasAuthorization,
             agents.reset);
+    app.get('/agents/resettrades/:agentId', auth.agent.hasAuthorization,
+            agents.reset);
     app.del('/agents/apikey/:agentId', auth.requiresLogin,
             auth.agent.hasAuthorization, agents.resetapikey);
 
