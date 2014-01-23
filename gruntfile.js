@@ -34,8 +34,8 @@ module.exports = function(grunt) {
         },
         nodemon: {
             dev: {
+                script: 'server.js',
                 options: {
-                    file: 'server.js',
                     args: [],
                     ignoredFiles: ['README.md', 'node_modules/**', '.DS_Store',
                                    '**/*.swp*', '**/*.swp:1'],
@@ -94,6 +94,4 @@ module.exports = function(grunt) {
 
     //Bower task.
     grunt.registerTask('install', ['bower']);
-
-
 };

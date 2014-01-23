@@ -362,6 +362,7 @@ var compute_redistribution = function(league, agents, cb) {
     _.each(agents, function(agent) {
         var id = agent._id;
         var desiredvalue = zkp1[id] * _.last(competitionvalues);
+        console.log(id + ' ' + desiredvalue + ' ' + _.last(x[id]));
         deltavalue[id] = nnum.Round(desiredvalue - _.last(x[id]), 2);
     });
 

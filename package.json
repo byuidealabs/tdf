@@ -42,8 +42,7 @@
         "grunt-env": "latest",
         "grunt-bower-task": "latest",
         "sylvester": "latest",
-        "numjs": "latest",
-        "moment": "latest"
+        "numjs": "latest"
     },
     "devDependencies": {
         "supertest": "latest",

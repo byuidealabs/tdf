@@ -4,13 +4,14 @@
 var express = require('express'),
     fs = require('fs'),
     passport = require('passport'),
-    logger = require('mean-logger'),
-    moment = require('moment');
+    logger = require('mean-logger');
 
 /**
  * Main application entry file.
  * Please note that the order of loading is important.
  */
+
+console.log('ENTERING SERVER');
 
 //Load configurations
 //if test env, load example file
@@ -65,8 +66,7 @@ exports = module.exports = app;
 var ticks = require('./app/controllers/ticks');
 var tickrate = 60*60; //TODO move to front-end
 var scraper = function() {
-    var timestr = moment().format('MM/DD/YYYY HH:mm:ss');
-    console.log('(' + timestr + ') Scraping new Data.');
+    console.log('Scraping new Data.');
     ticks.tick(function() {
         console.log('\tData scraped. Next scrape in ' + tickrate +
                     ' second(s).\n');
