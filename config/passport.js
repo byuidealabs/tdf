@@ -39,9 +39,6 @@ module.exports = function(passport) {
             passwordField: 'password'
         },
         function(email, password, done) {
-            console.log('reached');
-            console.log('email ' + email);
-            console.log('password ' + password);
             User.findOne({
                 email: email
             }, function(err, user) {
