@@ -94,6 +94,28 @@ TickSchema.statics.securityHistory = function(symbol, cb) {
     });
 };
 
+TickSchema.statics.currentStatus = function(symbols, select, cb) {
+    dataconn.yahooQuotes(symbols, function(err, quotes) {
+        var stats = {};
+        _.each(quotes, function(quote, symbol) {
+            if (select === 'all') {
+                stats[symbol] = {
+                    ask: quote.ask,
+                    bid: quote.bid,
+                    last: quote.last
+                };
+            }
+            else if (select === 'ask') {
+                stats[symbol] = quote.ask;
+            }
+            else {
+                stats[symbol] = quote.bid;
+            }
+        });
+        cb(stats);
+    });
+};
+
 //=============================================================================
 //  Finalize
 //=============================================================================

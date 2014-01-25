@@ -222,3 +222,18 @@ exports.symbols = function(req, res) {
     // TODO see if league is passed, filter based on league
     res.jsonp(SYMBOLS);
 };
+
+exports.currentstatus = function(req, res) {
+    var allsymbols = SYMBOLS; //TODO
+    var select = 'all';
+    if (_.contains(_.keys(req.query), 'select')) {
+        select = req.query.select;
+    }
+    Tick.currentStatus(allsymbols, select, function(stats) {
+        res.jsonp(stats);
+    });
+};
+
+exports.allhistories = function(req, res) {
+    res.jsonp('reached');
+};

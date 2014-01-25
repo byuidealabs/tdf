@@ -167,7 +167,7 @@ module.exports = function(app, passport, auth) {
     app.get('/ticks/:n', ticks.historical);
 
     app.param('n', function(req, res, next, value) {
-        req.n = parseInt(value);
+        req.n = parseInt(value, 10);
         next();
     });
 
@@ -177,6 +177,8 @@ module.exports = function(app, passport, auth) {
 
     app.get('/history/:securityId', ticks.historical);
     app.get('/history', ticks.symbols);
+    app.get('/currentstatus', ticks.currentstatus);
+    app.get('/allhistories', ticks.allhistories);
 
     app.param('securityId', function(req, res, next, id) {
         req.symbol = id;
