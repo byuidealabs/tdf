@@ -226,7 +226,7 @@ exports.symbols = function(req, res) {
 exports.currentstatus = function(req, res) {
     var allsymbols = SYMBOLS; //TODO
     var select = 'all';
-    if (_.contains(_.keys(req.query), 'select')) {
+    if (req.query.select !== undefined) {
         select = req.query.select;
     }
     Tick.currentStatus(allsymbols, select, function(stats) {
@@ -235,5 +235,18 @@ exports.currentstatus = function(req, res) {
 };
 
 exports.allhistories = function(req, res) {
-    res.jsonp('reached');
+    var allsymbols = SYMBOLS; //TODO
+    var n = 12;
+    var select = 'all';
+
+    if (req.query.n !== undefined) {
+        n = parseInt(req.query.n, 10);
+    }
+    if (req.query.select !== undefined) {
+        select = req.query.select;
+    }
+
+    Tick.allHistories(allsymbols, n, select, function(histories) {
+        res.jsonp(histories);
+    });
 };

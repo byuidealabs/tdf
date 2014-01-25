@@ -98,21 +98,57 @@ TickSchema.statics.currentStatus = function(symbols, select, cb) {
     dataconn.yahooQuotes(symbols, function(err, quotes) {
         var stats = {};
         _.each(quotes, function(quote, symbol) {
-            if (select === 'all') {
+            if (select === 'ask') {
+                stats[symbol] = quote.ask;
+            }
+            else if (select === 'bid') {
+                stats[symbol] = quote.bid;
+            }
+            else if (select === 'last') {
+                stats[symbol] = quote.last;
+            }
+            else {
                 stats[symbol] = {
                     ask: quote.ask,
                     bid: quote.bid,
                     last: quote.last
                 };
-            }
-            else if (select === 'ask') {
-                stats[symbol] = quote.ask;
-            }
-            else {
-                stats[symbol] = quote.bid;
+
             }
         });
         cb(stats);
+    });
+};
+
+TickSchema.statics.allHistories = function(symbols, n, select, cb) {
+    this.find({}).sort({time: -1}).limit(n).exec(function(err, docs) {
+        var result = {};
+
+        _.each(docs, function(doc) {
+            var record = {};
+            _.each(doc.securities, function(security) {
+                if (select === 'ask') {
+                    record[security.symbol] = security.ask;
+                }
+                else if (select === 'bid') {
+                    record[security.symbol] = security.bid;
+                }
+                else if (select === 'last'){
+                    record[security.symbol] = security.last;
+                }
+                else {
+                    record[security.symbol] = {
+                        ask: security.ask,
+                        bid: security.bid,
+                        last: security.last,
+                    };
+                }
+            });
+            result[doc.time] = record;
+        });
+
+        cb(result);
+
     });
 };
 
