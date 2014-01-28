@@ -4,36 +4,7 @@ A paper-trading system for use in studying controls applied to finance.
 
 ## Installation of a Virtualbox Image
 
-A recent build of TDF can be downloaded, imported into, and run from virtual box without requiring the installation of the TDF source or dependencies. To do this:
-
-1. Download and install Virtualbox from [virtualbox.org/wiki/Downloads](https://www.virtualbox.org/wiki/Downloads)
-2. Download the TDF Virtual Appliance from [ideaquant.cs.byu.edu/tour-de-finance.ova](http://ideaquant.cs.byu.edu/tour-de-finance.ova)
-3. Start Virtualbox
-	![View of Virtualbox Once Started](docs/vb-install-images/3-start-vb.png)
-4. Within Virtualbox, navigate to `file > Import Appliance`
-	![File > Import Appliance](docs/vb-install-images/4-import-tdf.png)
-5. Click `Open appliance`
-	![Import Virtual Appliance Dialogue](docs/vb-install-images/5-open-tdf.png)
-6. Navigate to the location where you downloaded the TDF Virtual Appliance and open the file `tour-de-finance.ova`
-	![Example Location of the tour-de-finance.ova File](docs/vb-install-images/6-navigate-file.png)
-7. Click `Next`
-	![Virtual Appliance Ready to be Imported](docs/vb-install-images/7-import-tdf.png)
-8. Click `Import`. Virtualbox will begin importing TDF. This may take a while.
-	![Import Details](docs/vb-install-images/8a-import-details.png)
-	![Import: Time Remaining](docs/vb-install-images/8b-import-time.png)
-9. Now you will have a Virtualbox instance with the name in the form of `deploy_...`. Highlight this instance and click the green `start` button
-	![TDF Imported](docs/vb-install-images/9-imported.png)
-10. Click `Next` on any dialogue box that pops up
-	![Information Running TDF](docs/vb-install-images/10a-dialogue1.png)
-	![Information Running TDF](docs/vb-install-images/10b-dialogue2.png)
-11. Your machine will boot up
-	![TDF Booting](docs/vb-install-images/11-booting.png)
-12. Eventually your machine will be booted. You can now minimize the virtual machine as you won't need to login here
-	![TDF Booted](docs/vb-install-images/12-booted.png)
-13. Now, you should be able to get to the TDF webapp by going to [localhost:3000](http://localhost:3000/) in any web browser
-	![TDF Web App](docs/vb-install-images/13-app.png)
-14. If you ever need to close the virtual machine, just try to close it like any other program. (Red box in upper right hand corner). Then select `Power off the Machine` when the following dialogue box opens. TDF will then be exited safely
-	![Exit Dialogue](docs/vb-install-images/14-exit.png)
+A VirtualBox image of TDF can be downloaded and installed with a few clicks. See [idealabs/byu.edu/Features/TDF.php](http://idealabs.byu.edu/Features/TDF.php) for step-by-step instructions on how to do this.
 
 ## Installation from Source
 
@@ -112,6 +83,8 @@ Once you have installed TDF, you will need to begin by creating a league. To do 
 After loging in with the admin account, click on `Leagues` in the top navigation bar, and then click the button to add a league. Enter a name of the league and then, if you wish, modify the rest of the league parameters. 
 
 Now that you have a league, you and other users can register agents to trade and compete within this league.
+
+See [idealabs/byu.edu/Features/TDF.php](http://idealabs.byu.edu/Features/TDF.php) for more information.
 
 ## Back-end Trading
 
@@ -202,3 +175,7 @@ The response is a JSON object of the following form:
         },
         "total_value": <Total value of portfolio = uninvested_cash + sum_{i = 1 to n} value(<symbol i>)>
     }
+    
+## Other Queries
+
+Other queries that can be made are described in detail at [idealabs/byu.edu/Features/TDF.php](http://idealabs.byu.edu/Features/TDF.php).
