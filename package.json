@@ -15,7 +15,12 @@
     "scripts": {
         "start": "node node_modules/grunt-cli/bin/grunt",
         "test": "node node_modules/grunt-cli/bin/grunt test",
-        "postinstall": "bower install"
+        "postinstall": "bower install",
+        "pm2-start": "./node_modules/pm2/bin/pm2 start server.js -i max",
+        "pm2-stop": "./node_modules/pm2/bin/pm2 stop server.js",
+        "pm2-delete": "./node_modules/pm2/bin/pm2 delete server.js",
+        "pm2-restart": "./node_modules/pm2/bin/pm2 restart server.js",
+        "pm2-monit": "./node_modules/pm2/bin/pm2 monit"
     },
     "dependencies": {
         "express": "latest",
@@ -42,7 +47,8 @@
         "grunt-env": "latest",
         "grunt-bower-task": "latest",
         "sylvester": "latest",
-        "numjs": "latest"
+        "numjs": "latest",
+        "pm2": "latest"
     },
     "devDependencies": {
         "supertest": "latest",
