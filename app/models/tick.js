@@ -78,17 +78,26 @@ TickSchema.statics.securityHistory = function(symbol, cb) {
         });
 
         dataconn.yahooQuotes([symbol], function(err, quotes) {
-            var result = {
-                current: {
-                    ask: Number(quotes[symbol].ask),
-                    bid: Number(quotes[symbol].bid),
-                    last: Number(quotes[symbol].last)
-                },
-                ask: ask,
-                bid: bid,
-                last: last
-            };
-            cb(result);
+            if (err !== null) {
+                console.log(err);
+                cb({
+                    error: 'Connection error, could not retrieve history of ' +
+                           symbol + '.'
+                });
+            }
+            else {
+                var result = {
+                    current: {
+                        ask: Number(quotes[symbol].ask),
+                        bid: Number(quotes[symbol].bid),
+                        last: Number(quotes[symbol].last)
+                    },
+                    ask: ask,
+                    bid: bid,
+                    last: last
+                };
+                cb(result);
+            }
         });
 
     });
@@ -96,27 +105,36 @@ TickSchema.statics.securityHistory = function(symbol, cb) {
 
 TickSchema.statics.currentStatus = function(symbols, select, cb) {
     dataconn.yahooQuotes(symbols, function(err, quotes) {
-        var stats = {};
-        _.each(quotes, function(quote, symbol) {
-            if (select === 'ask') {
-                stats[symbol] = quote.ask;
-            }
-            else if (select === 'bid') {
-                stats[symbol] = quote.bid;
-            }
-            else if (select === 'last') {
-                stats[symbol] = quote.last;
-            }
-            else {
-                stats[symbol] = {
-                    ask: quote.ask,
-                    bid: quote.bid,
-                    last: quote.last
-                };
+        if (err !== null) {
+            console.log('#' + err + '#' + (err === undefined));
+            cb({
+                error: 'Connection error, could not retrieve the current ' +
+                       'status of the securities.'
+            });
+        }
+        else {
+            var stats = {};
+            _.each(quotes, function(quote, symbol) {
+                if (select === 'ask') {
+                    stats[symbol] = quote.ask;
+                }
+                else if (select === 'bid') {
+                    stats[symbol] = quote.bid;
+                }
+                else if (select === 'last') {
+                    stats[symbol] = quote.last;
+                }
+                else {
+                    stats[symbol] = {
+                        ask: quote.ask,
+                        bid: quote.bid,
+                        last: quote.last
+                    };
 
-            }
-        });
-        cb(stats);
+                }
+            });
+            cb(stats);
+        }
     });
 };
 
