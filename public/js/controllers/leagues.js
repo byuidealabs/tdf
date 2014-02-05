@@ -122,7 +122,14 @@ angular.module('tdf.leagues').controller('LeaguesController',
                 $scope.league = league;
                 $scope.leagues = [league];
 
-                $scope.setLeagueChartOptions(league);
+                $scope.leaguechart_lims = {
+                    center: league.startCash,
+                    up_value: 1,
+                    up_order: 1,
+                    down_value: 1,
+                    down_order: 2
+                };
+                $scope.setLeagueChartOptions();
 
                 $scope.$watch('league.redistribute.n', function(n) {
                     var alpha;
@@ -148,7 +155,26 @@ angular.module('tdf.leagues').controller('LeaguesController',
         };
 
 
-        $scope.setLeagueChartOptions = function(league) {
+        $scope.setLeagueChartOptions = function() {
+            if ($scope.league === undefined ||
+                $scope.leaguechart_lims === undefined) {
+                return;
+            }
+
+            var actual_limit = function(center, direction, order, value) {
+                return center + direction*(value * Math.pow(10, order));
+            };
+
+            var league = $scope.league;
+            var limits = $scope.leaguechart_lims;
+
+            var lower_limit = actual_limit(limits.center, -1,
+                                           limits.down_order,
+                                           limits.down_value);
+            var upper_limit = actual_limit(limits.center, 1,
+                                           limits.up_order,
+                                           limits.up_value);
+
             var trialStart = new Date(league.trialStart).getTime();
             var competitionStart = new Date(league.competitionStart).getTime();
             var competitionEnd = new Date(league.competitionEnd).getTime();
@@ -163,7 +189,9 @@ angular.module('tdf.leagues').controller('LeaguesController',
                         return $filter('currency')(tick);
                     },
                     zoomRange: [0.05, 5],
-                    panRange: false
+                    panRange: [lower_limit, upper_limit],
+                    min: lower_limit,
+                    max: upper_limit
                 },
                 zoom: {
                     interactive: true
@@ -243,6 +271,10 @@ angular.module('tdf.leagues').controller('LeaguesController',
             });
             $scope.chartData = chartData;
         });
+
+        $scope.$watch('leaguechart_lims', function() {
+            $scope.setLeagueChartOptions();
+        }, true);
 
 
     }]);
