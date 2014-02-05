@@ -132,7 +132,8 @@ exports.show = function(req, res) {
 exports.all = function(req, res) {
 
     var user = req.user;
-    Agent.find(req.query).sort('-created').populate('user', 'name username').
+    Agent.find(req.query).sort('-status.portfolio_value').
+        populate('user', 'name username').
         populate('league', 'name startCash').exec(function (err, agents) {
 
         var setStatusOnAgent = function(i, cb) {
