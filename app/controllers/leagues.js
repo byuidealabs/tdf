@@ -82,7 +82,7 @@ exports.show = function(req, res) {
  * List of leagues
  */
 exports.all = function(req, res) {
-    League.find().sort('-status.portfolio_value').exec(function(err, leagues) {
+    League.find().sort('-created').exec(function(err, leagues) {
         if (err) {
             res.render('error', {
                 status: 500
