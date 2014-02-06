@@ -132,7 +132,7 @@ exports.show = function(req, res) {
 exports.all = function(req, res) {
 
     var user = req.user;
-    Agent.find(req.query).sort('-status.portfolio_value').
+    Agent.find(req.query).
         populate('user', 'name username').
         populate('league', 'name startCash').exec(function (err, agents) {
 

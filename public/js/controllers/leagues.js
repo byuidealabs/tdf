@@ -122,15 +122,6 @@ angular.module('tdf.leagues').controller('LeaguesController',
                 $scope.league = league;
                 $scope.leagues = [league];
 
-                $scope.leaguechart_lims = {
-                    center: league.startCash,
-                    up_value: 1,
-                    up_order: 1,
-                    down_value: 1,
-                    down_order: 2
-                };
-                $scope.setLeagueChartOptions();
-
                 $scope.$watch('league.redistribute.n', function(n) {
                     var alpha;
                     if ($scope.league.redistribute.alpha === undefined) {
@@ -149,7 +140,37 @@ angular.module('tdf.leagues').controller('LeaguesController',
                 Agents.query({
                     league: league._id
                 }, function(agents) {
+
+                    var getDefaultYLim = function(center, direction, agents) {
+                        var off = 0;
+                        if (direction === 'down') {
+                            // offset of highest-valued agent from center
+                            off = center - _.last(agents).status.total_value;
+                        }
+                        if (direction === 'up') {
+                            // offset of lowest-valued agent from center
+                            off = _.first(agents).status.total_value - center;
+                        }
+
+                        off = Math.max(10, off);
+                        console.log(direction + ': ' + off);
+                        var order = Math.ceil(Math.log(off) / Math.log(10));
+                        return order;
+                    };
+
                     $scope.agents = agents;
+
+                    $scope.leaguechart_lims = {
+                        center: league.startCash,
+                        up_value: 1,
+                        up_order: getDefaultYLim(league.startCash, 'up',
+                                                 agents),
+                        down_value: 1,
+                        down_order: getDefaultYLim(league.startCash, 'down',
+                                                   agents)
+                    };
+                    $scope.setLeagueChartOptions();
+
                 });
             });
         };
