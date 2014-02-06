@@ -154,6 +154,57 @@ angular.module('tdf.leagues').controller('LeaguesController',
             });
         };
 
+        /**
+         * @param limit {'lower', 'upper'}
+         * @param size {'order', 'value'}
+         * @param direction {-1, 1}
+         */
+        $scope.leagueChartYMove = function(the_limit, size, direction) {
+            if (the_limit === 'lower') {
+                if (size === 'order') {
+                    var new_down_order = $scope.leaguechart_lims.down_order +
+                        direction;
+                    new_down_order = Math.max(-1, new_down_order);
+                    new_down_order = Math.min(
+                        Math.ceil(Math.log(
+                            $scope.leaguechart_lims.center) / Math.log(10)),
+                        new_down_order);
+                    $scope.leaguechart_lims.down_order = new_down_order;
+
+                }
+                if (size === 'value') {
+                    var new_down_value = $scope.leaguechart_lims.down_value +
+                        direction;
+                    new_down_value = Math.max(1, new_down_value);
+                    new_down_value = Math.min(9, new_down_value);
+                    $scope.leaguechart_lims.down_value = new_down_value;
+                }
+            }
+            if (the_limit === 'upper') {
+                if (size === 'order') {
+                    var new_up_order = $scope.leaguechart_lims.up_order +
+                        direction;
+                    new_up_order = Math.max(-1, new_up_order);
+                    new_up_order = Math.min(
+                        Math.ceil(Math.log(
+                            $scope.leaguechart_lims.center) / Math.log(10)),
+                        new_up_order);
+                    $scope.leaguechart_lims.up_order = new_up_order;
+
+                }
+                if (size === 'value') {
+                    var new_up_value = $scope.leaguechart_lims.up_value +
+                        direction;
+                    new_up_value = Math.max(1, new_up_value);
+                    new_up_value = Math.min(9, new_up_value);
+                    $scope.leaguechart_lims.up_value = new_up_value;
+                }
+            }
+        };
+
+        $scope.leagueChartLimit = function(center, direction, order, value) {
+            return center + direction*(value * Math.pow(10, order));
+        };
 
         $scope.setLeagueChartOptions = function() {
             if ($scope.league === undefined ||
@@ -161,19 +212,17 @@ angular.module('tdf.leagues').controller('LeaguesController',
                 return;
             }
 
-            var actual_limit = function(center, direction, order, value) {
-                return center + direction*(value * Math.pow(10, order));
-            };
-
             var league = $scope.league;
             var limits = $scope.leaguechart_lims;
 
-            var lower_limit = actual_limit(limits.center, -1,
-                                           limits.down_order,
-                                           limits.down_value);
-            var upper_limit = actual_limit(limits.center, 1,
-                                           limits.up_order,
-                                           limits.up_value);
+            $scope.leaguechart_lims.lower =
+                $scope.leagueChartLimit(limits.center, -1,
+                                        limits.down_order,
+                                        limits.down_value);
+            $scope.leaguechart_lims.upper =
+                $scope.leagueChartLimit(limits.center, 1,
+                                        limits.up_order,
+                                        limits.up_value);
 
             var trialStart = new Date(league.trialStart).getTime();
             var competitionStart = new Date(league.competitionStart).getTime();
@@ -189,9 +238,10 @@ angular.module('tdf.leagues').controller('LeaguesController',
                         return $filter('currency')(tick);
                     },
                     zoomRange: [0.05, 5],
-                    panRange: [lower_limit, upper_limit],
-                    min: lower_limit,
-                    max: upper_limit
+                    panRange: [$scope.leaguechart_lims.lower,
+                               $scope.leaguechart_lims.upper],
+                    min: $scope.leaguechart_lims.lower,
+                    max: $scope.leaguechart_lims.upper
                 },
                 zoom: {
                     interactive: true
