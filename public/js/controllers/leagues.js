@@ -122,8 +122,6 @@ angular.module('tdf.leagues').controller('LeaguesController',
                 $scope.league = league;
                 $scope.leagues = [league];
 
-                $scope.setLeagueChartOptions(league);
-
                 $scope.$watch('league.redistribute.n', function(n) {
                     var alpha;
                     if ($scope.league.redistribute.alpha === undefined) {
@@ -142,13 +140,111 @@ angular.module('tdf.leagues').controller('LeaguesController',
                 Agents.query({
                     league: league._id
                 }, function(agents) {
+
+                    var getDefaultYLim = function(center, direction, agents) {
+                        var off = 0;
+                        if (direction === 'down') {
+                            // offset of highest-valued agent from center
+                            off = center - _.last(agents).status.total_value;
+                        }
+                        if (direction === 'up') {
+                            // offset of lowest-valued agent from center
+                            off = _.first(agents).status.total_value - center;
+                        }
+
+                        off = Math.max(10, off);
+                        console.log(direction + ': ' + off);
+                        var order = Math.ceil(Math.log(off) / Math.log(10));
+                        return order;
+                    };
+
                     $scope.agents = agents;
+
+                    $scope.leaguechart_lims = {
+                        center: league.startCash,
+                        up_value: 1,
+                        up_order: getDefaultYLim(league.startCash, 'up',
+                                                 agents),
+                        down_value: 1,
+                        down_order: getDefaultYLim(league.startCash, 'down',
+                                                   agents)
+                    };
+                    $scope.setLeagueChartOptions();
+
                 });
             });
         };
 
+        /**
+         * @param limit {'lower', 'upper'}
+         * @param size {'order', 'value'}
+         * @param direction {-1, 1}
+         */
+        $scope.leagueChartYMove = function(the_limit, size, direction) {
+            if (the_limit === 'lower') {
+                if (size === 'order') {
+                    var new_down_order = $scope.leaguechart_lims.down_order +
+                        direction;
+                    new_down_order = Math.max(-1, new_down_order);
+                    new_down_order = Math.min(
+                        Math.ceil(Math.log(
+                            $scope.leaguechart_lims.center) / Math.log(10)),
+                        new_down_order);
+                    $scope.leaguechart_lims.down_order = new_down_order;
 
-        $scope.setLeagueChartOptions = function(league) {
+                }
+                if (size === 'value') {
+                    var new_down_value = $scope.leaguechart_lims.down_value +
+                        direction;
+                    new_down_value = Math.max(1, new_down_value);
+                    new_down_value = Math.min(9, new_down_value);
+                    $scope.leaguechart_lims.down_value = new_down_value;
+                }
+            }
+            if (the_limit === 'upper') {
+                if (size === 'order') {
+                    var new_up_order = $scope.leaguechart_lims.up_order +
+                        direction;
+                    new_up_order = Math.max(-1, new_up_order);
+                    new_up_order = Math.min(
+                        Math.ceil(Math.log(
+                            $scope.leaguechart_lims.center) / Math.log(10)),
+                        new_up_order);
+                    $scope.leaguechart_lims.up_order = new_up_order;
+
+                }
+                if (size === 'value') {
+                    var new_up_value = $scope.leaguechart_lims.up_value +
+                        direction;
+                    new_up_value = Math.max(1, new_up_value);
+                    new_up_value = Math.min(9, new_up_value);
+                    $scope.leaguechart_lims.up_value = new_up_value;
+                }
+            }
+        };
+
+        $scope.leagueChartLimit = function(center, direction, order, value) {
+            return center + direction*(value * Math.pow(10, order));
+        };
+
+        $scope.setLeagueChartOptions = function() {
+            if ($scope.league === undefined ||
+                $scope.leaguechart_lims === undefined) {
+                return;
+            }
+
+            var league = $scope.league;
+            var limits = $scope.leaguechart_lims;
+
+            $scope.leaguechart_lims.lower =
+                $scope.leagueChartLimit(limits.center, -1,
+                                        limits.down_order,
+                                        limits.down_value);
+            $scope.leaguechart_lims.upper =
+                $scope.leagueChartLimit(limits.center, 1,
+                                        limits.up_order,
+                                        limits.up_value);
+
             var trialStart = new Date(league.trialStart).getTime();
             var competitionStart = new Date(league.competitionStart).getTime();
             var competitionEnd = new Date(league.competitionEnd).getTime();
@@ -163,7 +259,10 @@ angular.module('tdf.leagues').controller('LeaguesController',
                         return $filter('currency')(tick);
                     },
                     zoomRange: [0.05, 5],
-                    panRange: false
+                    panRange: [$scope.leaguechart_lims.lower,
+                               $scope.leaguechart_lims.upper],
+                    min: $scope.leaguechart_lims.lower,
+                    max: $scope.leaguechart_lims.upper
                 },
                 zoom: {
                     interactive: true
@@ -243,6 +342,10 @@ angular.module('tdf.leagues').controller('LeaguesController',
             });
             $scope.chartData = chartData;
         });
+
+        $scope.$watch('leaguechart_lims', function() {
+            $scope.setLeagueChartOptions();
+        }, true);
 
 
     }]);

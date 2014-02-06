@@ -1,20 +1,24 @@
-.navbar .nav>li>a.brand {
-    padding-left:20px;
-    margin-left:0
+/*-----------------------------------------------------------------------------
+ * Page Layout
+ *---------------------------------------------------------------------------*/
+
+html, body {
+    height: 100%
 }
 
-.content {
-    margin-top:50px;
-    width:100%;
-    padding-bottom:100px;
+.pagewrapper {
+    min-height: 100%;
+    height: auto !important;
+    height: 100%;
+    margin: 0 auto -100px;
+}
+
+.footerpush, footer {
+    height: 100px !important;
 }
 
 footer {
-    position:fixed;
-    left:0px;
-    bottom:0px;
-
-    height: 100px;
+    position: relative;
     width: 100%;
     background: #eee;
     -webkit-box-shadow: 0 8px 6px 6px black;
@@ -27,7 +31,6 @@ footer p {
 }
 
 footer a {
-    position: relative;
     display: block;
     width: 187px;
     margin: 5px auto;
@@ -35,6 +38,26 @@ footer a {
 
 footer img {
     height: 90px;
+}
+
+.content {
+    margin-top: 0 !important;
+    padding-top: 50px;
+}
+
+/*-----------------------------------------------------------------------------
+ * Page Elements
+ *---------------------------------------------------------------------------*/
+
+.navbar .nav>li>a.brand {
+    padding-left:20px;
+    margin-left:0
+}
+
+.content {
+    margin-top:50px;
+    width:100%;
+    padding-bottom:100px;
 }
 
 .modal {
