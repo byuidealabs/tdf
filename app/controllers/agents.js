@@ -143,8 +143,12 @@ exports.all = function(req, res) {
                     agents[i] = agent;
                     cb(i+1, cb);
                 });
+
             }
             else {
+                agents = agents.sort(function(a, b) {
+                    return b.status.total_value - a.status.total_value;
+                });
                 res.jsonp(agents);
             }
         };
@@ -238,7 +242,6 @@ var __execute_trade = function(agent, trade, quotes, res) {
         });
 
         // Check if any leverage limits are reached
-        console.log(JSON.stringify(curr_composition));
         var value = dataconn.portfolioValue(curr_composition, quotes, false);
         var neg_value = -1 * dataconn.portfolioValue(curr_composition, quotes,
                                                         true);
