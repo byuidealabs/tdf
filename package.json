@@ -21,7 +21,8 @@
         "pm2-delete": "./node_modules/pm2/bin/pm2 delete server.js",
         "pm2-restart": "./node_modules/pm2/bin/pm2 restart server.js",
         "pm2-monit": "./node_modules/pm2/bin/pm2 monit",
-        "pm2-logs": "./node_modules/pm2/bin/pm2 logs"
+        "pm2-logs": "./node_modules/pm2/bin/pm2 logs",
+        "pm2-reload": "./node_modules/pm2/bin/pm2 reload all"
     },
     "dependencies": {
         "express": "latest",
@@ -49,7 +50,8 @@
         "grunt-bower-task": "latest",
         "sylvester": "latest",
         "numjs": "latest",
-        "pm2": "latest"
+        "pm2": "latest",
+        "agenda": "latest"
     },
     "devDependencies": {
         "supertest": "latest",
