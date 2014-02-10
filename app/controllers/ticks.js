@@ -62,96 +62,101 @@ var update_portfolio_values = function(agents, quotes, cb) {
     }
     else {
         var agent = _.first(agents);
-        var restagents = _.rest(agents);
 
-        var curr_portfolio = _.last(agent.portfolio) ||
-            {composition: {cash00: agent.league.startCash}};
-        var new_composition = _.clone(curr_portfolio.composition);
-        var composition = {};
-        var totalvalue = dataconn.portfolioValue(new_composition,
-                                                 quotes, false);
+        if (agent.league.leaguePhase === 1 || agent.league.leaguePhase === 2) {
 
-        var neg_value = -1*dataconn.portfolioValue(new_composition, quotes,
-                                                   true);
-        var max_neg = totalvalue * agent.league.leverageLimit;
-        if (totalvalue <= 0) {
-            console.log('Value of agent ' + agent.name +
-                        ' has reached 0. Freezing account.');
-            // TODO
-        }
-        else if (neg_value > max_neg) {
-            // Leverage limit exceeded, sell off random securities until either
-            // the leverage limit is within acceptable bounds or the value
-            // of the portfolio reaches zero.
+            var restagents = _.rest(agents);
 
-            console.log('Leverage limit exceeded on agent ' + agent.name +
-                        '. Selling off securities.');
-            var sell_method = 'bid'; //TODO
+            var curr_portfolio = _.last(agent.portfolio) ||
+                {composition: {cash00: agent.league.startCash}};
+            var new_composition = _.clone(curr_portfolio.composition);
+            var composition = {};
+            var totalvalue = dataconn.portfolioValue(new_composition,
+                                                    quotes, false);
 
-            var curr_neg_value = neg_value;
-            while (curr_neg_value > max_neg) {
-                // Keep selling random securities until within leverage limit
-                // or until there is nothing left to sell
-
-                // Choose random security
-                var symbols = dataconn.compositionSymbols(new_composition,
-                                                          true);
-                if (_.size(symbols) === 0) {
-                    break;
-                }
-                var rdm = Math.floor(Math.random()*symbols.length);
-                var symbol = symbols[rdm];
-
-                // Sell 1 share of security, cleaning list if no more of that
-                // security exists
-                var price = dataconn.get_security_value(quotes, symbol,
-                                                        sell_method);
-
-                new_composition.cash00 += price;
-                new_composition[symbol] -= 1;
-
-                if (new_composition[symbol] === 0) {
-                    delete new_composition[symbol];
-                }
-
-                // Recompute neg_value and max_neg
-                curr_neg_value = -1 * dataconn.portfolioValue(new_composition,
-                                                              quotes, true);
+            var neg_value = -1*dataconn.portfolioValue(new_composition, quotes,
+                                                    true);
+            var max_neg = totalvalue * agent.league.leverageLimit;
+            if (totalvalue <= 0) {
+                console.log('Value of agent ' + agent.name +
+                            ' has reached 0. Freezing account.');
+                // TODO
             }
-            agent.portfolio.push({composition: new_composition});
-        }
+            else if (neg_value > max_neg) {
+                // Leverage limit exceeded, sell off random securities until
+                // either the leverage limit is within acceptable bounds or the
+                // value of the portfolio reaches zero.
 
-        totalvalue = 0; //reset for new computation
-        _.each(new_composition, function(quantity, symbol) {
-            // TODO move into dataconn
-            if (symbol === 'cash00') {
-                totalvalue += quantity;
+                console.log('Leverage limit exceeded on agent ' + agent.name +
+                            '. Selling off securities.');
+                var sell_method = 'bid'; //TODO
+
+                var curr_neg_value = neg_value;
+                while (curr_neg_value > max_neg) {
+                    // Keep selling random securities until within leverage
+                    // limit or until there is nothing left to sell
+
+                    // Choose random security
+                    var symbols = dataconn.compositionSymbols(new_composition,
+                                                            true);
+                    if (_.size(symbols) === 0) {
+                        break;
+                    }
+                    var rdm = Math.floor(Math.random()*symbols.length);
+                    var symbol = symbols[rdm];
+
+                    // Sell 1 share of security, cleaning list if no more of
+                    // that security exists
+                    var price = dataconn.get_security_value(quotes, symbol,
+                                                            sell_method);
+
+                    new_composition.cash00 += price;
+                    new_composition[symbol] -= 1;
+
+                    if (new_composition[symbol] === 0) {
+                        delete new_composition[symbol];
+                    }
+
+                    // Recompute neg_value and max_neg
+                    curr_neg_value = -1 * dataconn.portfolioValue(
+                        new_composition, quotes, true);
+                }
+                agent.portfolio.push({composition: new_composition});
             }
-            else {
-                var pricetype = 'bid';  //TODO get from league
 
-                if (quotes[symbol] === undefined) {
-                    console.log('Ticks: Undefined symbol ' + symbol);
-                    console.log(JSON.stringify(new_composition));
+            totalvalue = 0; //reset for new computation
+            _.each(new_composition, function(quantity, symbol) {
+                // TODO move into dataconn
+                if (symbol === 'cash00') {
+                    totalvalue += quantity;
                 }
                 else {
-                    var sellprice = quotes[symbol][pricetype];
-                    var securityprice = nnum.Round(sellprice, 2) * quantity;
+                    var pricetype = 'bid';  //TODO get from league
 
-                    totalvalue += securityprice;
-                    composition[symbol] = securityprice;
+                    if (quotes[symbol] === undefined) {
+                        console.log('Ticks: Undefined symbol ' + symbol);
+                        console.log(JSON.stringify(new_composition));
+                    }
+                    else {
+                        var sellprice = quotes[symbol][pricetype];
+                        var securityprice = nnum.Round(sellprice, 2) *
+                            quantity;
+
+                        totalvalue += securityprice;
+                        composition[symbol] = securityprice;
+                    }
                 }
-            }
-        });
+            });
 
-        agent.portfoliovalue.push({
-            composition: composition,
-            totalvalue: totalvalue
-        });
+            agent.portfoliovalue.push({
+                composition: composition,
+                totalvalue: totalvalue
+            });
 
-        agent.save(function() {
-            update_portfolio_values(restagents, quotes, cb);
-        });
+            agent.save(function() {
+                update_portfolio_values(restagents, quotes, cb);
+            });
+        }
     }
 };
 
