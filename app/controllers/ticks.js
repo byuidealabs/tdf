@@ -161,11 +161,7 @@ var update_portfolio_values = function(agents, quotes, cb) {
 
 // TODO grab from leagues
 
-/**
- * Execute a tick
- */
-exports.tick = function(cb) {
-
+var execute_tick = function(cb) {
     // 1. Promote leagues and get their symbols
     tick_leagues(function(allsymbols) {
 
@@ -187,7 +183,19 @@ exports.tick = function(cb) {
         });
 
     });
+};
 
+/**
+ * Execute a tick
+ */
+exports.tick = function(cb) {
+    execute_tick(cb);
+};
+
+exports.maketick = function(req, res) {
+    execute_tick(function() {
+        res.jsonp('Ticked!');
+    });
 };
 
 /**

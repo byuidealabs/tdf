@@ -4,8 +4,7 @@
 var express = require('express'),
     fs = require('fs'),
     passport = require('passport'),
-    logger = require('mean-logger'),
-    Agenda = require('agenda');
+    logger = require('mean-logger');
 
 /**
  * Main application entry file.
@@ -60,24 +59,3 @@ logger.init(app, passport, mongoose);
 
 //expose app
 exports = module.exports = app;
-
-// Initialize agenda
-// TODO move database name to config/env
-var agenda = new Agenda();
-agenda.database('mongodb://localhost/tdf-dev-agenda', 'agendaJobs');
-
-// Scraper Functionality:
-var ticks = require('./app/controllers/ticks');
-var tickrate = '0-59/30 * * * *';
-
-agenda.define('scrape yahoo', {lockLifetime: 10000}, function(job, done) {
-    console.log('Scraping new Data (new ticker).');
-    ticks.tick(function() {
-        var now = new Date();
-        console.log('\t' + now.toUTCString() + ': Data scraped.');
-        done();
-    });
-});
-
-agenda.every(tickrate, 'scrape yahoo');
-agenda.start();
