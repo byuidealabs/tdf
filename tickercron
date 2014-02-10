@@ -1,1 +1,1 @@
-0,30 * * * * wget http://localhost:80/maketick
+0 * * * * wget http://localhost:80/maketick
