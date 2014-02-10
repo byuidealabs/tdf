@@ -62,11 +62,9 @@ var update_portfolio_values = function(agents, quotes, cb) {
     }
     else {
         var agent = _.first(agents);
+        var restagents = _.rest(agents);
 
         if (agent.league.leaguePhase === 1 || agent.league.leaguePhase === 2) {
-
-            var restagents = _.rest(agents);
-
             var curr_portfolio = _.last(agent.portfolio) ||
                 {composition: {cash00: agent.league.startCash}};
             var new_composition = _.clone(curr_portfolio.composition);
@@ -156,6 +154,9 @@ var update_portfolio_values = function(agents, quotes, cb) {
             agent.save(function() {
                 update_portfolio_values(restagents, quotes, cb);
             });
+        }
+        else {
+            update_portfolio_values(restagents, quotes, cb);
         }
     }
 };
