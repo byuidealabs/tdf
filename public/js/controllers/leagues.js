@@ -271,8 +271,8 @@ angular.module('tdf.leagues').controller('LeaguesController',
                     interactive: true
                 },
                 legend: {
-                    show: true,
-                    container: '#chart-legend',
+                    show: false,
+                    //container: '#chart-legend',
                     noColumns: 2
                 },
                 grid: {

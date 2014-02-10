@@ -10,58 +10,58 @@
                         style='width: 100%; height: 300px'></div>
 
                 </div>
-                <div class='col-lg-4' id='chart-legend'></div>
-            </div>
-            <hr />
-            <div class='row form-group'>
-                <label class='control-label col-lg-3'>
-                    Y-Axis Upper Limit =
-                    {{leaguechart_lims.upper | currency}}
-                </label>
                 <div class='col-lg-4'>
-                    <div class='btn-group'>
-                        <a class='btn btn-primary'
-                            ng-click='leagueChartYMove("upper", "order", 1)'>
-                            --
-                        </a>
-                        <a class='btn btn-primary'
-                            ng-click='leagueChartYMove("upper", "value", 1)'>
-                            -
-                        </a>
-                        <a class='btn btn-success'
-                            ng-click='leagueChartYMove("upper", "value", -1)'>
-                            +
-                        </a>
-                        <a class='btn btn-success'
-                            ng-click='leagueChartYMove("upper", "order", -1)'>
-                            ++
-                        </a>
+                    <div class='row form-group'>
+                        <label class='control-label col-lg-6'>
+                            Y-Axis Upper Limit =
+                            {{leaguechart_lims.upper | currency}}
+                        </label>
+                        <div class='col-lg-6'>
+                            <div class='btn-group'>
+                                <a class='btn btn-primary'
+                                    ng-click='leagueChartYMove("upper", "order", 1)'>
+                                    --
+                                </a>
+                                <a class='btn btn-primary'
+                                    ng-click='leagueChartYMove("upper", "value", 1)'>
+                                    -
+                                </a>
+                                <a class='btn btn-success'
+                                    ng-click='leagueChartYMove("upper", "value", -1)'>
+                                    +
+                                </a>
+                                <a class='btn btn-success'
+                                    ng-click='leagueChartYMove("upper", "order", -1)'>
+                                    ++
+                                </a>
+                            </div>
+                        </div>
                     </div>
-                </div>
-            </div>
-            <div class='row form-group'>
-                <label class='control-label col-lg-3'>
-                    Y-Axis Lower Limit =
-                    {{leaguechart_lims.lower | currency}}
-                </label>
-                <div class='col-lg-4'>
-                    <div class='btn-group'>
-                        <a class='btn btn-primary'
-                            ng-click='leagueChartYMove("lower", "order", 1)'>
-                            --
-                        </a>
-                        <a class='btn btn-primary'
-                            ng-click='leagueChartYMove("lower", "value", 1)'>
-                            -
-                        </a>
-                        <a class='btn btn-success'
-                            ng-click='leagueChartYMove("lower", "value", -1)'>
-                            +
-                        </a>
-                        <a class='btn btn-success'
-                            ng-click='leagueChartYMove("lower", "order", -1)'>
-                            ++
-                        </a>
+                    <div class='row form-group'>
+                        <label class='control-label col-lg-6'>
+                            Y-Axis Lower Limit =
+                            {{leaguechart_lims.lower | currency}}
+                        </label>
+                        <div class='col-lg-6'>
+                            <div class='btn-group'>
+                                <a class='btn btn-primary'
+                                    ng-click='leagueChartYMove("lower", "order", 1)'>
+                                    --
+                                </a>
+                                <a class='btn btn-primary'
+                                    ng-click='leagueChartYMove("lower", "value", 1)'>
+                                    -
+                                </a>
+                                <a class='btn btn-success'
+                                    ng-click='leagueChartYMove("lower", "value", -1)'>
+                                    +
+                                </a>
+                                <a class='btn btn-success'
+                                    ng-click='leagueChartYMove("lower", "order", -1)'>
+                                    ++
+                                </a>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
