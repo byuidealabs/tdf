@@ -12,8 +12,6 @@ var express = require('express'),
  * Please note that the order of loading is important.
  */
 
-console.log('ENTERING SERVER');
-
 //Load configurations
 //if test env, load example file
 var env = process.env.NODE_ENV = process.env.NODE_ENV || 'development',
@@ -72,11 +70,12 @@ agenda.database('mongodb://localhost/tdf-dev-agenda', 'agendaJobs');
 var ticks = require('./app/controllers/ticks');
 var tickrate = '0-59/30 * * * *';
 
-agenda.define('scrape yahoo', {lockLifetime: 10000}, function() {
+agenda.define('scrape yahoo', {lockLifetime: 10000}, function(job, done) {
     console.log('Scraping new Data (new ticker).');
     ticks.tick(function() {
         var now = new Date();
         console.log('\t' + now.toUTCString() + ': Data scraped.');
+        done();
     });
 });
 
