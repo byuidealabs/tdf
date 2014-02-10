@@ -72,6 +72,8 @@ AgentSchema.methods.setStatus = function(isPrivate, Tick, cb) {
                 'total_value': (cash + securities_value)
             };
         }
+        agent.portfolio = _.last(agent.portfolio, 300);
+        agent.portfoliovalue = _.last(agent.portfoliovalue, 300);
         cb(agent);
     };
 

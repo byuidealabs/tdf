@@ -415,6 +415,10 @@ exports.current_composition = function(req, res) {
 
     dataconn.yahooQuotes(symbols, function(err, quotes) {
 
+        if (err !== null) {
+            console.log(err);
+        }
+
         var composition = {
             'uninvested_cash': curr_composition.cash00
         };

@@ -163,7 +163,7 @@ module.exports = function(app, passport, auth) {
     //=========================================================================
 
     var ticks = require('../app/controllers/ticks');
-    app.get('/tick', ticks.tick);
+    app.get('/maketick', ticks.maketick);
     app.get('/ticks/:n', ticks.historical);
 
     app.param('n', function(req, res, next, value) {
