@@ -178,7 +178,7 @@ var execute_tick = function(cb) {
             tick.save(function(/*err*/) {
                 // 3. Update portfolio values
                 Agent.find()
-                    .populate('league', 'startCash leverageLimit')
+                    .populate('league', 'startCash leverageLimit leaguePhase')
                     .exec(function(err, agents) {
                         update_portfolio_values(agents, quotes, function() {
                             //res.jsonp(tick);
