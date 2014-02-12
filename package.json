@@ -51,7 +51,8 @@
         "sylvester": "latest",
         "numjs": "latest",
         "pm2": "latest",
-        "agenda": "latest"
+        "agenda": "latest",
+        "heapdump": "latest"
     },
     "devDependencies": {
         "supertest": "latest",
