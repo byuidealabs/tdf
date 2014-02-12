@@ -8,7 +8,8 @@ var mongoose = require('mongoose'),
     dataconn = require('./dataconn'),
     Crypto = require('crypto'),
     nnum = require('numjs').nnum,
-    _ = require('underscore');
+    _ = require('underscore'),
+    async = require('async');
 
 var SANDP500 = require('../data/sandp500.js').sandp500_list;
 
@@ -136,32 +137,28 @@ exports.all = function(req, res) {
         populate('user', 'name username').
         populate('league', 'name startCash').exec(function (err, agents) {
 
-        var setStatusOnAgent = function(i, cb) {
-            if (i < agents.length) {
-                agents[i].setStatus(!agents[i].ownedBy(user), Tick,
-                                    function(agent) {
-                    agents[i] = agent;
-                    cb(i+1, cb);
+        var tocall = [];
+        _.each(agents, function(agent) {
+            tocall.push(function(callback) {
+                agent.setStatus(!agent.ownedBy(user), Tick, function(agent) {
+                    callback(null, agent);
                 });
+            });
+        });
 
+        async.parallel(tocall, function(err, results) {
+            console.log(results);
+            if (err === null) {
+                res.jsonp(results);
             }
             else {
-                agents = agents.sort(function(a, b) {
-                    return b.status.total_value - a.status.total_value;
+                console.log(err);
+                res.render('error', {
+                    status: 500
                 });
-                res.jsonp(agents);
             }
-        };
+        });
 
-        if (err) {
-            res.render('error', {
-                status: 500
-            });
-        }
-        else {
-            //res.jsonp(agents);
-            setStatusOnAgent(0, setStatusOnAgent);
-        }
     });
 };
 
