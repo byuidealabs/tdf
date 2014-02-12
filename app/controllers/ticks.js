@@ -35,9 +35,25 @@ var securities_list = function(quotes) {
 };
 
 var promote_leagues = function(cb) {
-    console.log('promoting leagues');
-
-    cb(null, 'leagues promoted');
+    League.find().exec(function(err, leagues) {
+        if (err !== null) {
+            cb(err, 'In league promotion: leagues not found');
+        }
+        else {
+            var tocall = [];
+            _.each(leagues, function(league) {
+                tocall.push(function(callback) {
+                    league.promote(function() {
+                        callback(null, 'league ' + league.name +
+                                 ' analyzed for promotion');
+                    });
+                });
+            });
+            async.parallel(tocall, function(err, results) {
+                cb(err, results);
+            });
+        }
+    });
 };
 
 var update_agent_portfolio = function(agent, quotes, cb) {
@@ -138,8 +154,6 @@ var update_agent_portfolio = function(agent, quotes, cb) {
 };
 
 var update_agents = function(cb)  {
-    console.log('updating agents');
-
     dataconn.yahooQuotes(SYMBOLS, function(err, quotes) { // TODO smart symbols
         var securities = securities_list(quotes);
         var tick = new Tick({securities: securities});
@@ -192,11 +206,11 @@ var execute_tick = function(cb) {
         promote_leagues,
         update_agents
     ],
-    function(err, results) {
-        console.log('running tick: ');
-        console.log('tick error: ' + err);
-        console.log('tick results:');
-        console.log(results);
+    function(err/*, results*/) {
+        if (err !== null) {
+            console.log('Tick Failed');
+            console.log(err);
+        }
         cb();
     });
 };
@@ -237,12 +251,6 @@ exports.historical = function(req, res) {
             }
         });
     }
-
-
-
-    /*Tick.historical(function(values) {
-        res.jsonp(values);
-    });*/
 };
 
 exports.symbols = function(req, res) {
