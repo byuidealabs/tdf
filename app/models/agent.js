@@ -100,6 +100,7 @@ AgentSchema.methods.setStatus = function(isPrivate, Tick, cb) {
 };
 
 AgentSchema.methods.setStatusWithQuotes = function(isPrivate, quotes, cb) {
+    // Use when querying all agents.
     var agent = this.toJSON();
     var curr_portfolio = _.last(agent.portfolio);
     var cash;
@@ -107,9 +108,7 @@ AgentSchema.methods.setStatusWithQuotes = function(isPrivate, quotes, cb) {
     var total_value;
     var securities_value;
 
-    agent.portfolio = _.last(agent.portfolio, MAX_SIZE);
-    agent.portfoliovalue = _.last(agent.portfoliovalue, MAX_SIZE);
-
+    // Set Status
     if (curr_portfolio === undefined) {
         cash = agent.league.startCash;
         if (isPrivate) {
@@ -146,6 +145,29 @@ AgentSchema.methods.setStatusWithQuotes = function(isPrivate, quotes, cb) {
             };
         }
     }
+
+    // Strip, simplify, and privitize portfolio and portfolio value
+    delete agent.portfolio;
+    delete agent.apikey;
+    delete agent.league;
+    agent.portfoliovalue = _.last(agent.portfoliovalue, MAX_SIZE);
+
+    var new_portfoliovalue = [];
+    _.each(agent.portfoliovalue, function(portfoliovalue) {
+        new_portfoliovalue.push({
+            'timestamp': portfoliovalue.timestamp,
+            'totalvalue': portfoliovalue.totalvalue
+        });
+    });
+    agent.portfoliovalue = new_portfoliovalue;
+
+    // Put current status onto list of portfolio values to graph the
+    // current point as well
+    agent.portfoliovalue.push({
+        'timestamp': new Date(),
+        'totalvalue': agent.status.total_value
+    });
+
     cb(agent);
 };
 
