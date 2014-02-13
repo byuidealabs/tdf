@@ -139,7 +139,9 @@ exports.all = function(req, res) {
         if (err === null) {
             Agent.find(req.query).
                 populate('user', 'name username').
-                populate('league', 'name startCash').exec(function (err, agents) {
+                populate('league', 'name startCash trialStart ' +
+                                   'competitionStart leaguePhase').
+                exec(function (err, agents) {
 
                 var tocall = [];
                 _.each(agents, function(agent) {

@@ -147,9 +147,7 @@ AgentSchema.methods.setStatusWithQuotes = function(isPrivate, quotes, cb) {
     }
 
     // Strip, simplify, and privitize portfolio and portfolio value
-    delete agent.portfolio;
-    delete agent.apikey;
-    delete agent.league;
+
     agent.portfoliovalue = _.last(agent.portfoliovalue, MAX_SIZE);
 
     var new_portfoliovalue = [];
@@ -161,12 +159,32 @@ AgentSchema.methods.setStatusWithQuotes = function(isPrivate, quotes, cb) {
     });
     agent.portfoliovalue = new_portfoliovalue;
 
+    // If portfolio value list is empty, add start of competition
+    if (_.size(agent.portfoliovalue) === 0) {
+        if (agent.league.leaguePhase === 1) {
+            agent.portfoliovalue.push({
+                'timestamp': agent.league.trialStart,
+                'totalvalue': agent.league.startCash
+            });
+        }
+        if (agent.league.leaguePhase === 2) {
+            agent.portfoliovalue.push({
+                'timestamp': agent.league.competitionStart,
+                'totalvalue': agent.league.startCash
+            });
+        }
+    }
+
     // Put current status onto list of portfolio values to graph the
     // current point as well
     agent.portfoliovalue.push({
         'timestamp': new Date(),
         'totalvalue': agent.status.total_value
     });
+
+    delete agent.portfolio;
+    delete agent.apikey;
+    delete agent.league;
 
     cb(agent);
 };
