@@ -99,61 +99,6 @@ var dissect_symbols = function(symbols, size) {
     return dissected;
 };
 
-/*var query_yahoo = function(symbols_list, quotes, cb) {
-    if (!symbols_list.length) {
-        cb(null, quotes);
-    }
-    else {
-        var symbols = _.first(symbols_list);
-        var rest_symbols = _.rest(symbols_list);
-
-        var symbol_str = _.reduce(symbols, function(memo, symbol) {
-            var pre = '';
-            if (symbol.length) {
-                pre = '+';
-            }
-            return memo + pre + symbol;
-        });
-        var url = yUrl + symbol_str;
-
-        request(url, function(error, rst, body) {
-            if (error) {
-                cb(error, null);
-            }
-            else {
-                csv().from.string(body.replace(/<(?:.|\n)*?>/gm, ''))
-                    .to.array(function(quotesarray) {
-                    _.each(quotesarray, function(quote) {
-                        var error = (quote[4] !== 'N/A');
-
-                        var last = quote[3];
-                        if (isNaN(last) || parseFloat(last) === 0) {
-                            last = 0;
-                            error = true;
-                        }
-                        var ask = quote[1];
-                        if (isNaN(ask) || parseFloat(ask) === 0) {
-                            ask = last;
-                        }
-                        var bid = quote[2];
-                        if (isNaN(bid) || parseFloat(bid) === 0) {
-                            bid = last;
-                        }
-
-                        quotes[quote[0].toUpperCase()] = {
-                            'ask': ask,
-                            'bid': bid,
-                            'last': last,
-                            'error': error
-                        };
-                    });
-                    query_yahoo(rest_symbols, quotes, cb);
-                });
-            }
-        });
-    }
-};*/
-
 var query_yahoo = function(symbols, cb) {
     // symbols should be a list no larger than DISSECT_SIZE
 
@@ -199,9 +144,9 @@ var query_yahoo = function(symbols, cb) {
                             'error': error
                         };
                     });
+                    cb(null, quotes);
                 }
             );
-            cb(null, quotes);
         }
     });
 };
@@ -230,10 +175,9 @@ exports.yahooQuotes = function(symbols, cb) {
                 }
             );
         });
+
         async.parallel(tocall, function(err, results) {
             if (err !== null) {
-                console.log('Error in yahooQuotes');
-                console.log(err);
                 cb(err, null);
             }
             else {
