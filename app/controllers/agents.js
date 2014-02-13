@@ -159,7 +159,7 @@ exports.all = function(req, res) {
                 });
 
                 async.parallel(tocall, function(err, results) {
-                    if (err === null) {
+                    if (err === null || err === undefined) {
                         //var startsort = new Date();
                         results = results.sort(function(a, b) {
                             return b.status.total_value - a.status.total_value;

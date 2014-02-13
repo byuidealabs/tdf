@@ -184,7 +184,6 @@ AgentSchema.methods.setStatusWithQuotes = function(isPrivate, quotes, cb) {
 
     delete agent.portfolio;
     delete agent.apikey;
-    delete agent.league;
 
     cb(agent);
 };

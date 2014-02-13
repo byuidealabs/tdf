@@ -1,5 +1,13 @@
 <section ng-controller='UsersController' ng-init='findOne()'>
     <h1>{{user.username}}</h1>
     <h2>Agents Owned</h2>
-    <agent-list></agent-list>
+
+    <div class='text-center' ng-if='agents === undefined'>
+        <div><img src='/img/bar-loader.gif' width='300px'/></div>
+        <div>Loading</div>
+    </div>
+
+    <div ng-if='agents !== undefined'>
+        <agent-list></agent-list>
+    </div>
 </section>
