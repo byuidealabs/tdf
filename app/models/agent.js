@@ -6,6 +6,8 @@ var mongoose = require('mongoose'),
     dataconn = require('../controllers/dataconn.js'),
     _ = require('underscore');
 
+var MAX_SIZE = 300;
+
 /**
  * Agent Schema
  */
@@ -55,7 +57,8 @@ AgentSchema.statics = {
 AgentSchema.methods.setStatus = function(isPrivate, Tick, cb) {
     var agent = this.toJSON();
     var curr_portfolio = _.last(agent.portfolio);
-
+    agent.portfolio = _.last(agent.portfolio, MAX_SIZE);
+    agent.portfoliovalue = _.last(agent.portfoliovalue, MAX_SIZE);
 
     var finalize_status = function(curr_composition, securities_value, cash,
                                    cb) {
@@ -72,8 +75,7 @@ AgentSchema.methods.setStatus = function(isPrivate, Tick, cb) {
                 'total_value': (cash + securities_value)
             };
         }
-        agent.portfolio = _.last(agent.portfolio, 300);
-        agent.portfoliovalue = _.last(agent.portfoliovalue, 300);
+
         cb(agent);
     };
 
@@ -95,6 +97,56 @@ AgentSchema.methods.setStatus = function(isPrivate, Tick, cb) {
             });
         }
     });
+};
+
+AgentSchema.methods.setStatusWithQuotes = function(isPrivate, quotes, cb) {
+    var agent = this.toJSON();
+    var curr_portfolio = _.last(agent.portfolio);
+    var cash;
+    var composition;
+    var total_value;
+    var securities_value;
+
+    agent.portfolio = _.last(agent.portfolio, MAX_SIZE);
+    agent.portfoliovalue = _.last(agent.portfoliovalue, MAX_SIZE);
+
+    if (curr_portfolio === undefined) {
+        cash = agent.league.startCash;
+        if (isPrivate) {
+            agent.status = {
+                'total_value': cash
+            };
+        }
+        else {
+            agent.status = {
+                'current_composition': {},
+                'cash': cash,
+                'securities_value': 0,
+                'total_value': cash,
+            };
+        }
+    }
+    else {
+        composition = curr_portfolio.composition;
+        cash = composition.cash00;
+        total_value = dataconn.portfolioValue(composition, quotes, false);
+        securities_value = total_value - cash;
+
+        if (isPrivate) {
+            agent.status = {
+                'total_value': total_value
+            };
+        }
+        else {
+            agent.status = {
+                'current_composition': composition,
+                'securities_value': securities_value,
+                'cash': cash,
+                'total_value': total_value
+            };
+        }
+    }
+    cb(agent);
 };
 
 AgentSchema.methods.ownedBy = function(user) {

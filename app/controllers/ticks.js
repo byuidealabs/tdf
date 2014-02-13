@@ -258,6 +258,11 @@ exports.symbols = function(req, res) {
     res.jsonp(SYMBOLS);
 };
 
+exports.get_symbols = function() {
+    // TODO see if league is passed, filter based on league
+    return SYMBOLS;
+};
+
 exports.currentstatus = function(req, res) {
     var allsymbols = SYMBOLS; //TODO
     var select = 'all';
