@@ -5,10 +5,12 @@
 var mongoose = require('mongoose'),
     Agent = mongoose.model('Agent'),
     Tick = mongoose.model('Tick'),
+    sandp500 = require('../data/sandp500.js'),
     dataconn = require('./dataconn'),
     Crypto = require('crypto'),
     nnum = require('numjs').nnum,
-    _ = require('underscore');
+    _ = require('underscore'),
+    async = require('async');
 
 var SANDP500 = require('../data/sandp500.js').sandp500_list;
 
@@ -132,35 +134,59 @@ exports.show = function(req, res) {
 exports.all = function(req, res) {
 
     var user = req.user;
-    Agent.find(req.query).
-        populate('user', 'name username').
-        populate('league', 'name startCash').exec(function (err, agents) {
+    var symbols = sandp500.sandp500_list;  // TODO
 
-        var setStatusOnAgent = function(i, cb) {
-            if (i < agents.length) {
-                agents[i].setStatus(!agents[i].ownedBy(user), Tick,
-                                    function(agent) {
-                    agents[i] = agent;
-                    cb(i+1, cb);
+    //var start = new Date();
+    dataconn.yahooQuotes(symbols, function(err, quotes) {
+        //var startquery = new Date();
+        if (err === null) {
+            Agent.find(req.query).
+                populate('user', 'name username').
+                populate('league', 'name startCash trialStart ' +
+                                   'competitionStart leaguePhase').
+                exec(function (err, agents) {
+
+                //var startstatus = new Date();
+
+                var tocall = [];
+                _.each(agents, function(agent) {
+                    tocall.push(function(callback) {
+                        agent.setStatusWithQuotes(!agent.ownedBy(user),
+                                                 quotes, function(agent) {
+                            callback(null, agent);
+                        });
+                    });
                 });
 
-            }
-            else {
-                agents = agents.sort(function(a, b) {
-                    return b.status.total_value - a.status.total_value;
+                async.parallel(tocall, function(err, results) {
+                    if (err === null || err === undefined) {
+                        //var startsort = new Date();
+                        results = results.sort(function(a, b) {
+                            return b.status.total_value - a.status.total_value;
+                        });
+                        //var end = new Date();
+                        //console.log('Time: ' + (end - start) / 1000 + ' s');
+                        //console.log('Quotes Time: ' + (startquery - start) / 1000  + ' s');
+                        //console.log('Query Time:' + (startstatus - startquery) / 1000 + 's');
+                        //console.log('Status Time: ' + (startsort - startstatus) / 1000 + 's');
+                        //console.log('Sort Time: ' + (end - startsort) / 1000 + ' s');
+                        res.jsonp(results);
+                    }
+                    else {
+                        console.log(err);
+                        res.render('error', {
+                            status: 500
+                        });
+                    }
                 });
-                res.jsonp(agents);
-            }
-        };
-
-        if (err) {
-            res.render('error', {
-                status: 500
             });
         }
         else {
-            //res.jsonp(agents);
-            setStatusOnAgent(0, setStatusOnAgent);
+            console.log('Error in finding agents: ' +
+                        'couldn\'t connect to yahoo.');
+            res.render('error', {
+                status: 500
+            });
         }
     });
 };
@@ -265,8 +291,10 @@ var __execute_trade = function(agent, trade, quotes, res) {
         // Save changes to agent
         agent.portfolio.push({composition: curr_composition});
         agent.save(function (err) {
-            console.log(err);
-            agent.setStatus(false, Tick, function(agent) {
+            if (err !== null) {
+                console.log(err);
+            }
+            agent.setStatusWithQuotes(false, quotes, function(agent) {
                 res.jsonp(agent);
             });
         });

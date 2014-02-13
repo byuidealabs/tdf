@@ -9,7 +9,8 @@ var mongoose = require('mongoose'),
     League = mongoose.model('League'),
     _ = require('underscore'),
     numjs = require('numjs'),
-    nnum = numjs.nnum;
+    nnum = numjs.nnum,
+    async = require('async');
 
 //=============================================================================
 //  Helper functions
@@ -17,29 +18,6 @@ var mongoose = require('mongoose'),
 
 var sandp500 = require('../data/sandp500.js');
 var SYMBOLS = sandp500.sandp500_list;
-
-var promote_leagues = function(leagues, symbols, cb) {
-
-    if (!leagues.length) {
-        cb(symbols);
-    }
-    else {
-        var league = _.first(leagues);
-        var restleagues = _.rest(leagues);
-
-        symbols = _.union(symbols, SYMBOLS); //TODO
-
-        league.promote(function() {
-            promote_leagues(restleagues, symbols, cb);
-        });
-    }
-};
-
-var tick_leagues = function(cb) {
-    League.find().exec(function(err, leagues) {
-        promote_leagues(leagues, SYMBOLS, cb); // Scrapes s&p 500 by default
-    });
-};
 
 var securities_list = function(quotes) {
     var securities = [];
@@ -56,109 +34,165 @@ var securities_list = function(quotes) {
     return securities;
 };
 
-var update_portfolio_values = function(agents, quotes, cb) {
-    if (!agents.length) {
-        cb();
-    }
-    else {
-        var agent = _.first(agents);
-        var restagents = _.rest(agents);
-
-        if (agent.league.leaguePhase === 1 || agent.league.leaguePhase === 2) {
-            var curr_portfolio = _.last(agent.portfolio) ||
-                {composition: {cash00: agent.league.startCash}};
-            var new_composition = _.clone(curr_portfolio.composition);
-            var composition = {};
-            var totalvalue = dataconn.portfolioValue(new_composition,
-                                                    quotes, false);
-
-            var neg_value = -1*dataconn.portfolioValue(new_composition, quotes,
-                                                    true);
-            var max_neg = totalvalue * agent.league.leverageLimit;
-            if (totalvalue <= 0) {
-                console.log('Value of agent ' + agent.name +
-                            ' has reached 0. Freezing account.');
-                // TODO
-            }
-            else if (neg_value > max_neg) {
-                // Leverage limit exceeded, sell off random securities until
-                // either the leverage limit is within acceptable bounds or the
-                // value of the portfolio reaches zero.
-
-                console.log('Leverage limit exceeded on agent ' + agent.name +
-                            '. Selling off securities.');
-                var sell_method = 'bid'; //TODO
-
-                var curr_neg_value = neg_value;
-                while (curr_neg_value > max_neg) {
-                    // Keep selling random securities until within leverage
-                    // limit or until there is nothing left to sell
-
-                    // Choose random security
-                    var symbols = dataconn.compositionSymbols(new_composition,
-                                                            true);
-                    if (_.size(symbols) === 0) {
-                        break;
-                    }
-                    var rdm = Math.floor(Math.random()*symbols.length);
-                    var symbol = symbols[rdm];
-
-                    // Sell 1 share of security, cleaning list if no more of
-                    // that security exists
-                    var price = dataconn.get_security_value(quotes, symbol,
-                                                            sell_method);
-
-                    new_composition.cash00 += price;
-                    new_composition[symbol] -= 1;
-
-                    if (new_composition[symbol] === 0) {
-                        delete new_composition[symbol];
-                    }
-
-                    // Recompute neg_value and max_neg
-                    curr_neg_value = -1 * dataconn.portfolioValue(
-                        new_composition, quotes, true);
-                }
-                agent.portfolio.push({composition: new_composition});
-            }
-
-            totalvalue = 0; //reset for new computation
-            _.each(new_composition, function(quantity, symbol) {
-                // TODO move into dataconn
-                if (symbol === 'cash00') {
-                    totalvalue += quantity;
-                }
-                else {
-                    var pricetype = 'bid';  //TODO get from league
-
-                    if (quotes[symbol] === undefined) {
-                        console.log('Ticks: Undefined symbol ' + symbol);
-                        console.log(JSON.stringify(new_composition));
-                    }
-                    else {
-                        var sellprice = quotes[symbol][pricetype];
-                        var securityprice = nnum.Round(sellprice, 2) *
-                            quantity;
-
-                        totalvalue += securityprice;
-                        composition[symbol] = securityprice;
-                    }
-                }
-            });
-
-            agent.portfoliovalue.push({
-                composition: composition,
-                totalvalue: totalvalue
-            });
-
-            agent.save(function() {
-                update_portfolio_values(restagents, quotes, cb);
-            });
+var promote_leagues = function(cb) {
+    League.find().exec(function(err, leagues) {
+        if (err !== null) {
+            cb(err, 'In league promotion: leagues not found');
         }
         else {
-            update_portfolio_values(restagents, quotes, cb);
+            var tocall = [];
+            _.each(leagues, function(league) {
+                tocall.push(function(callback) {
+                    league.promote(function() {
+                        callback(null, 'league ' + league.name +
+                                 ' analyzed for promotion');
+                    });
+                });
+            });
+            async.parallel(tocall, function(err, results) {
+                cb(err, results);
+            });
         }
+    });
+};
+
+var update_agent_portfolio = function(agent, quotes, cb) {
+    if (agent.league.leaguePhase === 1 || agent.league.leaguePhase === 2) {
+        var curr_portfolio = _.last(agent.portfolio) ||
+            {composition: {cash00: agent.league.startCash}};
+        var new_composition = _.clone(curr_portfolio.composition);
+        var composition = {};
+        var totalvalue = dataconn.portfolioValue(new_composition,
+                                                 quotes, false);
+
+        var neg_value = -1*dataconn.portfolioValue(new_composition, quotes,
+                                                true);
+        var max_neg = totalvalue * agent.league.leverageLimit;
+        if (totalvalue <= 0) {
+            console.log('Value of agent ' + agent.name +
+                        ' has reached 0. Freezing account.');
+            // TODO
+        }
+        else if (neg_value > max_neg) {
+            // Leverage limit exceeded, sell off random securities until
+            // either the leverage limit is within acceptable bounds or the
+            // value of the portfolio reaches zero.
+
+            console.log('Leverage limit exceeded on agent ' + agent.name +
+                        '. Selling off securities.');
+            var sell_method = 'bid'; //TODO
+
+            var curr_neg_value = neg_value;
+            while (curr_neg_value > max_neg) {
+                // Keep selling random securities until within leverage
+                // limit or until there is nothing left to sell
+
+                // Choose random security
+                var symbols = dataconn.compositionSymbols(new_composition,
+                                                        true);
+                if (_.size(symbols) === 0) {
+                    break;
+                }
+                var rdm = Math.floor(Math.random()*symbols.length);
+                var symbol = symbols[rdm];
+
+                // Sell 1 share of security, cleaning list if no more of
+                // that security exists
+                var price = dataconn.get_security_value(quotes, symbol,
+                                                        sell_method);
+
+                new_composition.cash00 += price;
+                new_composition[symbol] -= 1;
+
+                if (new_composition[symbol] === 0) {
+                    delete new_composition[symbol];
+                }
+
+                // Recompute neg_value and max_neg
+                curr_neg_value = -1 * dataconn.portfolioValue(
+                    new_composition, quotes, true);
+            }
+            agent.portfolio.push({composition: new_composition});
+        }
+
+        totalvalue = 0; //reset for new computation
+        _.each(new_composition, function(quantity, symbol) {
+            // TODO move into dataconn
+            if (symbol === 'cash00') {
+                totalvalue += quantity;
+            }
+            else {
+                var pricetype = 'bid';  //TODO get from league
+
+                if (quotes[symbol] === undefined) {
+                    console.log('Ticks: Undefined symbol ' + symbol);
+                    console.log(JSON.stringify(new_composition));
+                }
+                else {
+                    var sellprice = quotes[symbol][pricetype];
+                    var securityprice = nnum.Round(sellprice, 2) *
+                        quantity;
+
+                    totalvalue += securityprice;
+                    composition[symbol] = securityprice;
+                }
+            }
+        });
+
+        agent.portfoliovalue.push({
+            composition: composition,
+            totalvalue: totalvalue
+        });
+
+        agent.save(function() {
+            cb(null, 'porftolio of ' + agent.name + ' updated');
+        });
     }
+    else {
+        cb(null, 'no need to update portfolio of ' + agent.name);
+    }
+};
+
+var update_agents = function(cb)  {
+    dataconn.yahooQuotes(SYMBOLS, function(err, quotes) { // TODO smart symbols
+        var securities = securities_list(quotes);
+        var tick = new Tick({securities: securities});
+
+        async.parallel([
+            function (callback) {
+                tick.save(function(err) {
+                    callback(err, 'tick saved');
+                });
+            },
+            function (callback) {
+                Agent.find()
+                    .populate('league', 'startCash leverageLimit leaguePhase')
+                    .exec(function(err, agents){
+
+                    if (err) {
+                        callback(err, 'agents failed');
+                    }
+                    else {
+                        var tocall = [];
+                        _.each(agents, function(agent) {
+                            tocall.push(function(inner_callback) {
+                                update_agent_portfolio(
+                                    agent, quotes, function(err, results) {
+                                    inner_callback(err, results);
+                                });
+                            });
+                        });
+                        async.parallel(tocall, function(err, results) {
+                            callback(err, results);
+                        });
+                    }
+                });
+            }
+        ],
+        function (err, results) {
+            cb(err, results);
+        });
+    });
 };
 
 //=============================================================================
@@ -168,36 +202,29 @@ var update_portfolio_values = function(agents, quotes, cb) {
 // TODO grab from leagues
 
 var execute_tick = function(cb) {
-    // 1. Promote leagues and get their symbols
-    tick_leagues(function(allsymbols) {
-
-        // 2. Fetch yahoo data
-        dataconn.yahooQuotes(allsymbols, function(err, quotes) {
-            var securities = securities_list(quotes);
-            var tick = new Tick({securities: securities});
-            tick.save(function(/*err*/) {
-                // 3. Update portfolio values
-                Agent.find()
-                    .populate('league', 'startCash leverageLimit leaguePhase')
-                    .exec(function(err, agents) {
-                        update_portfolio_values(agents, quotes, function() {
-                            //res.jsonp(tick);
-                            cb();
-                        });
-                    });
-            });
-        });
-
+    async.series([
+        promote_leagues,
+        update_agents
+    ],
+    function(err/*, results*/) {
+        if (err !== null) {
+            console.log('Tick Failed');
+            console.log(err);
+        }
+        cb();
     });
 };
 
 /**
- * Execute a tick
+ * Execute a tick (use for an internal call)
  */
 exports.tick = function(cb) {
     execute_tick(cb);
 };
 
+/**
+ * Executes a tick (use for a url call)
+ */
 exports.maketick = function(req, res) {
     execute_tick(function() {
         res.jsonp('Ticked!');
@@ -224,17 +251,16 @@ exports.historical = function(req, res) {
             }
         });
     }
-
-
-
-    /*Tick.historical(function(values) {
-        res.jsonp(values);
-    });*/
 };
 
 exports.symbols = function(req, res) {
     // TODO see if league is passed, filter based on league
     res.jsonp(SYMBOLS);
+};
+
+exports.get_symbols = function() {
+    // TODO see if league is passed, filter based on league
+    return SYMBOLS;
 };
 
 exports.currentstatus = function(req, res) {

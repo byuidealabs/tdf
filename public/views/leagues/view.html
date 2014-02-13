@@ -1,7 +1,12 @@
 <section data-ng-controller='LeaguesController' data-ng-init='findOne()'>
     <h1>{{league.name}}</h1>
 
-    <div class='panel panel-info'>
+    <div class='text-center' ng-if='agents === undefined'>
+        <div><img src='/img/bar-loader.gif' width='300px'/></div>
+        <div>Loading</div>
+    </div>
+
+    <div class='panel panel-info' ng-if='agents !== undefined'>
         <div class='panel-heading'>Current Standings</div>
         <div class='panel-body'>
             <div class='row'>
@@ -68,7 +73,9 @@
         </div>
     </div>
 
-    <agent-list></agent-list>
+    <div ng-if='agents !== undefined'>
+        <agent-list></agent-list>
+    </div>
 
     <a class='btn btn-primary' href='/#!/leagues/'>Back to Leagues List</a>
     <a class='btn btn-default' href='/#!/histories'>

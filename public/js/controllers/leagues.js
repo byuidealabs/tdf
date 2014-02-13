@@ -153,7 +153,6 @@ angular.module('tdf.leagues').controller('LeaguesController',
                         }
 
                         off = Math.max(10, off);
-                        console.log(direction + ': ' + off);
                         var order = Math.ceil(Math.log(off) / Math.log(10));
                         return order;
                     };
