@@ -135,13 +135,18 @@ exports.all = function(req, res) {
 
     var user = req.user;
     var symbols = sandp500.sandp500_list;  // TODO
+
+    //var start = new Date();
     dataconn.yahooQuotes(symbols, function(err, quotes) {
+        //var startquery = new Date();
         if (err === null) {
             Agent.find(req.query).
                 populate('user', 'name username').
                 populate('league', 'name startCash trialStart ' +
                                    'competitionStart leaguePhase').
                 exec(function (err, agents) {
+
+                //var startstatus = new Date();
 
                 var tocall = [];
                 _.each(agents, function(agent) {
@@ -155,9 +160,16 @@ exports.all = function(req, res) {
 
                 async.parallel(tocall, function(err, results) {
                     if (err === null) {
+                        //var startsort = new Date();
                         results = results.sort(function(a, b) {
                             return b.status.total_value - a.status.total_value;
                         });
+                        //var end = new Date();
+                        //console.log('Time: ' + (end - start) / 1000 + ' s');
+                        //console.log('Quotes Time: ' + (startquery - start) / 1000  + ' s');
+                        //console.log('Query Time:' + (startstatus - startquery) / 1000 + 's');
+                        //console.log('Status Time: ' + (startsort - startstatus) / 1000 + 's');
+                        //console.log('Sort Time: ' + (end - startsort) / 1000 + ' s');
                         res.jsonp(results);
                     }
                     else {
@@ -279,8 +291,10 @@ var __execute_trade = function(agent, trade, quotes, res) {
         // Save changes to agent
         agent.portfolio.push({composition: curr_composition});
         agent.save(function (err) {
-            console.log(err);
-            agent.setStatus(false, Tick, function(agent) {
+            if (err !== null) {
+                console.log(err);
+            }
+            agent.setStatusWithQuotes(false, quotes, function(agent) {
                 res.jsonp(agent);
             });
         });
