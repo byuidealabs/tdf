@@ -142,7 +142,7 @@ exports.all = function(req, res) {
         if (err === null) {
             Agent.find(req.query).
                 populate('user', 'name username').
-                populate('league', 'name startCash trialStart ' +
+                populate('league', 'name startCash created trialStart ' +
                                    'competitionStart leaguePhase').
                 exec(function (err, agents) {
 
