@@ -7,7 +7,7 @@
     "angular-resource": "1.2.0-rc.2",
     "angular-cookies": "1.2.0-rc.2",
     "angular-route": "1.2.0-rc.2",
-    "angular-timer": "1.0.3",
+    "angular-timer": "1.0.9",
     "angular-bootstrap": "~0.6.0",
     "angular-ui-utils": "0.0.4",
     "json3": "~3.2.4",
