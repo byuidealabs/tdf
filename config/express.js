@@ -32,14 +32,15 @@ module.exports = function(app, passport) {
     app.set('view engine', 'jade');
 
     //Enable jsonp
-    app.enable("jsonp callback");
+    app.enable('jsonp callback');
 
     app.configure(function() {
         //cookieParser should be above session
         app.use(express.cookieParser());
 
         //bodyParser should be above methodOverride
-        app.use(express.bodyParser());
+        app.use(express.json());
+        app.use(express.urlencoded());
         app.use(express.methodOverride());
 
         //express/mongo session storage
@@ -64,7 +65,9 @@ module.exports = function(app, passport) {
         //routes should be at the last
         app.use(app.router);
 
-        //Assume "not found" in the error msgs is a 404. this is somewhat silly, but valid, you can do whatever you like, set properties, use instanceof etc.
+        //Assume "not found" in the error msgs is a 404. this is somewhat
+        //silly, but valid, you can do whatever you like, set properties,
+        //use instanceof etc.
         app.use(function(err, req, res, next) {
             //Treat as 404
             if (~err.message.indexOf('not found')) return next();
@@ -79,7 +82,7 @@ module.exports = function(app, passport) {
         });
 
         //Assume 404 since no middleware responded
-        app.use(function(req, res, next) {
+        app.use(function(req, res) {
             res.status(404).render('404', {
                 url: req.originalUrl,
                 error: 'Not found'

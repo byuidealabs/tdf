@@ -161,18 +161,17 @@ AgentSchema.methods.setStatusWithQuotes = function(isPrivate, quotes, cb) {
 
     // If portfolio value list is empty, add start of competition
     if (_.size(agent.portfoliovalue) === 0) {
+        var startdate = agent.league.created;
         if (agent.league.leaguePhase === 1) {
-            agent.portfoliovalue.push({
-                'timestamp': agent.league.trialStart,
-                'totalvalue': agent.league.startCash
-            });
+            startdate = agent.league.trialStart;
         }
         if (agent.league.leaguePhase === 2) {
-            agent.portfoliovalue.push({
-                'timestamp': agent.league.competitionStart,
-                'totalvalue': agent.league.startCash
-            });
+            startdate = agent.league.competitionStart;
         }
+        agent.portfoliovalue.push({
+            'timestamp': startdate,
+            'totalvalue': agent.league.startCash
+        });
     }
 
     // Put current status onto list of portfolio values to graph the
