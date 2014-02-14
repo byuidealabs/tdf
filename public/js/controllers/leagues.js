@@ -115,6 +115,8 @@ angular.module('tdf.leagues').controller('LeaguesController',
 
         $scope.findOne = function() {
 
+            $scope.loading = true;
+
             Leagues.get({
                 leagueId: $routeParams.leagueId
             },
@@ -145,11 +147,17 @@ angular.module('tdf.leagues').controller('LeaguesController',
                         var off = 0;
                         if (direction === 'down') {
                             // offset of highest-valued agent from center
-                            off = center - _.last(agents).status.total_value;
+                            var lastagent = _.last(agents) || {
+                                status: {total_value: league.startCash - 1000}
+                            };
+                            off = center - lastagent.status.total_value;
                         }
                         if (direction === 'up') {
                             // offset of lowest-valued agent from center
-                            off = _.first(agents).status.total_value - center;
+                            var firstagent = _.first(agents) || {
+                                status: {total_value: league.startCash + 1000}
+                            };
+                            off = firstagent.status.total_value - center;
                         }
 
                         off = Math.max(10, off);
@@ -169,7 +177,7 @@ angular.module('tdf.leagues').controller('LeaguesController',
                                                    agents)
                     };
                     $scope.setLeagueChartOptions();
-
+                    $scope.loading = false;
                 });
             });
         };
