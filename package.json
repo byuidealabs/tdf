@@ -16,7 +16,7 @@
         "start": "node node_modules/grunt-cli/bin/grunt",
         "test": "node node_modules/grunt-cli/bin/grunt test",
         "postinstall": "bower install",
-        "pm2-start": "PORT=80 ./node_modules/pm2/bin/pm2 start server.js -i max",
+        "pm2-start": "./node_modules/pm2/bin/pm2 start server.js -i max",
         "pm2-stop": "./node_modules/pm2/bin/pm2 stop server.js",
         "pm2-delete": "./node_modules/pm2/bin/pm2 delete server.js",
         "pm2-restart": "./node_modules/pm2/bin/pm2 restart server.js",
@@ -32,10 +32,6 @@
         "connect-flash": "latest",
         "passport": "latest",
         "passport-local": "latest",
-        "passport-facebook": "latest",
-        "passport-twitter": "latest",
-        "passport-github": "latest",
-        "passport-google-oauth": "latest",
         "underscore": "latest",
         "request": "latest",
         "csv": "latest",
@@ -51,8 +47,7 @@
         "sylvester": "latest",
         "numjs": "latest",
         "pm2": "latest",
-        "agenda": "latest",
-        "heapdump": "latest"
+        "agenda": "latest"
     },
     "devDependencies": {
         "supertest": "latest",

@@ -1,26 +1,6 @@
 {
     "db": "mongodb://localhost/tdf",
     "app": {
-        "name": "TDF - Production"
-    },
-    "facebook": {
-        "clientID": "APP_ID",
-        "clientSecret": "APP_SECRET",
-        "callbackURL": "http://localhost:3000/auth/facebook/callback"
-    },
-    "twitter": {
-        "clientID": "CONSUMER_KEY",
-        "clientSecret": "CONSUMER_SECRET",
-        "callbackURL": "http://localhost:3000/auth/twitter/callback"
-    },
-    "github": {
-        "clientID": "APP_ID",
-        "clientSecret": "APP_SECRET",
-        "callbackURL": "http://localhost:3000/auth/github/callback"
-    },
-    "google": {
-        "clientID": "APP_ID",
-        "clientSecret": "APP_SECRET",
-        "callbackURL": "http://localhost:3000/auth/google/callback"
+        "name": "TDF: Tour de Finance"
     }
 }
