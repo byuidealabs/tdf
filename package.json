@@ -25,7 +25,7 @@
         "pm2-reload": "./node_modules/pm2/bin/pm2 reload all"
     },
     "dependencies": {
-        "express": "latest",
+        "express": "~3.x",
         "jade": "latest",
         "mongoose": "latest",
         "connect-mongo": "latest",

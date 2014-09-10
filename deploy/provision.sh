@@ -11,7 +11,10 @@ echo 'deb http://downloads-distro.mongodb.org/repo/ubuntu-upstart dist 10gen' | 
 apt-get update
 apt-get install -y mongodb-10gen
 
-su vagrant -c "cd ~; git clone http://github.com/nwoodbury/tdf.git"
+su vagrant -c "echo 'smallfiles = true' >> /etc/mongodb.conf"
+su vagrant -c "service mongodb start"
+
+su vagrant -c "cd ~; git clone http://github.com/byuidealabs/tdf.git"
 su vagrant -c "cd ~/tdf; npm install"
 
 cat >/etc/init/tdf.conf <<EOF
