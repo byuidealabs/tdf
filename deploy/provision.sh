@@ -1,3 +1,6 @@
+sudo apt-get install language-pack-en-base
+sudo dpkg-reconfigure locales
+
 apt-get update
 apt-get install -y python-software-properties python g++ make git
 add-apt-repository ppa:chris-lea/node.js
@@ -11,11 +14,11 @@ echo 'deb http://downloads-distro.mongodb.org/repo/ubuntu-upstart dist 10gen' | 
 apt-get update
 apt-get install -y mongodb-10gen
 
-su vagrant -c "echo 'smallfiles = true' >> /etc/mongodb.conf"
-su vagrant -c "service mongodb start"
+echo 'smallfiles=true' | sudo tee -a /etc/mongodb.conf
+sudo service mongodb restart
 
 su vagrant -c "cd ~; git clone http://github.com/byuidealabs/tdf.git"
-su vagrant -c "cd ~/tdf; npm install"
+su vagrant -c "cd ~/tdf; crontab tickercron3000; npm install"
 
 cat >/etc/init/tdf.conf <<EOF
 description "Tour De Finance"
