@@ -36,7 +36,7 @@
         "underscore": "latest",
         "request": "latest",
         "csv": "0.3.7",
-        "async": "latest",
+        "async": "0.2.10",
         "view-helpers": "latest",
         "mean-logger": "latest",
         "forever": "latest",
