@@ -46,7 +46,7 @@ You can stop MongoDB by:
 You can also restart MongoDB by:
 
 	sudo service mongodb restart
-	
+
 Note that occasionally a lock on MongoDB will prevent TDF from accessing its data. This will manifest as an error when running grunt indicating that a port (the number may vary depending on the installation and configuration of MongoDB) is unavailable. To fix this error:
 
 	sudo rm /var/lib/mongodb/mongod.lock
@@ -68,7 +68,30 @@ If you get a git error 128, you may need to switch the url protocol to https:// 
 
 	git config --global url."https://".insteadOf git://
 
-### Step 5: Run the Grunt Server
+### Step 5: Setup the Crontab
+
+TDF must make repetitive calls to Yahoo Finance in order to collect and store
+temporal pricing information as well as the value of the agents' portfolios
+over time. Such calls can be performed manually by opening the URL
+`<host>:<port>/maketick`. However, we recommend that this be performed
+automatically on the host machine using a scheduled chronjob. Further, we
+recommend that this be performed every hour on the hour while the markets are
+open (any more frequent than this and TDF stops performing well, and even
+at this tick rate, TDF slows down and becomes almost unusable with 30
+agents after about a month).
+
+To aid in creating this crontab entry, we have provided two scripts,
+`tickercron3000` and `tickercron80`, the former of which assumes that TDF
+is being run on port 3000 of the local machine and the later assumes that TDF
+is being run on port 80 of the local machine. Add the crontab entry with
+
+        crontab tickercron3000
+
+and verify that the entry has been added by viewing the crontab with
+
+        crontab -e
+
+### Step 6: Run the Grunt Server
 
 In the tdf directory, start the grunt server by:
 
@@ -80,7 +103,7 @@ If everything is installed properly, you will get a message stating that the ser
 
 Once you have installed TDF, you will need to begin by creating a league. To do this, you will need an admin account. For now, an admin account is created by registering an account with the username `admin` (this will be changed in the future for greater security and flexibility of admins).
 
-After loging in with the admin account, click on `Leagues` in the top navigation bar, and then click the button to add a league. Enter a name of the league and then, if you wish, modify the rest of the league parameters. 
+After loging in with the admin account, click on `Leagues` in the top navigation bar, and then click the button to add a league. Enter a name of the league and then, if you wish, modify the rest of the league parameters.
 
 Now that you have a league, you and other users can register agents to trade and compete within this league.
 
@@ -149,13 +172,13 @@ The response is a JSON object of the following form:
             <JavaScript date of first scraped data>: <last at date>
         }
     }
-    
+
 ## Querying the Agent's Portfolio Composition
 
 A user can query to receive the current composition of an agent's portfolio and the values of all securities in the portfolio through the following URL:
 
     <host>/agents/<agent-id>/composition?apikey=<apikey>
-	
+
 where `<host>` is the location of TDF, `<agent-id>` is the agent's public id, and `<apikey>` is the agent's private api key.
 
 The response is a JSON object of the following form:
@@ -175,7 +198,7 @@ The response is a JSON object of the following form:
         },
         "total_value": <Total value of portfolio = uninvested_cash + sum_{i = 1 to n} value(<symbol i>)>
     }
-    
+
 ## Other Queries
 
 Other queries that can be made are described in detail at [idealabs/byu.edu/Features/TDF.php](http://idealabs.byu.edu/Features/TDF.php).
