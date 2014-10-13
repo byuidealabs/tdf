@@ -25,7 +25,8 @@
         "pm2-reload": "./node_modules/pm2/bin/pm2 reload all"
     },
     "dependencies": {
-        "express": "~3.x",
+        "express": "~3.9.x",
+        "method-override": "2.2.0",
         "jade": "latest",
         "mongoose": "latest",
         "connect-mongo": "latest",
@@ -34,7 +35,7 @@
         "passport-local": "latest",
         "underscore": "latest",
         "request": "latest",
-        "csv": "latest",
+        "csv": "0.3.7",
         "async": "latest",
         "view-helpers": "latest",
         "mean-logger": "latest",

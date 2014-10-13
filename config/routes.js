@@ -103,8 +103,8 @@ module.exports = function(app, passport, auth) {
     app.get('/leagues/:leagueId', leagues.show);
     app.put('/leagues/:leagueId', auth.requiresLogin, auth.requiresAdmin,
             leagues.update);
-    app.del('/leagues/:leagueId', auth.requiresLogin, auth.requiresAdmin,
-            leagues.destroy);
+    app.delete('/leagues/:leagueId', auth.requiresLogin, auth.requiresAdmin,
+               leagues.destroy);
 
     // Finish with setting up the leagueId param
     app.param('leagueId', leagues.league);
@@ -120,20 +120,20 @@ module.exports = function(app, passport, auth) {
     app.get('/agents/:agentId', agents.show);
     app.put('/agents/:agentId', auth.requiresLogin,
             auth.agent.hasAuthorization, agents.update);
-    app.del('/agents/:agentId', auth.requiresLogin,
-            auth.agent.hasAuthorization, agents.destroy);
+    app.delete('/agents/:agentId', auth.requiresLogin,
+               auth.agent.hasAuthorization, agents.destroy);
     app.put('/agents/trade/:agentId', auth.agent.hasAuthorization,
             agents.trade);
     app.post('/agents/trade/:agentId', auth.agent.hasAuthorization,
              agents.trade);
     app.get('/agents/trade/:agentId', auth.agent.hasAuthorization,
             agents.trade);
-    app.del('/agents/trade/:agentId', auth.agent.hasAuthorization,
-            agents.reset);
+    app.delete('/agents/trade/:agentId', auth.agent.hasAuthorization,
+               agents.reset);
     app.get('/agents/resettrades/:agentId', auth.agent.hasAuthorization,
             agents.reset);
-    app.del('/agents/apikey/:agentId', auth.requiresLogin,
-            auth.agent.hasAuthorization, agents.resetapikey);
+    app.delete('/agents/apikey/:agentId', auth.requiresLogin,
+               auth.agent.hasAuthorization, agents.resetapikey);
 
     app.get('/agents/:agentId/composition', auth.agent.hasAuthorization,
             agents.current_composition);
