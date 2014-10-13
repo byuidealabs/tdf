@@ -122,7 +122,7 @@ The server can also be manually restarted with
 
 Finally, the pm2 instance can be destroyed with
 
-        npm run pm2-destroy
+        npm run pm2-delete
 
 ## Getting Started
 
