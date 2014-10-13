@@ -91,13 +91,38 @@ and verify that the entry has been added by viewing the crontab with
 
         crontab -e
 
-### Step 6: Run the Grunt Server
+### Step 6: Run the Server (grunt or pm2)
 
-In the tdf directory, start the grunt server by:
+For testing, in the tdf directory, start the grunt server by:
 
 	grunt
 
 If everything is installed properly, you will get a message stating that the server is running on port 3000. Navigate to [localhost:3000](http://localhost:3000) to access TDF.
+
+If the TDF app is ready to deploy, we recommend running a pm2 server instead
+of a grunt server as pm2 will parallelize TDF across all available cores of the
+machine and will restart TDF automatically if it happens to crash for any
+reason. To start the pm2 server:
+
+        npm run pm2-start
+
+Once running, the server usage can be seen with
+
+        npm run pm2-monit
+
+The server can be stopped with
+
+        npm run pm2-stop
+
+The server can also be manually restarted with
+
+        npm run pm2-restart
+
+(note, the stop and the restart scripts can take some time to execute).
+
+Finally, the pm2 instance can be destroyed with
+
+        npm run pm2-destroy
 
 ## Getting Started
 
